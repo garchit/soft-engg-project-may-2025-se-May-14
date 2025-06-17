@@ -1,0 +1,119 @@
+openapi: 3.0.0
+info:
+  title: User API
+  version: 1.0.0
+  description: API for managing user records.
+
+paths:
+  /user:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - full_name
+                - username
+                - email
+                - password
+                - dob
+                - user_type
+                - institute_id
+              properties:
+                full_name:
+                  type: string
+                  example: John Doe
+                username:
+                  type: string
+                  example: johndoe
+                email:
+                  type: string
+                  format: email
+                  example: johndoe@example.com
+                password:
+                  type: string
+                  example: securepassword123
+                parents_email:
+                  type: string
+                  format: email
+                  example: parent@example.com
+                dob:
+                  type: string
+                  format: date
+                  example: 2000-01-01
+                user_type:
+                  type: integer
+                  example: 1
+                institute_id:
+                  type: integer
+                  example: 101
+                user_class:
+                  type: string
+                  example: 10th Grade
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User created successfully
+        "400":
+          description: Invalid input or user exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Username is already taken
+
+  /user/{id}:
+    get:
+      summary: Get a user (stub for now)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Returns a placeholder HTML message
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <h1>Hello! World</h1>
+
+    put:
+      summary: Update a user (stub for now)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Put method acknowledged
+
+    delete:
+      summary: Delete a user (stub for now)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Delete method acknowledged
