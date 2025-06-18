@@ -9,15 +9,30 @@ from time import perf_counter_ns
 from models import db
 from models.institute import Institute
 from datetime import datetime
-# from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required, current_user
 
 class InstituteResource(Resource):
+       # @login_required
        def get(self,id):
-              pass
+              institute=db.session.query(Institute).filter(Institute.id==id).first()
+              try:
+                     if institute==None:
+                            return {"error":"No such User"},404
+                     elif institute:
+                            return {"message":"Found Institute",
+                                    "Name":institute.name,
+                                    "Address":institute.address,
+                                    "email":institute.email,
+                                    "password":institute.password
+                                    }
+              except:
+                     return {"error":"Interval Server Error"},500
+
+              
               
               
        def put(self,id):
-              print("Inside put of USer Apt")
+              pass          
 
 
        def post(self):
