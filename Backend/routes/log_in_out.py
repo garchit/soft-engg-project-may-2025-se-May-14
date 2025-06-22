@@ -8,6 +8,7 @@ from flask_jwt_extended import create_access_token,jwt_required
 from time import perf_counter_ns
 from models import db
 from models.user import User
+from models.institute import Institute
 from datetime import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -18,17 +19,28 @@ class LoginResource(Resource):
             data = request.get_json(force=True)
 
             # Validate input
-            username = data.get("username")
+            email = data.get("email")
             password = data.get("password")
 
-            if not username or not password:
-                return {"error": "Username and password are required."}, 400
+            if not email or not password:
+
+                return {"error": "Email and password are required."}, 400
 
             # Find the user
-            user = User.query.filter_by(username=username).first()
+            user = User.query.filter_by(email=email).first()
 
             if not user:
-                return {"error": "No such user."}, 404
+                institute = Institute.query.filter_by(email=email).first()
+                if not institute:
+                    return {"error": "No such user."}, 404
+                if institute.password!=password:
+                    return {"error":"Invalid Credentials"},401
+                login_user(institute)
+                return {
+                    "message":"Login is Successful",
+                    "id":institute.id,
+                    "name":institute.name
+                }
 
             # Check password (plain text comparison)
             if user.password != password:
@@ -50,7 +62,7 @@ class LoginResource(Resource):
             return {"error": f"Something went wrong: {str(e)}"}, 500
         
 class LogoutResource(Resource):
-    # @login_required
+    @login_required
     def post(self):
         try:
             # logout_user()

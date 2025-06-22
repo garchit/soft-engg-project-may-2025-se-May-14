@@ -15,10 +15,8 @@ class UserApi(Resource):
               print("Inside get of USer api") 
               return "<h1>Hello! World</h1>"
               
-              
        def put(self,id):
               print("Inside put of USer Apt")
-
 
        def post(self):
               data = request.get_json(force=True)  # or without force if header is set correctly

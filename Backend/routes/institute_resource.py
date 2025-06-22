@@ -1,18 +1,13 @@
-from flask import Flask, request, make_response
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_restful import Api, Resource, reqparse, fields, marshal_with
-from werkzeug.exceptions import HTTPException
+from flask_restful import  Resource
 import json
-from datetime import date,timedelta
-from flask_jwt_extended import create_access_token,jwt_required
-from time import perf_counter_ns
 from models import db
 from models.institute import Institute
-from datetime import datetime
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_required
 
 class InstituteResource(Resource):
-       # @login_required
+       @login_required
        def get(self,id):
               institute=db.session.query(Institute).filter(Institute.id==id).first()
               try:
@@ -28,16 +23,28 @@ class InstituteResource(Resource):
               except:
                      return {"error":"Interval Server Error"},500
 
-              
-              
-              
+       @login_required       
        def put(self,id):
-              pass          
+              data=request.get_json()
+              name=data.get("name")
+              address=data.get("address")
+              institute=db.session.query(Institute).filter(Institute.id==id).first()
+              if institute==None:
+                     return {"error":"No such Institute"},404
+              if name=="" or name==None:
+                     return {"error":"bad Request"},400
+              if institute:
+                     try:
 
-
+                            institute.name=name
+                            institute.address=address
+                            db.session.commit()
+                            return {"message":"Successfully Updated"},200
+                     except:
+                            return {"error":"Internal Server Error"},500
+      
        def post(self):
               data = request.get_json(force=True)  # or without force if header is set correctl
-
               new_institute = Institute(
                      name=data.get("name"),
                      email=data.get("email"),
@@ -64,6 +71,15 @@ class InstituteResource(Resource):
                      return {"error":"Internal Server Error"},500
 
               return {"message": "User created successfully"   }, 201
-
+      
+       @login_required
        def delete(self,id):
-              print("Inside delte of USer Api")
+              try:
+                     institute=db.session.query(Institute).filter(Institute.id==id).first()
+                     if institute is None:
+                            return {"error":"No such Institute"},404
+                     db.session.delete(institute)
+                     db.session.commit()
+                     return {"message":"Deleted Succesfully"},200
+              except:
+                     return {"error":"Internal Server Error"},500

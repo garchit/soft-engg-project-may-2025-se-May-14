@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: Institute API
+  version: 1.0.0
+  description: API for managing institutes
+
+paths:
+  /institute:
+    post:
+      summary: Create a new institute
+      tags:
+        - Institute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - address
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '201':
+          description: Institute created successfully
+        '401':
+          description: Validation error or already exists
+        '500':
+          description: Internal Server Error
+
+  /institute/{id}:
+    get:
+      summary: Get an institute by ID
+      tags:
+        - Institute
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Institute found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  Name:
+                    type: string
+                  Address:
+                    type: string
+                  email:
+                    type: string
+                  password:
+                    type: string
+        '404':
+          description: No such institute
+        '500':
+          description: Internal Server Error
+
+    put:
+      summary: Update an institute by ID
+      tags:
+        - Institute
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '200':
+          description: Successfully updated
+        '400':
+          description: Bad request
+        '404':
+          description: No such institute
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Delete an institute by ID
+      tags:
+        - Institute
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted successfully
+        '404':
+          description: No such institute
+        '500':
+          description: Internal Server Error

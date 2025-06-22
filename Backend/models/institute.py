@@ -1,6 +1,8 @@
 from models import db
+from flask_login import UserMixin
 
-class Institute(db.Model):
+
+class Institute(db.Model,UserMixin):
     __tablename__ = 'institute'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
