@@ -1,10 +1,76 @@
 openapi: 3.0.0
 info:
-  title: Institute API
+  title: SAVVY API
   version: 1.0.0
-  description: API for managing institutes
+  description: |
+    SAVVY is a financial literacy platform designed to teach kids aged 8–14 about money through interactive games and guided lessons.
+    This API provides all backend functionality for managing users (students, admins, institutes), handling authentication, and organizing content into educational units.
+    Tags:
+    - Auth: Login and logout routes
+    - Institute: CRUD operations for institutes
+    - Teacher: Teachers who oversee student activities
+    - User: Admins and students under an institute
+    - Unit: Financial literacy content structured by topic
 
 paths:
+  /login:
+    post:
+      summary: Login a user or institute
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+        '401':
+          description: Invalid credentials
+        '404':
+          description: No such user
+        '400':
+          description: Missing email or password
+        '500':
+          description: Internal Server Error
+
+  /logout:
+    post:
+      summary: Logout the currently logged-in user
+      tags:
+        - Auth
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Logout successful
+        '500':
+          description: Logout failed
+
   /institute:
     post:
       summary: Create a new institute
@@ -118,5 +184,394 @@ paths:
           description: Deleted successfully
         '404':
           description: No such institute
+        '500':
+          description: Internal Server Error
+
+  /teacher:
+    post:
+      summary: Create a new teacher
+      tags:
+        - Teacher
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - password
+                - email
+                - class_teacher
+                - institute_id
+              properties:
+                name:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+                class_teacher:
+                  type: integer
+                institute_id:
+                  type: integer
+      responses:
+        '201':
+          description: Teacher Added Successfully
+        '400':
+          description: Email already in use or invalid class
+        '401':
+          description: Required field missing or no such institute
+        '500':
+          description: Internal Server Error
+
+  /teacher/{id}:
+    get:
+      summary: Get a teacher by ID
+      tags:
+        - Teacher
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Teacher Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  name:
+                    type: string
+                  institute_id:
+                    type: integer
+                  email:
+                    type: string
+                  class_teacher:
+                    type: integer
+        '401':
+          description: Teacher not found
+        '500':
+          description: Internal Server Error
+
+    put:
+      summary: Update a teacher by ID
+      tags:
+        - Teacher
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - password
+                - class_teacher
+              properties:
+                name:
+                  type: string
+                password:
+                  type: string
+                class_teacher:
+                  type: integer
+      responses:
+        '200':
+          description: Teacher Updated Successfully
+        '400':
+          description: Invalid class
+        '401':
+          description: Missing fields
+        '404':
+          description: Teacher not found
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Delete a teacher by ID
+      tags:
+        - Teacher
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Teacher deleted successfully
+        '401':
+          description: No such teacher
+        '500':
+          description: Internal Server Error
+
+  /unit:
+    post:
+      summary: Create a new unit
+      tags:
+        - Unit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Unit added successfully
+        '400':
+          description: Title already exists
+        '500':
+          description: Internal Server Error
+
+  /unit/{id}:
+    get:
+      summary: Get a unit by ID
+      tags:
+        - Unit
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Unit found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+        '404':
+          description: Unit not found
+
+    put:
+      summary: Update a unit by ID
+      tags:
+        - Unit
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Unit updated successfully
+        '400':
+          description: Title already exists
+        '404':
+          description: Unit not found
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Delete a unit by ID
+      tags:
+        - Unit
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Unit deleted successfully
+        '404':
+          description: Unit not found
+        '500':
+          description: Internal Server Error
+
+  /user:
+    post:
+      summary: Create a new user
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - full_name
+                - username
+                - email
+                - password
+                - dob
+                - user_type
+                - institute_id
+              properties:
+                full_name:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                parents_email:
+                  type: string
+                dob:
+                  type: string
+                  format: date
+                user_type:
+                  type: string
+                  enum: [admin, student]
+                institute_id:
+                  type: integer
+                user_class:
+                  type: string
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Validation error (invalid input or duplicates)
+        '500':
+          description: Internal Server Error
+
+  /user/{id}:
+    get:
+      summary: Get a user by ID
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  full_name:
+                    type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  parents_email:
+                    type: string
+                  dob:
+                    type: string
+                  user_type:
+                    type: string
+                  institute_id:
+                    type: integer
+                  user_class:
+                    type: string
+        '404':
+          description: User not found
+
+    put:
+      summary: Update a user by ID
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                parents_email:
+                  type: string
+                dob:
+                  type: string
+                  format: date
+                user_type:
+                  type: string
+                  enum: [admin, student]
+                user_class:
+                  type: string
+      responses:
+        '200':
+          description: User updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Delete a user by ID
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
         '500':
           description: Internal Server Error
