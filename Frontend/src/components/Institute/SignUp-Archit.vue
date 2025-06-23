@@ -8,7 +8,7 @@
 
 
       <div class="signup-right">
-        <h3 class="signup-title">Join Your Institute</h3>
+        <h3 class="signup-title">Register Your Institute</h3>
         <form @submit.prevent="handleSubmit" class="signup-form">
           
           <div class="form-group">
@@ -27,27 +27,45 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input v-model="confirmPassword" type="password" class="form-input" placeholder="Confirm Password" required minlength="6">
+          </div>
+
+          <div class="form-group">
             <label class="form-label">Address</label>
             <textarea v-model="address" class="form-input" placeholder="Enter Address" required></textarea>
           </div>
 
           <button type="submit" class="submit-btn">Sign Up</button>
         </form>
+        <div class="login-link-wrap">
+          <a href="#" @click.prevent="goToLogin" class="login-link">← Back to Login</a>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 let instituteName = ref('')
 let instituteEmail = ref('')
 let password = ref('')
+let confirmPassword = ref('');
 let address = ref('')
 
 
 const handleSubmit = async () => {
+  
+  if (password.value !== confirmPassword.value) {
+    alert("Passwords do not match!");
+    return;
+  }
+
   try {
     const response = await fetch('http://127.0.0.1:5000/Fianance_Tutor/institute/signup', {
       method: 'POST',
@@ -78,11 +96,118 @@ const handleSubmit = async () => {
   } catch (error) {
     alert('Sign Up Failed: ' + error.message);
   }
-}
+};
+
+const goToLogin = () => {
+  router.push('/'); 
+};
 
 </script>
 
 <style scoped>
+body{
+  font-family: 'Arial', sans-serif;
+}
+
+.signup-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #E54C91 0%, #FFC800 100%);
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  padding: 40px 30px;
+}
+
+.signup-title {
+  text-align: center;
+  font-size: 26px;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+.signup-form .form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.3s;
+  font-family: 'Arial', sans-serif;
+}
+
+.form-input:focus {
+  border-color: #fc6076;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #fc6076 0%, #ff9a44 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 15px;
+}
+
+.submit-btn:hover {
+  background: linear-gradient(135deg, #ff9a44 0%, #fc6076 100%);
+}
+
+.login-link-wrap {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.login-link {
+  color: #fc6076;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.login-link:hover {
+  color: #fc6076;
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .signup-card {
+    padding: 30px 20px;
+  }
+
+  .signup-title {
+    font-size: 22px;
+  }
+}
+/* 
 body{
   font-family: 'Arial', sans-serif;
 }
@@ -91,7 +216,7 @@ body{
   justify-content: center;
   align-items: center;
   height: 100vh;
-  /*background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);*/
+  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
   background: linear-gradient(135deg, #E54C91 0%, #FFC800 100%);
   font-family: 'Arial', sans-serif;
   
@@ -106,7 +231,7 @@ body{
   display: flex;
   overflow: hidden;
   padding-left : 100px; 
-  /*background-color: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);*/
+  background-color: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
 }
 
 .signup-left {
@@ -187,5 +312,5 @@ body{
 
 .submit-btn:hover {
   background: linear-gradient(135deg, #ff9a44 0%, #fc6076 100%);
-}
+} */
 </style>

@@ -16,7 +16,7 @@
       <button class="cta-button" @click="handleGetStarted" :style="{ transform: buttonTransform }">Get Started</button>
       <div class="sign-in-section">
         <span class="sign-in-text">Already have an account?</span>
-        <a href="#" class="sign-in-link" @click.prevent="handleSignIn">Sign In</a>
+        <a href="#" class="sign-in-link" @click.prevent="handleSignIn">Login</a>
       </div>
     </div>
 
@@ -72,12 +72,6 @@
         <span class="float-icon">₹</span>
       </div>
 
-    <div class="confetti-piece"
-         v-for="confetti in confettiPieces"
-         :key="confetti.id"
-         :style="confetti.style">
-    </div>
-
     <footer class="footer">
       <div class="footer-content">
         <p>Made with ❤️ by Team Savvy</p>
@@ -98,8 +92,6 @@ const buttonTransform = ref('translateY(-3px)');
 const showPopup = ref(false);
 const hoveredOption = ref(null);
 const hoveredFeatures = reactive({});
-const confettiPieces = reactive([]);
-let confettiId = 0;
 let floatingInterval;
 
 const features = [
@@ -165,7 +157,6 @@ const getFeatureIconStyle = (id) => {
 };
 
 const selectAccountType = (type) => {
-  showConfetti();
   closeAccountTypePopup();
  if (type === 'student') {
     router.push('/student');
@@ -177,35 +168,6 @@ const selectAccountType = (type) => {
     }
 };
 
-const showConfetti = () => {
-  const colors = ['#ff9a9e', '#fecfef', '#667eea', '#764ba2', '#ffecd2', '#fcb69f'];
-  for (let i = 0; i < 30; i++) {
-    createConfettiPiece(colors[Math.floor(Math.random() * colors.length)]);
-  }
-};
-
-const createConfettiPiece = (color) => {
-  const confetti = {
-    id: confettiId++,
-    style: {
-      position: 'fixed',
-      width: '10px',
-      height: '10px',
-      backgroundColor: color,
-      left: Math.random() * window.innerWidth + 'px',
-      top: '-10px',
-      borderRadius: '50%',
-      pointerEvents: 'none',
-      zIndex: '1000',
-      animation: 'fall 3s linear forwards'
-    }
-  };
-  confettiPieces.push(confetti);
-  setTimeout(() => {
-    const index = confettiPieces.findIndex(c => c.id === confetti.id);
-    if (index > -1) confettiPieces.splice(index, 1);
-  }, 3000);
-};
 
 const handleKeydown = (e) => {
   if (e.key === 'Escape' && showPopup.value) {
@@ -225,6 +187,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+
 /* Paste all your CSS from styles.css here 
 @import './styles.css';*/
 
@@ -232,32 +195,28 @@ onBeforeUnmount(() => {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    
 }
 
-#app{
-    background-color: red;
-   font-family: 'Arial', sans-serif;
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: transparent;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+#app {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
     background: linear-gradient(135deg, #E54C91 0%, #FFC800 100%);
     min-height: 100vh;
+    width: 100%;
+    height: 100%;
     overflow-x: hidden;
 }
 
-
-
-body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #6d4445 0%, #fecfef 50%, #fecfef 100%);
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-.app {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    
-}
 
 /* Navigation */
 .navbar {
@@ -691,23 +650,6 @@ body {
   color: rgb(213, 213, 213);
 }
 
-/* Confetti */
-.confetti-piece {
-    position: fixed;
-    pointer-events: none;
-}
-
-@keyframes fall {
-    0% {
-        transform: translateY(-10px) rotate(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(calc(100vh + 10px)) rotate(360deg);
-        opacity: 0;
-    }
-}
-
 /* Footer */
 .footer {
   background: rgba(255, 255, 255, 0.1);
@@ -717,7 +659,6 @@ body {
   width: 100%;
 
 }
-
 
 .footer-content {
     text-align: center;
