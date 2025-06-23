@@ -575,3 +575,132 @@ paths:
           description: User not found
         '500':
           description: Internal Server Error
+  /lecture:
+    post:
+      summary: Create a new lecture
+      tags:
+        - Lecture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - unit_id
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                link:
+                  type: string
+                unit_id:
+                  type: integer
+      responses:
+        '201':
+          description: Lecture added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: integer
+        '400':
+          description: Title already exists
+        '500':
+          description: Internal Server Error
+
+  /lecture/{id}:
+    get:
+      summary: Get a lecture by ID
+      tags:
+        - Lecture
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lecture found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  link:
+                    type: string
+                  unit_id:
+                    type: integer
+        '404':
+          description: Lecture not found
+
+    put:
+      summary: Update a lecture by ID
+      tags:
+        - Lecture
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - unit_id
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                link:
+                  type: string
+                unit_id:
+                  type: integer
+      responses:
+        '200':
+          description: Lecture updated successfully
+        '400':
+          description: Title already exists
+        '404':
+          description: Lecture not found
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Delete a lecture by ID
+      tags:
+        - Lecture
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lecture deleted successfully
+        '404':
+          description: Lecture not found
+        '500':
+          description: Internal Server Error
