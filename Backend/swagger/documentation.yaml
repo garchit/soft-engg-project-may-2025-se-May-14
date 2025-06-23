@@ -6,7 +6,7 @@ info:
     SAVVY is a financial literacy platform designed to teach kids aged 8–14 about money through interactive games and guided lessons.
     This API provides all backend functionality for managing users (students, admins, institutes), handling authentication, and organizing content into educational units.
     Tags:
-    - Auth: Login and logout routes
+    - Auth: Login and logout routesg
     - Institute: CRUD operations for institutes
     - Teacher: Teachers who oversee student activities
     - User: Admins and students under an institute
