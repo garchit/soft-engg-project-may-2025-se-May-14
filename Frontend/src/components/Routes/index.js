@@ -1,7 +1,7 @@
 import { createRouter , createWebHistory } from "vue-router";
 import LandingPage from "../LandingPage.vue";
 import SignUpArchit from "../Institute/SignUp-Archit.vue";
-import SignUp from "../Student/SignUp.vue";
+import SignUp from "../Student/SignUp-Tanuja.vue";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
