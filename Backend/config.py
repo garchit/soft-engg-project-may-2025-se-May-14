@@ -14,3 +14,5 @@ TESTING = False
 REMEMBER_COOKIE_SAMESITE = "None"
 REMEMBER_COOKIE_SECURE = True
 WTF_CSRF_ENABLED = False
+SWAGGER_URL = '/api/docs'
+API_URL = '/static/documentation.yaml'

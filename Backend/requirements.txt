@@ -9,3 +9,4 @@
     flask_cors
     flask_migrate
     flasgger
+    flask_swagger_ui
