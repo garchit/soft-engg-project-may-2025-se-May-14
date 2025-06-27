@@ -1,4 +1,7 @@
 openapi: 3.0.0
+servers:
+  - url: /Finance_Tutor
+
 info:
   title: SAVVY API
   version: 1.0.0
@@ -14,6 +17,7 @@ info:
 
 paths:
   /login:
+
     post:
       summary: Login a user or institute
       tags:
@@ -71,7 +75,7 @@ paths:
         '500':
           description: Logout failed
 
-  /institute:
+  /institute/signup:
     post:
       summary: Create a new institute
       tags:
