@@ -6,56 +6,59 @@
         <form @submit.prevent="handleSubmit" class="signup-form">
 
           <!-- Row 1: Username -->
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Username</label>
-              <input v-model="username" type="text" class="form-input" placeholder="Enter Username" required>
-            </div>
+          <div class="form-row" style="justify-content: center; align-items: center;">
+          <div class="form-group" style="width: 50%; max-width: 300px;">
+            <label class="form-label" style="text-align: center;">Username</label>
+            <input v-model="username" type="text" class="form-input" placeholder="Enter Username" required>
           </div>
+        </div>
 
           <!-- Row 2: Parent's Email and Date of Birth -->
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Parent's Email</label>
+            <div class="form-row" style="align-items: center; justify-content: center;">
+            <div class="form-group" style="flex: 1; text-align: center;">
+              <label class="form-label" style="display: flex; justify-content: center; align-items: center; height: 100%;">Parent's Email</label>
               <input v-model="parentEmail" type="email" class="form-input" placeholder="Enter Parent's Email" required>
             </div>
-            <div class="form-group">
-              <label class="form-label">Date of Birth</label>
+            <div class="form-group" style="flex: 1; text-align: center;">
+              <label class="form-label" style="display: flex; justify-content: center; align-items: center; height: 100%;">Date of Birth</label>
               <input v-model="dateOfBirth" type="date" class="form-input" required>
             </div>
-          </div>
+            </div>
 
           <!-- Row 3: Class and Password -->
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Class</label>
-              <select v-model="className" class="form-input" required>
-                <option value="">Select Class</option>
-                <option v-for="cls in classes" :key="cls" :value="cls">{{ cls }}</option>
+            <div class="form-row" style="justify-content: center; align-items: center;">
+            <div class="form-group" style="text-align: center;">
+              <label class="form-label form-label-thick" style="text-align: center;">Institute Name</label>
+              <select v-model="institute" class="form-input" required>
+              <option value="">Select Institute</option>
+              <option v-for="inst in institutes" :key="inst" :value="inst">{{ inst }}</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label">Password</label>
+            <div class="form-group" style="text-align: center;">
+              <label class="form-label form-label-thick" style="text-align: center;">Class</label>
+              <select v-model="className" class="form-input" required>
+              <option value="">Select Class</option>
+              <option v-for="cls in classes" :key="cls" :value="cls">{{ cls }}</option>
+              </select>
+            </div>
+            </div>
+
+
+            <!-- Row 4: Confirm Password and Institute Name -->
+            <div class="form-row" style="justify-content: center; align-items: center;">
+            <div class="form-group" style="text-align: center;">
+              <label class="form-label" style="text-align: center;">Password</label>
               <input v-model="password" type="password" class="form-input" placeholder="Enter Password" required minlength="6">
             </div>
-          </div>
-
-          <!-- Row 4: Confirm Password and Institute Name -->
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Confirm Password</label>
+            
+            <div class="form-group" style="text-align: center;">
+              <label class="form-label" style="text-align: center;">Confirm Password</label>
               <input v-model="confirmPassword" type="password" class="form-input" placeholder="Confirm Password" required minlength="6">
             </div>
-            <div class="form-group">
-              <label class="form-label">Institute Name</label>
-              <select v-model="institute" class="form-input" required>
-                <option value="">Select Institute</option>
-                <option v-for="inst in institutes" :key="inst" :value="inst">{{ inst }}</option>
-              </select>
+            
             </div>
-          </div>
 
-          <button type="submit" class="submit-btn">Sign Up</button>
+            <button type="submit" class="submit-btn" style="padding: 8px; font-size: 14px;">Sign Up</button>
         </form>
         <div class="login-link-wrap">
           <a href="#" @click.prevent="goToLogin" class="login-link">← Back to Login</a>
@@ -178,7 +181,7 @@ const goToLogin = () => {
 }
 
 .submit-btn {
-  width: 100%;
+  width: 50%;
   padding: 12px;
   background: linear-gradient(135deg, #fc6076 0%, #ff9a44 100%);
   border: none;
@@ -188,6 +191,9 @@ const goToLogin = () => {
   cursor: pointer;
   transition: 0.3s ease;
   margin-top: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .submit-btn:hover {
