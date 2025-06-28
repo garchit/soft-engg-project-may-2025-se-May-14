@@ -20,4 +20,3 @@ class User(db.Model,UserMixin):
     streak_start_timestamp = db.Column(db.DateTime, nullable=True)
     latest_timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_class = db.Column(db.String(50), nullable=True)
-    

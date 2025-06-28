@@ -4,7 +4,9 @@ from flask_restful import  Resource
 import json
 from models import db
 from models.institute import Institute
+from models.user import User
 from flask_login import login_required
+from .helper_functions import to_dict,count_students
 
 class InstituteResource(Resource):
        @login_required
@@ -83,3 +85,18 @@ class InstituteResource(Resource):
                      return {"message":"Deleted Succesfully"},200
               except:
                      return {"error":"Internal Server Error"},500
+              
+
+
+class AllInstitute(Resource):
+       def get(self):
+              all_institues=Institute.query.all()
+              json_list=[]
+              for each_institute in all_institues:
+                     total_students=count_students(each_institute.id)
+                     if each_institute.id!=-1:
+                            json_list.append(to_dict(each_institute,total_students))
+                     else:
+                            json_list.append({"IndependentStudents":total_students})
+
+              return json_list,200

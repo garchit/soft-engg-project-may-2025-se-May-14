@@ -8,3 +8,4 @@ class Unit(db.Model):
     description = db.Column(db.Text)
 
     lectures = db.relationship('Lecture', backref='unit', cascade='all, delete-orphan')
+    questions=db.relationship('Question',backref='unit',cascade="all,delete-orphan")
