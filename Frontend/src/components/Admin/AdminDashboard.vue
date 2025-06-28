@@ -11,29 +11,29 @@
         <Sidebar />
   
         <div class="admin-content">
-          <h1 class="dashboard-title" style="text-align: center;">Hi Admin</h1><br /><br />
+            <h1 class="dashboard-title" style="text-align: center; color: white;">Hi Admin</h1><br /><br />
   
           <div class="main-container">
-            <h2 class="table-title" style="text-align: center;">Top Performing Schools</h2>
+            <h2 class="table-title" style="text-align: center; color: white;">Top Performing Schools</h2>
   
             <div class="table-container">
               <div class="badges-section">
               <div class="badge">
-                <img src="@/components/assets/silver-medal.png" alt="Silver Medal" class="badge-icon" />
+                <img src="@/assets/silver-medal.png" alt="Silver Medal" class="badge-icon" />
                 <div class="badge-text">
                   <p>Institute B</p>
                   <p>Score: 90</p>
                 </div>
               </div>
               <div class="badge">
-                <img src="@/components/assets/gold-medal.png" alt="Gold Medal" class="badge-icon" />
+                <img src="@/assets/gold-medal.png" alt="Gold Medal" class="badge-icon" />
                 <div class="badge-text">
                   <p>Institute A</p>
                   <p>Score: 95</p>
                 </div>
               </div>
               <div class="badge">
-                <img src="@/components/assets/bronze-medal.png" alt="Bronze Medal" class="badge-icon" />
+                <img src="@/assets/bronze-medal.png" alt="Bronze Medal" class="badge-icon" />
                 <div class="badge-text">
                   <p>Institute C</p>
                   <p>Score: 85</p>
