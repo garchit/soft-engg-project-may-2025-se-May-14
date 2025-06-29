@@ -24,7 +24,7 @@ class LectureResource(Resource):
             "link": lecture.link
         }, 200
 
-    @login_required
+    # @login_required
     def post(self):
         data = request.get_json(force=True)
         title = data.get("title")

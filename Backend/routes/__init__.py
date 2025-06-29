@@ -3,7 +3,7 @@ from .user import UserApi
 from .log_in_out import LoginResource,LogoutResource
 from .institute_resource import InstituteResource,AllInstitute
 from .teachers_resource import TeacherResource
-from .unit_resource import UnitResource
+from .unit_resource import CourseResource
 from .lectures import LectureResource
 from .questions_resource import QuestionResource
 
@@ -16,7 +16,7 @@ def init_routes(app):
     api.add_resource(LogoutResource,"/logout")
     api.add_resource(InstituteResource,"/institute/<int:id>","/institute/signup")
     api.add_resource(TeacherResource,"/teacher","/teacher/<int:id>")
-    api.add_resource(UnitResource,"/unit","/unit/<int:id>")
+    api.add_resource(CourseResource,"/course","/course/<int:id>")
     api.add_resource(LectureResource, '/lecture', '/lecture/<int:id>')
     api.add_resource(AllInstitute, '/all_institute')
     api.add_resource(QuestionResource, '/question','/question/<int:id>')
