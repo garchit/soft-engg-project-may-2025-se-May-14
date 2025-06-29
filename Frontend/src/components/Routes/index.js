@@ -2,12 +2,17 @@ import { createRouter , createWebHistory } from "vue-router";
 import LandingPage from "../LandingPage.vue";
 import SignUpArchit from "../Institute/SignUp-Archit.vue";
 import SignUp from "../Student/SignUp-Tanuja.vue";
+import AdminHome from "../Admin/AdminDashboard.vue";
+import StudentHome from "../Student/StudentHome.vue";
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {path: "/" , component: LandingPage},
     {path: "/institute" , component: SignUpArchit},
-    {path: "/student" , component:SignUp}
+    {path: "/student" , component:SignUp},
+    {path: "/admin-home" , component: AdminHome},
+    {path: "/student-home" , component: StudentHome}
   ]
 })
 
