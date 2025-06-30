@@ -13,7 +13,7 @@
         <StudentSidebar />
   
         <div class="student-content">
-          <h1 class="dashboard-title" style="text-align: center;">HOME</h1><br /><br />
+            <h1 class="dashboard-title" style="text-align: center; color: white;">HOME</h1><br /><br />
   
           <div class="main-container">
               <div class="donut-chart-section">
@@ -30,36 +30,61 @@
             
             </div>
   
-            <h2 class="insights-header" style="text-align: center; font-weight: bold; font-size: 1.5em;">Units Completed</h2>
+            <h2 class="insights-header" style="text-align: center; color: white; font-weight: bold; font-size: 1.5em;margin-top: 20px; margin-bottom: 2px;">Units Completed</h2>
             <div class="charts-section">
-              <div class="unit-card">
-                <h3 style="color: white;">Demand & Supply</h3>
-              </div>
-              <div class="unit-card">
-                <h3 style="color: white;">Borrowing</h3>
-              </div>
-              <div class="unit-card">
-                <h3 style="color: white;">Lending</h3>
-              </div>
-              <div class="unit-card">
-                <h3 style="color: white;">Profit & Loss</h3>
-              </div>
+                <CCard style="width: 150px; height: 150px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px;">
+                <CCardImage orientation="center" src="/src/assets/demand&supply.jpg" style="width: 100%; height: 70%; object-fit: cover;" />
+                <CCardBody style="text-align: center; padding: 5px;">
+                  <CCardText>Demand & Supply</CCardText>
+                </CCardBody>
+                </CCard>
+                <CCard style="width: 150px; height: 150px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center;">
+                <CCardImage orientation="center" src="/src/assets/borrowing.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
+                <CCardBody style="text-align: center; padding: 10px;">
+                  <CCardText>Borrowing</CCardText>
+                </CCardBody>
+                </CCard>
+                <CCard style="width: 150px; height: 150px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center;">
+                <CCardImage orientation="center" src="/src/assets/budgeting.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
+                <CCardBody style="text-align: center; padding: 10px;">
+                  <CCardText>Budgeting</CCardText>
+                </CCardBody>
+                </CCard>
+                <CCard style="width: 150px; height: 150px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px;">
+                <CCardImage orientation="center" src="/src/assets/personal finance.jpg" style="width: 100%; height: 70%; object-fit: cover;" />
+                <CCardBody style="text-align: center; padding: 5px;">
+                  <CCardText>Personal Finance</CCardText>
+                </CCardBody>
+                </CCard>
             </div>
+
   
-            <h2 class="insights-header" style="text-align: center; font-weight: bold; font-size: 1.5em;">Recommended For You</h2>
+            <h2 class="insights-header" style="text-align: center; color: white;font-weight: bold; font-size: 1.5em; margin-top: 20px; margin-bottom: 2px;">Recommended For You</h2>
             <div class="charts-section">
-              <div class="unit-card">
-                <h3 style="color: white;">Demand & Supply</h3>
-              </div>
-              <div class="unit-card">
-                <h3 style="color: white;">Borrowing</h3>
-              </div>
-              <div class="unit-card">
-                <h3 style="color: white;">Lending</h3>
-              </div>
-              <div class="unit-card">
-                <h3 style="color: white;">Profit & Loss</h3>
-              </div>
+                <CCard style="width: 150px; height: 150px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px;">
+                <CCardImage orientation="center" src="/src/assets/demand&supply.jpg" style="width: 100%; height: 70%; object-fit: cover;" />
+                <CCardBody style="text-align: center; padding: 5px;">
+                  <CCardText>Demand & Supply</CCardText>
+                </CCardBody>
+                </CCard>
+                <CCard style="width: 150px; height: 150px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center;">
+                <CCardImage orientation="center" src="/src/assets/borrowing.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
+                <CCardBody style="text-align: center; padding: 10px;">
+                  <CCardText>Borrowing</CCardText>
+                </CCardBody>
+                </CCard>
+                <CCard style="width: 150px; height: 150px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center;">
+                <CCardImage orientation="center" src="/src/assets/budgeting.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
+                <CCardBody style="text-align: center; padding: 10px;">
+                  <CCardText>Budgeting</CCardText>
+                </CCardBody>
+                </CCard>
+                <CCard style="width: 150px; height: 150px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px;">
+                <CCardImage orientation="center" src="/src/assets/personal finance.jpg" style="width: 100%; height: 70%; object-fit: cover;" />
+                <CCardBody style="text-align: center; padding: 5px;">
+                  <CCardText>Personal Finance</CCardText>
+                </CCardBody>
+                </CCard>
             </div>
           </div>
         </div>
@@ -72,7 +97,9 @@
   import Navbar from './Navbar.vue'; 
   import StreakCalendar from './Calendar.vue';
   import StudentSidebar from './StudentSidebar.vue';
+  import { CCard, CCardImage, CCardBody, CCardText } from '@coreui/vue';
   import DonutChart from '../donutChart.vue'; 
+  import demandSupplyImage from '@/assets/demand&supply.jpg';
   
 
   const backgroundRef = ref(null);
