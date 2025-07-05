@@ -6,6 +6,9 @@ from .teachers_resource import TeacherResource
 from .unit_resource import CourseResource
 from .lectures import LectureResource
 from .questions_resource import QuestionResource
+from .questions_resource import AllQuestionResource
+from .streak_resource import StreakResource,StreakCalendarData
+
 
 def init_routes(app):
     api = Api(app, prefix='/Finance_Tutor')
@@ -20,4 +23,7 @@ def init_routes(app):
     api.add_resource(LectureResource, '/lecture', '/lecture/<int:id>')
     api.add_resource(AllInstitute, '/all_institute')
     api.add_resource(QuestionResource, '/question','/question/<int:id>')
+    api.add_resource(AllQuestionResource, '/questions/unit/<int:unit_id>')
+    api.add_resource(StreakResource,'/user/streak')
+    api.add_resource(StreakCalendarData,'/user/streak/calendar')
 
