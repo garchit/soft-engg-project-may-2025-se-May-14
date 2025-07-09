@@ -5,7 +5,7 @@ import SignUp from "../Student/SignUp-Tanuja.vue";
 import AdminHome from "../Admin/AdminDashboard.vue";
 import StudentHome from "../Student/StudentHome.vue";
 import StudentPractice from "../Student/StudentPractice.vue";
-
+import StudentProfile from "../Student/StudentProfile.vue";
 
 const router = createRouter({
   history: createWebHistory(),

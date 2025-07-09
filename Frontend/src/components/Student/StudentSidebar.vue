@@ -32,6 +32,17 @@
             PRACTICE
           </router-link>
         </li>
+
+          <li class="nav-item">
+          <router-link 
+            to="/studentprofile" 
+            class="nav-link" 
+            :class="{ active: activeLink === 'PROFILE' }"
+            @click="setActiveLink('studentprofile')"
+          >
+            PROFILE
+          </router-link>
+        </li>
       </ul>
     </nav>
   </div>

@@ -4,7 +4,7 @@
 
 
 
-    <StudentSidebar_2/>
+    <StudentSidebar/>
     <!-- Main Content -->
     <div class="main-content">
       <header class="profile-header">
@@ -47,7 +47,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import StudentSidebar_2 from './StudentSidebar_2.vue'
+// import StudentSidebar_2 from './StudentSidebar_2.vue'
+import StudentSidebar from './StudentSidebar.vue'
 import Navbar from './Navbar.vue'
 // Sidebar navigation
 const navItems = [
