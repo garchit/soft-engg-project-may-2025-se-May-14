@@ -19,7 +19,7 @@
   <style scoped>
   .navbar {
     width: 100%;
-    background-color: #ffededa1;
+    background-color: #ffffff;
     color: rgb(72, 162, 204);
     padding: 15px 30px;
     position: fixed;

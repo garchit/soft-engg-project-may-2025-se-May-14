@@ -123,6 +123,7 @@
     position: relative;
     width: 100%;
     max-width: 300px;
+    border-radius: 20px;
     aspect-ratio: 1 / 1;
     margin: auto;
   }
@@ -133,7 +134,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    color: white;
+    color: rgb(2, 2, 2);
   }
   
   .percentage {

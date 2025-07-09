@@ -4,6 +4,8 @@ import SignUpArchit from "../Institute/SignUp-Archit.vue";
 import SignUp from "../Student/SignUp-Tanuja.vue";
 import AdminHome from "../Admin/AdminDashboard.vue";
 import StudentHome from "../Student/StudentHome.vue";
+import StudentPractice from "../Student/StudentPractice.vue";
+
 
 const router = createRouter({
   history: createWebHistory(),
@@ -12,7 +14,8 @@ const router = createRouter({
     {path: "/institute" , component: SignUpArchit},
     {path: "/student" , component:SignUp},
     {path: "/admin-home" , component: AdminHome},
-    {path: "/student-home" , component: StudentHome}
+    {path: "/student-home" , component: StudentHome},
+    {path: "/student-practice" , component: StudentPractice},
   ]
 })
 
