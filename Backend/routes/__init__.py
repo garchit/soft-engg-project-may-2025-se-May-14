@@ -6,13 +6,9 @@ from .teachers_resource import TeacherResource,UserTeacherResource,TeacherWisePr
 from .unit_resource import CourseResource,CompletedCourse,CourseProgress
 from .lectures import LectureResource, UserLectureResource
 from .questions_resource import QuestionResource
-<<<<<<< HEAD
 from .ai_features import RecommendedCourses
-
-=======
 from .questions_resource import AllQuestionResource
 from .streak_resource import StreakResource,StreakCalendarData
->>>>>>> b4e5e944c7ca1763c43a59084071223cb652cded
 
 
 def init_routes(app):
@@ -28,7 +24,6 @@ def init_routes(app):
     api.add_resource(LectureResource, '/lecture', '/lecture/<int:id>')
     api.add_resource(AllInstitute, '/all_institute')
     api.add_resource(QuestionResource, '/question','/question/<int:id>')
-<<<<<<< HEAD
     api.add_resource(ToggleBlockInstitute, '/toggle_block_institute/<int:institute_id>')
     api.add_resource(CompletedCourse, '/user_course_completed/<int:user_id>')
     api.add_resource(UserLectureResource, '/user_lecture_watched/<int:user_id>/<int:lecture_id>')
@@ -36,10 +31,7 @@ def init_routes(app):
     api.add_resource(UserTeacherResource,"/user_teacher/<int:user_id>")
     api.add_resource(TeacherWiseProgress,"/teacher_wise_progress/<int:institute_id>")
     api.add_resource(RecommendedCourses,"/recommended_courses/<int:user_id>")
-
-=======
     api.add_resource(AllQuestionResource, '/questions/unit/<int:unit_id>')
     api.add_resource(StreakResource,'/user/streak')
     api.add_resource(StreakCalendarData,'/user/streak/calendar')
->>>>>>> b4e5e944c7ca1763c43a59084071223cb652cded
 
