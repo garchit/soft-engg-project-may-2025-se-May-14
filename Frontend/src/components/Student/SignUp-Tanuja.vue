@@ -25,7 +25,7 @@
             </div>
             </div>
 
-          <!-- Row 3: Class and Password -->
+
             <div class="form-row" style="justify-content: center; align-items: center;">
             <div class="form-group" style="text-align: center;">
               <label class="form-label form-label-thick" style="text-align: center;">Institute Name</label>
@@ -44,7 +44,6 @@
             </div>
 
 
-            <!-- Row 4: Confirm Password and Institute Name -->
             <div class="form-row" style="justify-content: center; align-items: center;">
             <div class="form-group" style="text-align: center;">
               <label class="form-label" style="text-align: center;">Password</label>
@@ -64,6 +63,14 @@
           <a href="#" @click.prevent="goToLogin" class="login-link">← Back to Login</a>
         </div>
       </div>
+      <div class="floating-emojis">
+        <span class="float-icon">💰</span>
+        <span class="float-icon">💸</span>
+        <span class="float-icon">⭐️</span>
+        <span class="float-icon">💵</span>
+        <span class="float-icon">💲</span>
+        <span class="float-icon">₹</span>
+      </div>
     </div>
   </div>
 </template>
@@ -71,6 +78,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { CFormSelect } from '@coreui/vue';
 
 const router = useRouter();
 
@@ -231,5 +239,39 @@ const goToLogin = () => {
   .signup-form .form-row {
     flex-direction: column;
   }
+}
+
+.floating-emojis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0; 
+  overflow: hidden;
+}
+
+.float-icon {
+  position: absolute;
+  font-size: 2.5rem;
+  opacity: 0.8;
+  animation: floatEmoji 10s infinite linear;
+}
+
+/* Random placements */
+.float-icon:nth-child(1) { top: 20%; left: 20%; animation-delay: 0s; }
+.float-icon:nth-child(2) { top: 20%; left: 80%; animation-delay: 0s; }
+.float-icon:nth-child(3) { top: 55%; left: 10%; animation-delay: 0s; }
+.float-icon:nth-child(4) { top: 90%; left: 80%; animation-delay: 0s; }
+.float-icon:nth-child(5) { top: 50%; left: 90%; animation-delay: 0s; }
+.float-icon:nth-child(6) { top: 88%; left: 15%; animation-delay: 0s; }
+
+@keyframes floatEmoji {
+  0% {transform: translate(0, 0) scale(1) rotate(0deg);}
+  25% {transform: translate(-10px, -60px) scale(1.1) rotate(10deg);}
+  50% {transform: translate(10px, -90px) scale(1.2) rotate(-10deg);}
+  75% {transform: translate(-5px, -60px) scale(1.1) rotate(10deg);}
+  100% {transform: translate(0, 0) scale(1) rotate(0deg);}
 }
 </style>

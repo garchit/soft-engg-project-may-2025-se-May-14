@@ -121,4 +121,34 @@ class QuestionResource(Resource):
         except SQLAlchemyError as e:
             return {"error":"Internal Server Error","details":str(e)},500
 
+
+class AllQuestionResource(Resource):
+    def get(self, unit_id):
+        try:
+            questions = db.session.query(Question).filter(Question.unit_id == unit_id).all()
+            
+            if not questions:
+                return {"message": "No questions found for the given unit ID"}, 404
+
+            question_list = []
+            for q in questions:
+                question_list.append({
+                    "id": q.id,
+                    "unit_id": q.unit_id,
+                    "description": q.description,
+                    "option_a": q.option_a,
+                    "option_b": q.option_b,
+                    "option_c": q.option_c,
+                    "option_d": q.option_d,
+                    "correct_option": q.correct_option
+                })
+
+            return {
+                "message": "Questions fetched successfully",
+                "questions": question_list
+            }, 200
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"error": "Internal Server Error", "details": str(e)}, 500
         

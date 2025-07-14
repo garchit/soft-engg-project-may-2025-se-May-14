@@ -70,35 +70,40 @@
   
 
   const progressDotPlugin = {
-    id: 'progressDotPlugin',
-    afterDatasetsDraw(chart) {
-      const meta = chart.getDatasetMeta(0);
-      if (!meta || !meta.data[0]) return;
-  
-      const ctx = chart.ctx;
-      const value = chart.data.datasets[0].data[0];
-      const total = 100;
-      const angle = (value / total) * 2 * Math.PI - Math.PI / 2;
-  
-      const { x: centerX, y: centerY } = meta.data[0];
-      const radius = meta.data[0].outerRadius - 10; 
-  
-      const dotX = centerX + Math.cos(angle) * radius;
-      const dotY = centerY + Math.sin(angle) * radius;
-  
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(dotX, dotY, 12, 0, 2 * Math.PI); 
-      ctx.fillStyle = '#29B6F6'; 
-      ctx.strokeStyle = '#fff'; 
-      ctx.lineWidth = 4; 
-      ctx.fill();
-      ctx.stroke();
-      ctx.closePath();
-      ctx.restore();
-    },
-  };
-  
+  id: 'progressDotPlugin',
+  afterDatasetsDraw(chart) {
+    const meta = chart.getDatasetMeta(0);
+    if (!meta || !meta.data[0]) return;
+
+    const ctx = chart.ctx;
+    const value = chart.data.datasets[0].data[0];
+    const total = 100;
+    const angle = (value / total) * 2 * Math.PI - Math.PI / 2;
+
+    const { x: centerX, y: centerY } = meta.data[0];
+    const outerRadius = meta.data[0].outerRadius;
+    const innerRadius = meta.data[0].innerRadius;
+
+
+    const ringCenterRadius = (outerRadius + innerRadius) / 2;
+
+    // Calculate dot position
+    const dotX = centerX + Math.cos(angle) * ringCenterRadius;
+    const dotY = centerY + Math.sin(angle) * ringCenterRadius;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, 21, 0, 2 * Math.PI); 
+    ctx.fillStyle = '#29B6F6';
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 4;
+    ctx.fill();
+    ctx.stroke();
+    ctx.closePath();
+    ctx.restore();
+  },
+};
+
 
   const chartOptions = {
     responsive: true,
@@ -109,6 +114,8 @@
       tooltip: { enabled: false },
     },
   };
+
+  
   </script>
   
   <style scoped>
@@ -116,6 +123,7 @@
     position: relative;
     width: 100%;
     max-width: 300px;
+    border-radius: 20px;
     aspect-ratio: 1 / 1;
     margin: auto;
   }
@@ -126,7 +134,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    color: white;
+    color: rgb(2, 2, 2);
   }
   
   .percentage {

@@ -88,7 +88,7 @@
   .calendar-container {
     margin-top: 30px;
     padding: 20px;
-    background: #ff5abf;
+    background: #1b1b1b;
     border-radius: 20px;
     color: white;
     width: 300px;
