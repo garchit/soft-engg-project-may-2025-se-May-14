@@ -2,16 +2,27 @@ from flask import Flask, request
 from flask_restful import Resource
 from models.unit import Unit as Course
 from flask_login import login_required
+from models.user_course import UserCourse
 from models import db
 from sqlalchemy.exc import SQLAlchemyError
 from models.lecture import Lecture
-from .helper_functions import create_json
+from .helper_functions import create_json,course_progress
+from models.user import User
+
 
 
 
 
 class CourseResource(Resource):
-    def get(self):
+    def get(self,id=None):
+        if id:
+            course=db.session.query(Course).filter(Course.id==id).first()
+            if not course:
+                return {"error":"Course Not Found"},404
+            course_data=create_json(course=course)
+            return {"message":"Course Fetched Successfully",
+                    "course_details":course_data
+                    },200
         courses = Course.query.all()
         course_data=[]
         for course in courses:
@@ -19,7 +30,6 @@ class CourseResource(Resource):
             
         if not Course:
             return {"error":"Course not found"},404
-        print(course_data)
         return{
             "message":"Course Found",
             "course_detail":course_data
@@ -28,7 +38,7 @@ class CourseResource(Resource):
     def post(self):
         data=request.get_json(force=True)
         title=data.get("title")
-        description=data.get("description")
+        description=data.get("description")     
         try:
             check_by_title=db.session.query(Course).filter(Course.title==title).first()
             if check_by_title:
@@ -49,12 +59,12 @@ class CourseResource(Resource):
         if check_title:
             return {"error":"Title already Exist"},400
     
-        Course=db.session.query(Course).filter(Course.id==id).first()
+        course=db.session.query(Course).filter(Course.id==id).first()
         if not Course:
             return {"error":"Course not found"},404
         try:
-            Course.title =title
-            Course.description=description
+            course.title =title
+            course.description=description
             db.session.commit()
             return {
                 "message":"Course Updated Succesfully",
@@ -67,11 +77,43 @@ class CourseResource(Resource):
     
     def delete(self,id):
         try:
-            Course=db.session.query(Course).filter(Course.id==id).first()
-            if not Course:
+            course=db.session.query(Course).filter(Course.id==id).first()
+            if not course:
                 return {"error":"No such Course"}
-            db.session.delete(Course)
+            db.session.delete(course)
             db.session.commit()
             return {"message":"Course Deleted Successfully"},200
-        except:
-            return {"error":"Internal Server Error"},500  
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"error":"Internal Server Error","details":str(e)},500  
+        
+class CompletedCourse(Resource):
+    def get(self,user_id):
+        pass
+    def post(self,user_id):
+        data=request.get_json(force=True)
+        course_id=data.get("course_id")
+        user=User.query.get(user_id)
+        if not user:
+            return {"error":"No such USer"},404
+        course=db.session.query(Course).filter(Course.id==course_id).first()
+        if not course:
+            return {"error":"No such course exist"},404
+        try:
+            user_course_completed=UserCourse(user_id=user_id,course_id=course_id)
+            db.session.add(user_course_completed)
+            db.session.commit()
+            return {"message":"Successfully Added"},201
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"error":"Internal Server Error","details":str(e)}
+
+class CourseProgress(Resource):
+    def get(self,user_id):
+        course_total_progress=course_progress(user_id)
+        sum_progress=0
+        for progress in course_total_progress:
+            sum_progress+=list(progress.values())[0]
+        total_courses=db.session.query(Course).count()
+        overall_progress=sum_progress/total_courses
+        return {"course_progress":course_total_progress,"overall_progress":round(overall_progress,2)},200

@@ -5,6 +5,10 @@ from models.teacher import Teacher
 from models.institute import Institute
 from flask_login import login_required
 from models import db
+from models.user_teacher import UserTeacher
+from models.user import User
+from .helper_functions import getTeachers,overall_progress
+from sqlalchemy.exc import SQLAlchemyError
 
 class TeacherResource(Resource):
     @login_required
@@ -57,14 +61,14 @@ class TeacherResource(Resource):
         except:
             return {"error":"Internal Sever Error"},500
 
-    @login_required
+    # @login_required
     def post(self):
         data=request.get_json(force=True)
         name=data.get("name")
         password=data.get("password")
         institute_id=data.get("institute_id")
         email=data.get("email")
-        class_teacher=data.get("class_teacher")
+        class_teacher=data.get("class_teacher") 
         if name is None or password is None  or email is None  or class_teacher is None or institute_id==None:
             return {"error":"Required Field is Missing"},401
         if name =="" or password ==""  or email ==""  or class_teacher == "" or institute_id=="":
@@ -80,7 +84,10 @@ class TeacherResource(Resource):
             return {"error":"Invalind Class"},400
         
         try:
-        
+            check_class_exist=db.session.query(Teacher).filter(Teacher.class_teacher==class_teacher,Teacher.institute_id==institute_id).first()
+            if check_class_exist:
+                return {"error":"This class already has a class teacher"},401
+            
             teacher_data=Teacher(name=name,password=password,institute_id=institute_id,email=email,class_teacher=class_teacher)
             db.session.add(teacher_data)
             db.session.commit()
@@ -102,3 +109,62 @@ class TeacherResource(Resource):
             return {"message":"Teacher is Successfully Removed from Institue"},200
         except:
             return {"error":"OOps there is Internal Server Occur"},500
+    
+class UserTeacherResource(Resource):
+    def get():
+        pass
+    def post(self, user_id):
+        try:
+            check_user = db.session.query(User).filter(User.id == user_id).first()
+            if not check_user:
+                return {"error": "No such user"}, 404
+
+            existing_link = db.session.query(UserTeacher).filter(UserTeacher.user_id == user_id).first()
+            if existing_link:
+                return {"error": "User is already assigned to a teacher"}, 401
+            check_class=check_user.user_class
+            teacher=db.session.query(Teacher).filter(Teacher.class_teacher==check_class,Teacher.institute_id==check_user.institute_id).first()
+            if not teacher:
+                return {"error":"There is no teacher assigned to this class"},401
+    
+
+            user_teacher = UserTeacher(user_id=user_id,teacher_id=teacher.id)
+            db.session.add(user_teacher)
+            db.session.commit()
+
+            return {"message": "Linked student to teacher"}, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {"error": "An unexpected error occurred", "details": str(e)}, 500
+        
+class TeacherWiseProgress(Resource):
+    def get(self,institute_id):
+        teachers=getTeachers(institute_id=institute_id)
+        teacher_wise=[]
+        try:
+            for teacher_id in teachers:
+                all_progress=[]
+                students=db.session.query(UserTeacher).filter(UserTeacher.teacher_id==teacher_id)
+
+                for student in students:
+                    user_id=student.user_id
+                    student_details=db.session.query(User).filter(User.id==user_id).first()
+                    progress=overall_progress(user_id=user_id)
+                    print(student_details.dob)
+                    all_progress.append({"student_name":student_details.full_name,
+                                        "dob":str(student_details.dob),
+                                        "student_id":student_details.id,
+                                        "student_name":student_details.full_name,
+                                        "overall_progress":progress})
+                    
+                teacher_wise.append({"teacher_id":teacher_id,"student_details":all_progress})
+            return {"teacher_progress":teacher_wise}
+        except SQLAlchemyError as e:
+            return {"error":"internal server error","details":str(e)},500
+        
+
+          
+            
+
+
