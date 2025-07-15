@@ -14,9 +14,12 @@ class User(db.Model,UserMixin):
     dob = db.Column(db.Date, nullable=False)
     rewards = db.Column(db.Integer, default=0)
     picture = db.Column(db.String(255), default='/static/user_placeholder.png')
-    user_type = db.Column(db.Boolean, nullable=False)  # 0= student, 1 = admin
+    user_type = db.Column(db.Boolean, nullable=False)
     institute_id = db.Column(db.Integer, nullable=False)
     streak = db.Column(db.Integer, default=0)
     streak_start_timestamp = db.Column(db.DateTime, nullable=True)
     latest_timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_class = db.Column(db.String(50), nullable=True)
+    verified = db.Column(db.Integer, default=0)
+
+    

@@ -8,7 +8,7 @@ from models.user import User
 from flask_login import login_required
 from .helper_functions import to_dict,count_students
 from sqlalchemy.exc import SQLAlchemyError
-
+from models.teacher import Teacher
 
 class InstituteResource(Resource):
        @login_required
@@ -126,6 +126,49 @@ class ToggleBlockInstitute(Resource):
               except SQLAlchemyError as e:
                      db.session.rollback()
                      return {"error": "Internal Server Error", "details": str(e)}, 500
+              
+class InstituteTeacher(Resource):
+    def get(self, institute_id):
+        try:
+            #Check if the institute exists
+            institute = db.session.query(Institute).filter_by(id=institute_id).first()
+            if not institute:
+                return {
+                    "message": f"Institution with id {institute_id} not found.",
+                    "teachers": []
+                }, 404
+
+            #Fetch teachers in this institute
+            teachers = db.session.query(Teacher).filter_by(institute_id=institute_id).all()
+
+            # Serialize teachers
+            teacher_list = [
+                {
+                    "id": teacher.id,
+                    "name": teacher.name,
+                    "email": teacher.email,
+                    "class": teacher.class_teacher
+                }
+                for teacher in teachers
+            ]
+
+            return {
+                "message": "Successfully fetched teachers.",
+                "teachers": teacher_list
+            }, 200
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {
+                "message": "Database error occurred.",
+                "error": str(e)
+            }, 500
+
+        except Exception as e:
+            return {
+                "message": "Unexpected error occurred.",
+                "error": str(e)
+            }, 500
               
               
 
