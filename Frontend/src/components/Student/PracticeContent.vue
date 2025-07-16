@@ -122,7 +122,7 @@ import { ref, onMounted, nextTick, computed } from 'vue';
 import InteractiveLayout from '../InteractiveLayout.vue';
 
 // Number of units (set this dynamically as needed)
-const numUnits = ref(3); // Change this value to test different cases (0-15)
+const numUnits = ref(10); // Change this value to test different cases (0-15)
 
 // Road segments: each segment extends the previous, so the path for n units is the first n segments joined
 const roadSegments = [
