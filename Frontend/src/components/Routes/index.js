@@ -6,6 +6,7 @@ import AdminHome from "../Admin/AdminDashboard.vue";
 import StudentHome from "../Student/StudentHome.vue";
 import StudentPractice from "../Student/StudentPractice.vue";
 import StudentProfile from "../Student/StudentProfile.vue";
+import VideosUploadPage from "../Admin/VideosUploadPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -18,6 +19,10 @@ const router = createRouter({
     {path: "/student-practice" , component: StudentPractice},
 
     {path : "/studentprofile" , component: StudentProfile},
+
+    {path : "/videos-upload" , component : VideosUploadPage}
+
+
   ]
 })
 

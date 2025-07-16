@@ -100,15 +100,15 @@ function editProfile() {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   }
 
-.sidebar {
-  background: #ffc56e;
+/*.sidebar {
+  
   width: 230px;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: 18px;
   position: relative;
-}
+}*/
 
 .sidebar-profile {
   margin-bottom: 20px;
