@@ -1,18 +1,10 @@
 <template>
+  <InteractiveLayout>
   <div class="profile-layout">
-    <!-- Sidebar -->
-
-
-
-    <StudentSidebar/>
     <!-- Main Content -->
     <div class="main-content">
       <header class="profile-header">
-        <span></span>
         <h1>PROFILE</h1>
-        <button class="logout-btn">
-          <span class="logout-icon">🔒</span> Logout
-        </button>
       </header>
 
       <section class="profile-card-section">
@@ -43,6 +35,7 @@
       </section>
     </div>
   </div>
+  </InteractiveLayout>
 </template>
 
 <script setup>
@@ -50,6 +43,8 @@ import { ref } from 'vue'
 // import StudentSidebar_2 from './StudentSidebar_2.vue'
 import StudentSidebar from './StudentSidebar.vue'
 import Navbar from './Navbar.vue'
+import InteractiveLayout from '../InteractiveLayout.vue'
+
 // Sidebar navigation
 const navItems = [
   { text: 'HOME', route: '/home' },
@@ -83,7 +78,6 @@ function editProfile() {
 .profile-layout {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(135deg, #fcb69f 0%, #ffecd2 100%);
   font-family: 'Poppins', sans-serif;
 }
 
@@ -159,13 +153,12 @@ function editProfile() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background : linear-gradient(135deg, #E54C91 0%, #FFC800 100%);
 }
 
 .profile-header {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-top: 22px;
   margin-bottom: 18px;

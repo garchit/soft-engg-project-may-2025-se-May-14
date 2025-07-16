@@ -10,3 +10,6 @@
     flask_migrate
     flasgger
     flask_swagger_ui
+    python-dotenv
+    torch
+    sentence_transformers

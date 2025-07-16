@@ -7,6 +7,8 @@ from models.institute import Institute
 from models.user import User
 from flask_login import login_required
 from .helper_functions import to_dict,count_students
+from sqlalchemy.exc import SQLAlchemyError
+from models.teacher import Teacher
 
 class InstituteResource(Resource):
        @login_required
@@ -51,7 +53,8 @@ class InstituteResource(Resource):
                      name=data.get("name"),
                      email=data.get("email"),
                      password=data.get("password"), 
-                     address=data.get("address")
+                     address=data.get("address"),
+                     blocked=0
                      )
               check_by_name=db.session.query(Institute).filter(Institute.name == new_institute.name).first()
               check_by_email=db.session.query(Institute).filter(Institute.email == new_institute.email).first()
@@ -97,6 +100,77 @@ class AllInstitute(Resource):
                      if each_institute.id!=-1:
                             json_list.append(to_dict(each_institute,total_students))
                      else:
-                            json_list.append({"IndependentStudents":total_students})
+                            json_list.append({"id":-1,
+                                              "name":"Independent Students",
+                                              "email":"Not Applicable",
+                                              "total_students":total_students,
+                                              "blocked":"You cannot block me!!"
+                                              })
 
               return json_list,200
+
+class ToggleBlockInstitute(Resource):
+       def put(self,institute_id):
+              try:
+
+                     institute=db.session.query(Institute).filter(Institute.id==institute_id).first()
+                     if not institute:
+                            return {"error":"No such institute"},404
+                     blocked=institute.blocked
+                     if blocked==0:
+                            institute.blocked=1
+                     else:
+                            institute.blocked=0
+                     db.session.commit()
+                     return {"message":"Action done successfully"},200
+              except SQLAlchemyError as e:
+                     db.session.rollback()
+                     return {"error": "Internal Server Error", "details": str(e)}, 500
+              
+class InstituteTeacher(Resource):
+    def get(self, institute_id):
+        try:
+            #Check if the institute exists
+            institute = db.session.query(Institute).filter_by(id=institute_id).first()
+            if not institute:
+                return {
+                    "message": f"Institution with id {institute_id} not found.",
+                    "teachers": []
+                }, 404
+
+            #Fetch teachers in this institute
+            teachers = db.session.query(Teacher).filter_by(institute_id=institute_id).all()
+
+            # Serialize teachers
+            teacher_list = [
+                {
+                    "id": teacher.id,
+                    "name": teacher.name,
+                    "email": teacher.email,
+                    "class": teacher.class_teacher
+                }
+                for teacher in teachers
+            ]
+
+            return {
+                "message": "Successfully fetched teachers.",
+                "teachers": teacher_list
+            }, 200
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {
+                "message": "Database error occurred.",
+                "error": str(e)
+            }, 500
+
+        except Exception as e:
+            return {
+                "message": "Unexpected error occurred.",
+                "error": str(e)
+            }, 500
+              
+              
+
+
+

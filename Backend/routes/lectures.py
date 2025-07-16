@@ -5,6 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from models import db
 from models.lecture import Lecture
 from models.unit import Unit  # required to check if unit_id exists
+from models.user_lecture import UserLecture
+from models.user import User
 
 
 class LectureResource(Resource):
@@ -122,3 +124,23 @@ class LectureResource(Resource):
         except SQLAlchemyError as e:
             db.session.rollback()
             return {"error": "Internal Server Error", "details": str(e)}, 500
+        
+class UserLectureResource(Resource):
+    def get(self):
+        pass
+    def post(self,user_id,lecture_id):
+        user=db.session.query(User).filter(User.id==user_id).first()
+        if user:
+            lecture=db.session.query(Lecture).filter(Lecture.id==lecture_id).first()
+            if lecture:
+                user_lecture=UserLecture(user_id=user_id,lecture_id=lecture_id)
+                db.session.add(user_lecture)
+                db.session.commit()
+                return {
+                    "message":"Succesfully Watched Lecture"
+                },200
+
+
+        
+        
+        

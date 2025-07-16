@@ -10,3 +10,4 @@ class Institute(db.Model,UserMixin):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     address=db.Column(db.String(255), nullable=False)
+    blocked=db.Column(db.Integer,nullable=False)

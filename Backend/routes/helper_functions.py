@@ -2,11 +2,18 @@ from models.user import User
 from models import db
 from models.lecture import Lecture
 from models.unit import Unit
+from models.user_lecture import UserLecture
+from models.lecture import Lecture
+from models.unit import Unit as Course
+from models.user_course import UserCourse
+from models.teacher import Teacher
 
 
 
 def to_dict(institute,total_students):
-              return {"id":institute.id,"name":institute.name,"email":institute.email,"total_students":total_students}
+              return {"id":institute.id,"name":institute.name,"email":institute.email,"total_students":total_students,
+                      "blocked":institute.blocked
+                      }
 
 def count_students(institute_id):
         return len(db.session.query(User).filter(User.institute_id==institute_id).all())
@@ -23,3 +30,46 @@ def create_json(course):
             "course_description":course.description,
             "lectures":lecture_data
             }
+
+def lecture_progress(user_id,course_id):
+        total_lectures=db.session.query(Lecture).filter(Lecture.unit_id==course_id).all()
+        total_lectures_attempted=0
+        for lecture in total_lectures:
+                user_lecture=db.session.query(UserLecture).filter(UserLecture.user_id==user_id,UserLecture.lecture_id==lecture.id).first()
+                if user_lecture:
+                        total_lectures_attempted+=1
+        if len(total_lectures)!=0:
+                attempted_quiz=len(db.session.query(UserCourse).filter(UserCourse.user_id==user_id,UserCourse.course_id==course_id).all())
+                # print(attempted_quiz)
+                progress=round(((total_lectures_attempted)*100)/len(total_lectures),2)
+        else:
+                progress=0
+        return {course_id:progress}
+
+def course_progress(user_id):
+        total_progress=[]
+        courses=db.session.query(Course).all()
+        for course in courses:
+                total_progress.append((lecture_progress(user_id=user_id,course_id=course.id)))
+                total_progress[-1][course.id]=0.7*total_progress[-1][course.id]
+                completed_course=db.session.query(UserCourse).filter(UserCourse.user_id==user_id,UserCourse.course_id==course.id).first()
+                if completed_course:
+                        total_progress[-1][course.id]=round(total_progress[-1][course.id]+30,2)
+        return total_progress
+
+
+def overall_progress(user_id):
+        course_total_progress=course_progress(user_id)
+        sum_progress=0
+        for progress in course_total_progress:
+            sum_progress+=list(progress.values())[0]
+        total_courses=db.session.query(Course).count()
+        overall_progress=sum_progress/total_courses
+        return round(overall_progress,2)
+
+def getTeachers(institute_id):
+        teachers=db.session.query(Teacher).filter(Teacher.institute_id==institute_id)
+        ids=[]
+        for teacher in teachers:
+                ids.append(teacher.id)
+        return ids

@@ -3,6 +3,9 @@ from flask_restful import Resource
 from datetime import datetime
 from models import db
 from models.user import User
+from models.institute import Institute
+from sqlalchemy.exc import SQLAlchemyError
+
 
 class UserApi(Resource):
     def get(self, id):
@@ -105,3 +108,85 @@ class UserApi(Resource):
         db.session.delete(user)
         db.session.commit()
         return {"message": "User deleted successfully"}, 200
+    
+class VerifyStudents(Resource):
+    def get(self, institute_id):
+        try:
+            institute = db.session.query(Institute).filter_by(id=institute_id).first()
+            if not institute:
+                return {
+                    "message": f"Institution with id {institute_id} does not exist.",
+                    "students": []
+                }, 404
+            students = db.session.query(User).filter(
+                User.institute_id == institute_id,
+                User.verified == 0
+            ).all()
+
+            unverified_student_list = [
+                {
+                    "id": student.id,
+                    "name": student.full_name,
+                    "dob": str(student.dob)
+                }
+                for student in students
+            ]
+
+            return {
+                "message": "Successfully fetched unverified students.",
+                "students": unverified_student_list
+            }, 200
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {
+                "message": "Database error occurred.",
+                "error": str(e)
+            }, 500
+
+        except Exception as e:
+            return {
+                "message": "An unexpected error occurred.",
+                "error": str(e)
+            }, 500
+    def put(self, user_id):
+        try:
+            data = request.get_json(force=True)
+
+            # Validate input
+            if not data or "verified" not in data:
+                return {"message": "Missing 'verified' field in request body."}, 400
+
+            verified_value = data["verified"]
+            if verified_value not in [1, -1]:
+                return {"message": "Invalid value for 'verified'. Must be 1 (verify) or -1 (reject)."}, 400
+
+            # Check if user exists
+            user = db.session.query(User).filter_by(id=user_id).first()
+            if not user:
+                return {"message": f"User with id {user_id} not found."}, 404
+
+            # Update verified status
+            user.verified = verified_value
+            db.session.commit()
+
+            status = "verified" if verified_value == 1 else "rejected"
+            return {
+                "message": f"User {user_id} has been successfully {status}."
+            }, 200
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {
+                "message": "Database error occurred.",
+                "error": str(e)
+            }, 500
+
+        except Exception as e:
+            return {
+                "message": "An unexpected error occurred.",
+                "error": str(e)
+            }, 500
+
+
+        
