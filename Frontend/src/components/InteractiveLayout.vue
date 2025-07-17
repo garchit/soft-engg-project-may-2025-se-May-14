@@ -122,7 +122,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 60px;
-  background-color: #ffffffac;
+  background-color: #EBCCD3;
   z-index: 1000;
   display: flex;
   padding: 0 20px;

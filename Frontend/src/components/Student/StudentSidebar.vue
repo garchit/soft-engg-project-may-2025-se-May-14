@@ -24,7 +24,7 @@
         </li>
         <li class="nav-item">
           <router-link 
-            to="/student-practice" 
+            to="/student-practice-content" 
             class="nav-link" 
             :class="{ active: activeLink === 'PRACTICE' }"
             @click="setActiveLink('student-practice')"
@@ -35,7 +35,7 @@
 
           <li class="nav-item">
           <router-link 
-            to="/studentprofile" 
+            to="/student-profile" 
             class="nav-link" 
             :class="{ active: activeLink === 'PROFILE' }"
             @click="setActiveLink('studentprofile')"
@@ -62,7 +62,7 @@ const setActiveLink = (linkName) => {
 .sidebar {
   width: 250px;
   height: 100vh; /* Full height */
-  background-color: rgba(255, 255, 255, 0.659);
+  background-color: #ffffff4b;
   position: fixed;
   left: 0;
   top: 0; /* Start from the top */
