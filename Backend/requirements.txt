@@ -12,4 +12,6 @@
     flask_swagger_ui
     python-dotenv
     torch
-    sentence_transformers
+    youtube-transcript-api
+    requests
+    urllib3

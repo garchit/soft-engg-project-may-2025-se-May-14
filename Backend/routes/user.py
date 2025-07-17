@@ -5,6 +5,8 @@ from models import db
 from models.user import User
 from models.institute import Institute
 from sqlalchemy.exc import SQLAlchemyError
+from models.user_teacher import UserTeacher
+from models.teacher import Teacher
 
 
 class UserApi(Resource):
@@ -127,6 +129,7 @@ class VerifyStudents(Resource):
                 {
                     "id": student.id,
                     "name": student.full_name,
+                    "class":student.user_class,
                     "dob": str(student.dob)
                 }
                 for student in students
@@ -168,6 +171,16 @@ class VerifyStudents(Resource):
 
             # Update verified status
             user.verified = verified_value
+            institute_id,user_class=user.institute_id,user.user_class
+
+            
+            teacher = db.session.query(Teacher).filter(Teacher.class_teacher == user_class,Teacher.institute_id == institute_id).first()
+
+            if not teacher:
+                return {"message": "No teacher found for the given class and institute."}, 404
+
+            user_teacher = UserTeacher(user_id=user_id,teacher_id=teacher.id)
+            db.session.add(user_teacher)
             db.session.commit()
 
             status = "verified" if verified_value == 1 else "rejected"
@@ -187,6 +200,3 @@ class VerifyStudents(Resource):
                 "message": "An unexpected error occurred.",
                 "error": str(e)
             }, 500
-
-
-        

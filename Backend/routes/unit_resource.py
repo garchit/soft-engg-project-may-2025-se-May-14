@@ -117,3 +117,4 @@ class CourseProgress(Resource):
         total_courses=db.session.query(Course).count()
         overall_progress=sum_progress/total_courses
         return {"course_progress":course_total_progress,"overall_progress":round(overall_progress,2)},200
+        
