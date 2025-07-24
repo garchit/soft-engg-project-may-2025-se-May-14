@@ -1,0 +1,353 @@
+Q: What is the difference between a savings account and a checking account?
+A: A savings account is designed for storing money and earning interest, while a checking account is used for daily transactions like paying bills and withdrawing cash.
+
+Q: What does "compound interest" mean?
+A: Compound interest is interest calculated on both the initial principal and the accumulated interest from previous periods.
+
+Q: How does a credit score work?
+A: A credit score is a number that reflects your creditworthiness, based on your credit history, payment habits, and debt usage.
+
+Q: What is a budget and why is it important?
+A: A budget is a financial plan that helps track income and expenses. It’s important because it helps you control spending, save money, and achieve financial goals.
+
+Q: What are fixed and variable expenses?
+A: Fixed expenses stay the same each month (like rent), while variable expenses can change (like groceries or utility bills).
+
+Q: What is the 50/30/20 budgeting rule?
+A: It's a rule suggesting you spend 50% of your income on needs, 30% on wants, and 20% on savings or debt repayment.
+
+Q: Why is an emergency fund important?
+A: It provides financial security in case of unexpected expenses like medical bills, car repairs, or job loss.
+
+Q: What is APR in credit cards?
+A: APR (Annual Percentage Rate) is the annual interest rate charged on borrowed money via your credit card.
+
+Q: What is the difference between gross income and net income?
+A: Gross income is your total earnings before deductions, while net income is what you take home after taxes and deductions.
+
+Q: How do taxes affect your paycheck?
+A: Taxes reduce your gross income, leading to a smaller net income. Deductions include federal, state, Social Security, and Medicare taxes.
+
+Q: How do you calculate your net worth?
+A: Net worth = Total Assets - Total Liabilities. It measures your overall financial health.
+
+Q: What are good habits for managing personal finances?
+A: Budgeting, tracking expenses, saving regularly, paying bills on time, and avoiding high-interest debt.
+
+Q: How do you start saving for retirement?
+A: Open a retirement account like an IRA or 401(k), contribute consistently, and invest in a diversified portfolio.
+
+Q: What is an IRA and how does it work?
+A: An Individual Retirement Account (IRA) lets you save for retirement with tax advantages. There are Traditional and Roth IRAs with different tax rules.
+
+Q: What are the benefits of using a credit card responsibly?
+A: Building credit history, earning rewards, and access to short-term credit. Misuse, however, can lead to debt and lower credit scores.
+
+Q: What is the snowball method for paying off debt?
+A: Pay off the smallest debts first to gain momentum, then move on to larger ones, regardless of interest rate.
+
+Q: How can you improve your credit score?
+A: Pay bills on time, reduce debt, maintain low credit utilization, and check your credit report for errors.
+
+Q: What are the risks of payday loans?
+A: Very high interest rates, short repayment terms, and risk of debt cycles.
+
+Q: What is a stock and how does it work?
+A: A stock represents ownership in a company. When you buy a stock, you own a piece of that company and may earn profits via dividends or stock price appreciation.
+
+Q: What is a mutual fund?
+A: A mutual fund pools money from many investors to buy a diversified portfolio of stocks, bonds, or other assets.
+
+Q: What’s the difference between a stock and a bond?
+A: A stock is ownership in a company, while a bond is a loan to a company or government that pays interest over time.
+
+Q: What is the S&P 500?
+A: It's an index that tracks the 500 largest publicly traded U.S. companies, used as a benchmark for stock market performance.
+
+Q: What does diversification mean in investing?
+A: Diversification means spreading your investments across different assets to reduce risk.
+
+Q: What is a dividend?
+A: A dividend is a portion of a company’s profit paid to shareholders, usually quarterly.
+
+Q: What is the difference between a Roth IRA and a traditional IRA?
+A: Roth IRA contributions are taxed now and withdrawn tax-free in retirement; Traditional IRA contributions may be tax-deductible, but withdrawals are taxed later.
+
+Q: What is a brokerage account?
+A: A brokerage account is an investment account that allows you to buy and sell stocks, bonds, and other securities.
+
+Q: What is a balance sheet?
+A: A balance sheet is a financial statement showing a company’s assets, liabilities, and equity at a specific point in time.
+
+Q: How does cash flow differ from profit?
+A: Cash flow measures the actual money moving in and out of a business, while profit is what’s left after all expenses are subtracted from revenue.
+
+Q: What is EBITDA?
+A: EBITDA stands for Earnings Before Interest, Taxes, Depreciation, and Amortization. It measures a company’s core profitability.
+
+Q: What are the three main financial statements?
+A: The income statement, balance sheet, and cash flow statement.
+
+Q: What is working capital?
+A: Working capital = Current Assets - Current Liabilities. It indicates a company's short-term financial health.
+
+Q: What is the break-even point?
+A: The point where total revenue equals total costs, meaning the business is not making a profit but also not losing money.
+
+Q: What is compound annual growth rate (CAGR)?
+A: CAGR is the average annual growth rate of an investment over time, accounting for compounding.
+
+Q: What does it mean to be "underwater" on a loan?
+A: It means you owe more on the loan than the asset securing it is worth.
+
+Q: What is an amortization schedule?
+A: An amortization schedule shows how loan payments are divided between principal and interest over time.
+
+Q: What is a grace period on a credit card?
+A: It’s the time after your billing cycle ends during which you can pay your balance without interest charges.
+
+Q: What is a hard inquiry on your credit report?
+A: A hard inquiry occurs when a lender checks your credit for a loan or credit application, which may lower your credit score.
+
+Q: What is a soft inquiry?
+A: A soft inquiry is a credit check that doesn’t impact your credit score, like checking your own report.
+
+Q: What is bankruptcy?
+A: Bankruptcy is a legal process that helps individuals or businesses eliminate or repay debt under court supervision.
+
+Q: What is financial risk tolerance?
+A: Risk tolerance is the amount of risk you’re comfortable taking with your investments.
+
+Q: What is rebalancing a portfolio?
+A: Rebalancing means adjusting your investment allocations to maintain your desired asset mix.
+
+Q: What is dollar-value averaging?
+A: It’s investing variable amounts to reach a target portfolio value at each interval.
+
+Q: What is a fiduciary financial advisor?
+A: A fiduciary is legally required to act in your best financial interest.
+
+Q: What is a robo-advisor?
+A: A robo-advisor is an automated platform that manages investments using algorithms.
+
+Q: What is the difference between pre-tax and post-tax contributions?
+A: Pre-tax contributions lower your taxable income now; post-tax contributions don’t, but qualified withdrawals are tax-free.
+
+Q: What is estate planning?
+A: Estate planning is arranging how your assets will be managed and distributed after your death.
+
+Q: What is a will?
+A: A will is a legal document that outlines how you want your assets distributed after death.
+
+Q: What is a trust?
+A: A trust is a legal arrangement where a trustee holds and manages assets for beneficiaries.
+
+Q: What is a health savings account (HSA)?
+A: An HSA is a tax-advantaged account used to pay for qualified medical expenses.
+
+Q: What is a flexible spending account (FSA)?
+A: An FSA is an employer-sponsored account for healthcare or dependent care expenses, funded with pre-tax dollars.
+
+Q: What is a sinking fund?
+A: A sinking fund is money set aside regularly for a planned future expense.
+
+Q: What is financial leverage?
+A: Financial leverage means using borrowed money to increase the potential return on investment.
+
+Q: What is a margin account?
+A: A margin account lets investors borrow money from a broker to buy securities.
+
+Q: What is short selling?
+A: Short selling is selling borrowed stock in hopes of buying it back later at a lower price.
+
+Q: What is the time value of money?
+A: The time value of money means a dollar today is worth more than a dollar in the future due to earning potential.
+
+Q: What is an expense ratio?
+A: An expense ratio is the annual fee a fund charges to manage your investment.
+
+Q: What is credit utilization?
+A: Credit utilization is the percentage of your credit limit you’re using; lower rates help your credit score.
+
+Q: What is a credit limit?
+A: A credit limit is the maximum amount you can borrow on a credit card or line of credit.
+
+Q: What is a debt-to-income ratio (DTI)?
+A: DTI compares your monthly debt payments to your gross monthly income and helps lenders assess affordability.
+
+Q: What is loan pre-approval?
+A: Loan pre-approval is a lender’s conditional commitment to lend you a specific amount based on financial review.
+
+Q: What is loan consolidation?
+A: Loan consolidation combines multiple debts into one loan, often with better terms or lower payments.
+
+Q: What is a home equity loan?
+A: A home equity loan lets you borrow a lump sum using the equity in your home as collateral.
+
+Q: What is a HELOC?
+A: A Home Equity Line of Credit is a revolving credit line secured by your home equity.
+
+Q: What is mortgage amortization?
+A: Mortgage amortization is the process of gradually paying off a mortgage with regular payments over time.
+
+Q: What is PMI (Private Mortgage Insurance)?
+A: PMI protects the lender if you default on a mortgage and is typically required with low down payments.
+
+Q: What is a down payment?
+A: A down payment is the initial amount paid upfront when buying a home, with the rest financed by a loan.
+
+Q: What is escrow?
+A: Escrow is when a third party holds funds until certain conditions of a real estate transaction are met.
+
+Q: What is title insurance?
+A: Title insurance protects against future claims or issues with the ownership of your property.
+
+Q: What is an appraisal?
+A: An appraisal is an expert estimate of a property’s market value, often required by lenders.
+
+Q: What is property tax?
+A: Property tax is a local government tax based on the assessed value of your real estate.
+
+Q: What is renters insurance?
+A: Renters insurance covers personal belongings and liability for people living in rented properties.
+
+Q: What is umbrella insurance?
+A: Umbrella insurance provides extra liability coverage beyond your home or auto policy limits.
+
+Q: What is depreciation?
+A: Depreciation is the decrease in an asset’s value over time due to wear, age, or obsolescence.
+
+Q: What is an emergency withdrawal penalty?
+A: It’s a fee or tax you may pay for taking early withdrawals from certain retirement accounts.
+
+Q: What is a required minimum distribution (RMD)?
+A: RMD is the minimum amount you must withdraw each year from retirement accounts starting at a certain age.
+
+Q: What is a 529 plan?
+A: A 529 plan is a tax-advantaged savings plan used to pay for education expenses.
+
+Q: What is FAFSA?
+A: The Free Application for Federal Student Aid determines eligibility for college financial aid.
+
+Q: What is the difference between a grant and a loan?
+A: Grants don’t need to be repaid; loans must be repaid, usually with interest.
+
+Q: What is a scholarship?
+A: A scholarship is financial aid awarded for academic or other achievements that doesn’t need to be repaid.
+
+Q: What is the rule of 72?
+A: The rule of 72 estimates how long it takes to double your money by dividing 72 by your interest rate.
+
+Q: What’s your favorite coin?
+A: I think the quarter is cool—it’s shiny and worth 25 cents, enough to start a gumball machine adventure!
+
+Q: How can I save money from my pocket money?
+A: Try putting a little bit in a piggy bank every time you get some—small coins grow big over time!
+
+Q: Is it better to buy one toy or save for two?
+A: Saving for two can be more fun in the long run—double the toys, double the smiles!
+
+Q: What’s a piggy bank?
+A: A piggy bank is a fun way to keep your money safe—just drop in your coins and watch it fill up.
+
+Q: Can I open a bank account like grown-ups?
+A: Many banks have special savings accounts for kids—with help from a parent, you sure can!
+
+Q: What’s interest? Is it like being interested in pizza?
+A: Kind of! In money, interest means the bank pays you a little extra for keeping your money with them.
+
+Q: What happens if I spend all my money?
+A: Then you have none left for fun things later—so it’s smart to save some and spend some.
+
+Q: Is it okay to buy candy with my money?
+A: Totally okay—just not all of it! Saving some is sweet too.
+
+Q: What’s the biggest coin ever made?
+A: Australia made a giant gold coin that weighs over a ton! But most coins are much smaller and fit in your pocket.
+
+Q: Can money grow on trees?
+A: I wish! But nope—money comes from working, saving, and making smart choices.
+
+Q: How do people earn money?
+A: Grown-ups usually earn money by working—like teachers, doctors, or even YouTubers!
+
+Q: Can I make money as a kid?
+A: Sure! You could do chores, help neighbors, or even run a lemonade stand with your parents’ help.
+
+Q: What’s the smartest thing to do with birthday money?
+A: Split it—spend a little, save a little, and maybe even share a little!
+
+Q: Is a penny lucky?
+A: Many people think so—especially if you find one heads-up!
+
+Q: Can I give money to help animals or people?
+A: Absolutely! Giving is one of the kindest things you can do with your money.
+
+Q: What’s a budget? Is it boring?
+A: Not boring at all—it’s like a plan that helps you save for fun stuff like toys or games!
+
+Q: Do you know any money jokes?
+A: Sure! Why did the dollar bill go to school? Because it wanted to make cents!
+
+Q: Can I be rich one day?
+A: Of course! With smart saving, learning, and big dreams, anything is possible.
+
+Q: What is allowance?
+A: Allowance is money your parents might give you regularly to spend, save, or learn how to manage money.
+
+Q: Why should I save money instead of spending it all?
+A: Saving money helps you buy bigger things later, like toys, games, or even a bike!
+
+Q: What is a coin jar?
+A: It’s a jar where you drop your spare coins—it’s like a treasure chest that slowly fills up with savings.
+
+Q: Can I make a budget for my pocket money?
+A: Totally! You can plan how much to save, spend, and maybe even give to someone in need.
+
+Q: What’s a “need” and what’s a “want”?
+A: A need is something important like food or clothes. A want is something fun, like candy or toys.
+
+Q: What is change?
+A: Change is the money you get back when you pay more than something costs—like if you give a dollar for a 75-cent candy, you get 25 cents back.
+
+Q: What’s a safe way to keep my money?
+A: You can use a piggy bank, a jar, or even open a bank account with help from an adult.
+
+Q: Why do prices have cents like $2.99 instead of $3?
+A: It’s a trick to make things seem cheaper, even if it’s just one penny less!
+
+Q: What is a sale?
+A: A sale means something costs less than usual—it’s a way to save money when you shop.
+
+Q: What does “investing” mean?
+A: Investing is putting your money into something, like a company, so it can grow over time.
+
+Q: What is a job?
+A: A job is work people do to earn money, like being a teacher, baker, or artist.
+
+Q: Why do we pay for things?
+A: We pay for things because people work hard to make or sell them—it’s how money is exchanged for goods or services.
+
+Q: What is money made of?
+A: Coins are made of metal and bills are made of paper and cotton, but their value comes from how we agree to use them.
+
+Q: What is a debit card?
+A: A debit card lets you spend money directly from your bank account—just like using cash, but with a card.
+
+Q: What is a wallet for?
+A: A wallet holds your money, cards, and maybe even fun stuff like stickers or photos!
+
+Q: Can saving be fun?
+A: Absolutely! Watching your money grow is exciting—especially when you’re saving for something awesome.
+
+Q: Why do adults have to pay bills?
+A: Bills are payments for things like electricity, water, or phones—stuff we use every day.
+
+Q: What’s a smart shopper?
+A: A smart shopper looks for good deals, compares prices, and doesn’t buy things they don’t really need.
+
+Q: What is a receipt?
+A: A receipt is a paper or digital note that shows what you bought and how much you paid.
+
+Q: Why can’t I buy everything I want?
+A: Because money is limited—we have to make smart choices and sometimes wait or save up.
