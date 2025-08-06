@@ -14,12 +14,12 @@
           </li>
           <li class="nav-item">
             <router-link 
-              to="/lectures" 
+              to="/videos-upload" 
               class="nav-link" 
               :class="{ active: activeLink === 'LECTURES' }"
               @click="setActiveLink('lectures')"
             >
-              LECTURES
+              LECTURES & Courses
             </router-link>
           </li>
           <li class="nav-item">
@@ -30,6 +30,17 @@
               @click="setActiveLink('institute')"
             >
               INSTITUTE
+            </router-link>
+          </li>
+
+          <li class="nav-item">
+            <router-link 
+              to="/quiz-manage" 
+              class="nav-link" 
+              :class="{ active: activeLink === 'INSTITUTE' }"
+              @click="setActiveLink('institute')"
+            >
+              Quiz Management
             </router-link>
           </li>
         </ul>
