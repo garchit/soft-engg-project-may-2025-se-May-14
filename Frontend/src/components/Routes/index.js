@@ -12,6 +12,9 @@ import StudentPractice from "../Student/StudentPractice.vue";
 import InstituteHome from "../Institute/InstituteHome.vue";
 import TeacherProgress from "../Institute/TeacherProgress.vue";
 import VerifyStudents from "../Institute/VerifyStudents.vue";
+import QuizManagement from "../Admin/QuizManagement.vue";
+import InstituteProfile from "../Institute/InstituteProfile.vue";
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -21,7 +24,7 @@ const router = createRouter({
     {path: "/login", component: Login},
     {path: "/admin-home" , component: AdminHome},
     {path: "/student-home" , component: StudentHome},
-    {path: "/student-practice" , component: StudentPractice},
+    // {path: "/student-practice" , component: StudentPractice},
 
     // {path : "/studentprofile" , component: StudentProfile},
 
@@ -33,7 +36,10 @@ const router = createRouter({
 
     {path: "/:institute_id/institute-home", component: InstituteHome},
     {path: "/:institute_id/teacher-progress/:teacher_id", component: TeacherProgress},
-    {path: "/:institute_id/verify-students", component: VerifyStudents}
+    {path: "/:institute_id/verify-students", component: VerifyStudents},
+    {path: "/quiz-manage" , component : QuizManagement},
+
+    {path: "/InstituteProfile" , component : InstituteProfile}
   ]
 })
 

@@ -10,16 +10,12 @@ import Sidebar from './Sidebar.vue'
 import { ref, onMounted } from 'vue'
 import deleteIcon from '@/assets/delete.png'
 import playButton from '@/assets/play-button.png'
+import updateIcon from '@/assets/updateIcon.png'
 import { useToast } from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
+import Swal from 'sweetalert2' // Add this import
+import pen from '@/assets/pen.png'
 
-// import VideoPlay from 'Frontend/node_modules/vue3-video-play'
-// import VideoPlay from 'vue3-video-play'
-// Frontend\node_modules\vue3-video-play
-// C:\Users\Archit Garg\Desktop\Project - SE\Frontend\node_modules\vue3-video-play
-// import 'vue3-video-play/dist/style.css'
-// import delete from '@/assets/delete.png'
-// Sidebar navigation state
 const activeTab = ref('lectures')
 
 const toast = useToast()
@@ -40,6 +36,20 @@ const selectedCourseId = ref(null)
 const showVideoModal = ref(false)
 const currentVideoUrl = ref('')
 
+// Update modal state
+const updateCourseModalVisible = ref(false)
+const updateLectureModalVisible = ref(false)
+const updateTitle = ref('')
+const updateDescription = ref('')
+const updateLectureTitle = ref('')
+const updateLectureDescription = ref('')
+const updateLectureVideoUrl = ref('')
+const updateLectureUnitId = ref('')
+const selectedCourseIdForUpdate = ref(null)
+const selectedLectureIdForUpdate = ref(null)
+const selectedLectureIndexForUpdate = ref(null)
+
+
 // Fetch courses from API
 const fetchCourses = async () => {
   try {
@@ -53,21 +63,7 @@ const fetchCourses = async () => {
   }
 }
 
-// Add course
-// const addCourse = () => {
-//   if (newTitle.value.trim() && newDescription.value.trim()) {
-//     Courses.value.push({
-//       course_title: newTitle.value,
-//       course_description: newDescription.value,
-//       lectures: []
-//     })
-//     newTitle.value = ''
-//     newDescription.value = ''
-//     visible.value = false
-//   }
-// }
 
-// ...existing code...
 
 const addCourse = async () => {
   if (newTitle.value.trim() && newDescription.value.trim()) {
@@ -112,20 +108,7 @@ const addCourse = async () => {
   }
 }
 
-// Add lecture
-// const addLectureToCourse = () => {
-//   if (newLectureTitle.value.trim() && newLectureVideoUrl.value.trim()) {
-//     Courses.value[selectedCourseIndex.value].lectures.push({
-//       lecture_title: newLectureTitle.value,
-//       lecture_description: newLectureDescription.value,
-//       lecture_link: newLectureVideoUrl.value
-//     })
-//     newLectureTitle.value = ''
-//     newLectureVideoUrl.value = ''
-//     newLectureDescription.value = ''
-//     lectureModalVisible.value = false
-//   }
-// }
+// add lecture
 
 const addLectureToCourse = async () => {
   if (newLectureTitle.value.trim() && newLectureVideoUrl.value.trim()) {
@@ -215,10 +198,23 @@ const closeVideoModal = () => {
   currentVideoUrl.value = ''
 }
 
-// Delete lecture function
+
+// Updated Delete lecture function with SweetAlert2
 const deleteLecture = async (courseIndex, lectureIndex, lectureId) => {
   console.log('Deleting lecture with ID:', lectureId);
-  if (confirm('Are you sure you want to delete this lecture?')) {
+
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
+  });
+
+  if (result.isConfirmed) {
     try {
       const response = await fetch(`${API_BASE_URL}/lecture/${lectureId}`, {
         method: 'DELETE',
@@ -228,36 +224,185 @@ const deleteLecture = async (courseIndex, lectureIndex, lectureId) => {
 
       // Remove from local array
       Courses.value[courseIndex].lectures.splice(lectureIndex, 1);
-      toast.success('Lecture deleted successfully!');
+
+      // Success alert
+      await Swal.fire({
+        title: 'Deleted!',
+        text: 'Your lecture has been deleted.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
 
     } catch (error) {
       console.error('Failed to delete lecture:', error);
-      toast.error('Failed to delete lecture!');
+
+      // Error alert
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete lecture. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   }
 }
+
 
 // Delete course function
 const deleteCourse = async (courseIndex, courseId) => {
   console.log('Deleting course with ID:', courseId);
-  if (confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
+
+  const result = await Swal.fire({
+    title: 'Delete Course?',
+    text: "This will permanently delete the course and all its lectures. This action cannot be undone!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete course!',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true
+  });
+
+  if (result.isConfirmed) {
     try {
       const response = await fetch(`${API_BASE_URL}/course/${courseId}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
+
       // Remove from local array
       Courses.value.splice(courseIndex, 1);
-      toast.success('Course deleted successfully!');
-      
+
+      // Success alert
+      await Swal.fire({
+        title: 'Deleted!',
+        text: 'Course has been deleted successfully.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
     } catch (error) {
       console.error('Failed to delete course:', error);
-      toast.error('Failed to delete course!');
+
+      // Error alert
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete course. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   }
 }
+
+// Update course
+const updateCourse = async () => {
+  if (updateTitle.value.trim() && updateDescription.value.trim()) {
+    const payload = {
+      title: updateTitle.value,
+      description: updateDescription.value,
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/course/${selectedCourseIdForUpdate.value}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      // Update local data
+      const courseIndex = Courses.value.findIndex(course => course.course_id === selectedCourseIdForUpdate.value);
+      if (courseIndex !== -1) {
+        Courses.value[courseIndex].course_title = updateTitle.value;
+        Courses.value[courseIndex].course_description = updateDescription.value;
+      }
+
+      updateTitle.value = '';
+      updateDescription.value = '';
+      updateCourseModalVisible.value = false;
+      selectedCourseIdForUpdate.value = null;
+      toast.success('Course updated successfully!')
+
+    } catch (error) {
+      console.error('Failed to update course:', error);
+      toast.error('Failed to update course!')
+    }
+  }
+}
+
+// Open update course modal
+const openUpdateCourseModal = (courseId, courseTitle, courseDescription) => {
+  selectedCourseIdForUpdate.value = courseId;
+  updateTitle.value = courseTitle;
+  updateDescription.value = courseDescription;
+  updateCourseModalVisible.value = true;
+}
+
+// Update lecture
+const updateLecture = async () => {
+  if (updateLectureTitle.value.trim() && updateLectureVideoUrl.value.trim()) {
+    const payload = {
+      title: updateLectureTitle.value,
+      description: updateLectureDescription.value,
+      link: updateLectureVideoUrl.value,
+      unit_id: updateLectureUnitId.value
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/lecture/${selectedLectureIdForUpdate.value}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      // Update local data
+      const courseIndex = Courses.value.findIndex(course => course.course_id === updateLectureUnitId.value);
+      if (courseIndex !== -1) {
+        const lectureIndex = selectedLectureIndexForUpdate.value;
+        Courses.value[courseIndex].lectures[lectureIndex].lecture_title = updateLectureTitle.value;
+        Courses.value[courseIndex].lectures[lectureIndex].lecture_description = updateLectureDescription.value;
+        Courses.value[courseIndex].lectures[lectureIndex].lecture_link = updateLectureVideoUrl.value;
+      }
+
+      updateLectureTitle.value = '';
+      updateLectureDescription.value = '';
+      updateLectureVideoUrl.value = '';
+      updateLectureUnitId.value = '';
+      updateLectureModalVisible.value = false;
+      selectedLectureIdForUpdate.value = null;
+      selectedLectureIndexForUpdate.value = null;
+      toast.success('Lecture updated successfully!')
+
+    } catch (error) {
+      console.error('Failed to update lecture:', error);
+      toast.error('Failed to update lecture!')
+    }
+  }
+}
+
+// Open update lecture modal
+const openUpdateLectureModal = (lectureId, lectureTitle, lectureDescription, lectureLink, unitId, courseIndex, lectureIndex) => {
+  selectedLectureIdForUpdate.value = lectureId;
+  selectedLectureIndexForUpdate.value = lectureIndex;
+  updateLectureTitle.value = lectureTitle;
+  updateLectureDescription.value = lectureDescription;
+  updateLectureVideoUrl.value = lectureLink;
+  updateLectureUnitId.value = unitId;
+  updateLectureModalVisible.value = true;
+}
+
 
 
 onMounted(fetchCourses)
@@ -289,15 +434,28 @@ onMounted(fetchCourses)
               <CAccordionHeader>
                 <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
                   <span>{{ Course.course_title }}</span>
-                  <CButton size="sm" color="info" @click.stop="openLectureModal(index, Course.course_id)">+ Add Lecture
-                  </CButton>
 
-                  <CButton @click.stop="deleteCourse(index, Course.course_id)"
-                    style="display: flex; justify-content: space-between; align-items: center;"
-                     title="Delete Course" color="danger">
+                  <div style="display: flex; gap: 10px; align-items: center;">
+
+                    
+                    <CButton size="sm" color="info" @click.stop="openLectureModal(index, Course.course_id)">+ Add Lecture
+                    </CButton>
+                    
+                    <CButton @click.stop="deleteCourse(index, Course.course_id)"
+                    style="display: flex; justify-content: space-between; align-items: center;" title="Delete Course"
+                    size="sm"
+                    color="danger">
                     <!-- <img :src="deleteIcon" alt="Delete" style="width: 20px; height: 20px;" /> -->
-                     Delete Course
+                    Delete Course
                   </CButton>
+                  
+                  <CButton size="sm" color="warning"
+                  @click.stop="openUpdateCourseModal(Course.course_id, Course.course_title, Course.course_description)">
+                  
+                  Update
+                </CButton>
+                
+              </div>
 
                 </div>
               </CAccordionHeader>
@@ -318,21 +476,31 @@ onMounted(fetchCourses)
                           style="background: none; border: none; padding: 0; cursor: pointer;">
                           <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
                         </button> -->
-
-
-                        <button @click="deleteLecture(index, i, lecture.lecture_id)" class="action-btn delete-btn"
+                        
+                        
+                        <div style="display: flex; gap: 10px;">
+                        
+                          <button @click="deleteLecture(index, i, lecture.lecture_id)" class="action-btn delete-btn"
                           title="Delete Lecture">
-                          <img :src="deleteIcon" alt="Delete" style="width: 22px; height: 22px;" />
+                          <img :src="deleteIcon" alt="Delete" style="width: 32px; height: 32px;" />
                         </button>
-
-
-                        <!-- Replace your current play button with this -->
-                        <button @click="playLecture(lecture.lecture_link)"
-                          style="background: none; border: none; padding: 0; cursor: pointer;">
-                          <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
-                        </button>
-
-
+                        
+                        <!-- Add update button to lecture header -->
+                        <button
+                        @click="openUpdateLectureModal(lecture.lecture_id, lecture.lecture_title, lecture.lecture_description, lecture.lecture_link, Course.course_id, index, i)"
+                        class="action-btn update-btn" title="Update Lecture">
+                        <img :src="pen" alt="Update" style="width: 32px; height: 32px;" />
+                      </button>
+                      
+                      
+                      <!-- Replace your current play button with this -->
+                      <button @click="playLecture(lecture.lecture_link)"
+                      style="background: none; border: none; padding: 0; cursor: pointer;">
+                      <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
+                    </button>
+                    
+                    
+                  </div>
 
 
                       </div>
@@ -398,6 +566,47 @@ onMounted(fetchCourses)
               <CButton color="secondary" @click="closeVideoModal">Close</CButton>
             </CModalFooter>
           </CModal>
+
+          <!-- Update Course Modal -->
+          <CModal :visible="updateCourseModalVisible" @close="updateCourseModalVisible = false" alignment="center"
+            size="lg">
+            <CModalHeader>
+              <CModalTitle>Update Course</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CForm>
+                <CFormInput v-model="updateTitle" label="Course Title" placeholder="Enter course title" class="mb-3" />
+                <CFormTextarea v-model="updateDescription" label="Course Description" rows="4"
+                  placeholder="Enter course description" />
+              </CForm>
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" @click="updateCourseModalVisible = false">Cancel</CButton>
+              <CButton color="warning" @click="updateCourse">Update</CButton>
+            </CModalFooter>
+          </CModal>
+
+          <!-- Update Lecture Modal -->
+          <CModal :visible="updateLectureModalVisible" @close="updateLectureModalVisible = false" alignment="center"
+            size="lg">
+            <CModalHeader>
+              <CModalTitle>Update Lecture</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CForm>
+                <CFormInput v-model="updateLectureTitle" label="Lecture Title" placeholder="Enter lecture title"
+                  class="mb-3" />
+                <CFormInput v-model="updateLectureDescription" label="Lecture Description"
+                  placeholder="Enter lecture description" class="mb-3" />
+                <CFormInput v-model="updateLectureVideoUrl" label="Lecture Link" placeholder="Enter video link" />
+              </CForm>
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" @click="updateLectureModalVisible = false">Cancel</CButton>
+              <CButton color="warning" @click="updateLecture">Update</CButton>
+            </CModalFooter>
+          </CModal>
+
 
 
 
@@ -485,4 +694,25 @@ onMounted(fetchCourses)
   color: #333;
   font-size: 0.98rem;
 }
+.action-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+/*.action-btn:hover {
+  background-color: #f0f0f0;
+} 
+
+.update-btn:hover {
+  background-color: #fff3cd;
+}
+
+.delete-btn:hover {
+  background-color: #f8d7da;
+}*/
+
 </style>
