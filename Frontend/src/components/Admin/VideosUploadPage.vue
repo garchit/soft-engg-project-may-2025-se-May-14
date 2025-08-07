@@ -85,6 +85,7 @@ const addCourse = async () => {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       console.log('Course added successfully:', data);
+      window.location.reload()
       // Optionally, add the new course to Courses or refetch
       Courses.value.push({
         course_title: newTitle.value,
@@ -142,6 +143,7 @@ const addLectureToCourse = async () => {
       newLectureDescription.value = '';
       lectureModalVisible.value = false;
       toast.success('Lecture added successfully!')
+      window.location.reload()
       // Optionally, refetch courses from server:
       // await fetchCourses();
 

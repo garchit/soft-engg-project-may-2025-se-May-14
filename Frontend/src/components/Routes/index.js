@@ -23,7 +23,7 @@ const router = createRouter({
     {path: "/student" , component:SignUp},
     {path: "/login", component: Login},
     {path: "/admin-home" , component: AdminHome},
-    {path: "/student-home" , component: StudentHome},
+    {path: "/:student_id/student-home" , component: StudentHome},
     // {path: "/student-practice" , component: StudentPractice},
 
     // {path : "/studentprofile" , component: StudentProfile},

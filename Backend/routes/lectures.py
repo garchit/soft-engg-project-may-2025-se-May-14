@@ -11,7 +11,7 @@ from models.user import User
 
 class LectureResource(Resource):
 
-    @login_required
+    # @login_required
     def get(self, id):
         lecture = db.session.query(Lecture).filter(Lecture.id == id).first()
         if not lecture:
@@ -65,7 +65,7 @@ class LectureResource(Resource):
             db.session.rollback()
             return {"error": "Internal Server Error", "details": str(e)}, 500
 
-    @login_required
+    # @login_required
     def put(self, id):
         data = request.get_json(force=True)
         title = data.get("title")
@@ -110,7 +110,7 @@ class LectureResource(Resource):
             db.session.rollback()
             return {"error": "Internal Server Error", "details": str(e)}, 500
 
-    @login_required
+    # @login_required
     def delete(self, id):
         try:
             lecture = db.session.query(Lecture).filter(Lecture.id == id).first()
