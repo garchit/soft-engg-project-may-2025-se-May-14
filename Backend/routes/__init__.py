@@ -13,6 +13,7 @@ from .badge_resource import BadgeResourse
 from .ai_chatbot import AIChatbot
 from .videosummary import VideoSummaryResource
 from .admin_resources import Homepage
+from .user_leaderboard import LeaderboardApi,UserRankApi
 
 
 
@@ -45,6 +46,8 @@ def init_routes(app):
     api.add_resource(BadgeResourse,"/badge","/badge/<int:id>")
     api.add_resource(AIChatbot,"/ai_chatbot")
     api.add_resource(VideoSummaryResource, '/video_summary/<int:lecture_id>')
+    api.add_resource(LeaderboardApi,'/user_leaderboard')
+    api.add_resource(UserRankApi,'/user_rank/<string:username>')
     api.add_resource(Homepage,"/admin/home")
 
 
