@@ -78,7 +78,14 @@ const handleSubmit = async () => {
 
     alert(data.message);
     console.log('User:', data.user);
-    // router.push('/app/dashboard');
+    console.log('Role', data.user.role);
+    if(data.user.role == "admin"){
+        router.push('/admin-home')
+    } else if(data.user.role == "institute"){
+        router.push(`/${data.id}/institute-home`)
+    } else{
+        router.push(`/${data.user.id}/student-home`)
+    }
 
   } catch (error) {
     alert(error.message);
@@ -239,7 +246,7 @@ form{
     margin-bottom: 30px;
     padding-left: 10px; 
     background-color: inherit;
-    align-item: left;
+    align-items: left;
 }
 input::placeholder{
     color: black;

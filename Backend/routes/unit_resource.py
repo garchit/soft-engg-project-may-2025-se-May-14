@@ -93,20 +93,21 @@ class CompletedCourse(Resource):
     def post(self,user_id):
         data=request.get_json(force=True)
         course_id=data.get("course_id")
+        marks_scored=data.get("marks_scored")
         user=User.query.get(user_id)
         if not user:
-            return {"error":"No such USer"},404
+            return {"error":"No such User"},404
         course=db.session.query(Course).filter(Course.id==course_id).first()
         if not course:
             return {"error":"No such course exist"},404
         try:
-            user_course_completed=UserCourse(user_id=user_id,course_id=course_id)
+            user_course_completed=UserCourse(user_id=user_id,course_id=course_id,marks_scored=marks_scored)
             db.session.add(user_course_completed)
             db.session.commit()
             return {"message":"Successfully Added"},201
         except SQLAlchemyError as e:
             db.session.rollback()
-            return {"error":"Internal Server Error","details":str(e)}
+            return {"error":"Internal Server Error","details":str(e)},500
 
 class CourseProgress(Resource):
     def get(self,user_id):

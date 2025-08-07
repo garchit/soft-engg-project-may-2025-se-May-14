@@ -7,9 +7,11 @@ from models.institute import Institute
 from sqlalchemy.exc import SQLAlchemyError
 from models.user_teacher import UserTeacher
 from models.teacher import Teacher
-
+from .log_in_out import role_required
+from flask_login import login_required
 
 class UserApi(Resource):
+    @role_required(0)
     def get(self, id):
         user = db.session.query(User).filter(User.id == id).first()
         if not user:
@@ -24,7 +26,8 @@ class UserApi(Resource):
             "dob": str(user.dob),
             "user_type": "admin" if user.user_type else "student",
             "institute_id": user.institute_id,
-            "user_class": user.user_class
+            "user_class": user.user_class,
+            "password": user.password
         }, 200
 
     def post(self):
@@ -81,9 +84,7 @@ class UserApi(Resource):
 
         user.full_name = data.get('full_name', user.full_name)
         user.username = data.get('username', user.username)
-        user.email = data.get('email', user.email)
         user.parents_email = data.get('parents_email', user.parents_email)
-        user.user_class = data.get('user_class', user.user_class)
 
         role = data.get("user_type", "admin" if user.user_type else "student")
         if role == "admin":

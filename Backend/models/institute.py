@@ -11,3 +11,5 @@ class Institute(db.Model,UserMixin):
     password = db.Column(db.String(255), nullable=False)
     address=db.Column(db.String(255), nullable=False)
     blocked=db.Column(db.Integer,nullable=False)
+    # users = db.relationship("User", backref="institute", cascade="all, delete-orphan")
+    users = db.relationship("User", back_populates="institute", cascade="all, delete-orphan")

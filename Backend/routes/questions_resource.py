@@ -4,7 +4,6 @@ from flask_restful import Resource
 from flask import request
 from models.unit import Unit
 from sqlalchemy.exc import SQLAlchemyError
-
 class QuestionResource(Resource):
     def get(self,id):
         try:
@@ -24,7 +23,6 @@ class QuestionResource(Resource):
         except SQLAlchemyError as e:
             db.session.rollback()        
             return {"error":"Internal Server Error","details":str(e)},500
-
     def post(self):
         data=request.get_json(force=True)
         unit_id=data.get("unit_id")

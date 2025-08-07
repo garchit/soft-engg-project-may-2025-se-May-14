@@ -35,21 +35,21 @@
                 <div class="stat-icon">👥</div>
                 <div class="stat-content">
                   <h3>Total Students</h3>
-                  <p class="stat-number">{{ totalStudent }}</p>
+                  <p class="stat-number">{{ totalStudents }}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <h2 class="section-title">Top Performing Schools</h2>
-          <div class="table-section">
+          <!-- <div class="table-section">
             <div class="podium-container">
               <div class="podium-item second-place">
                 <div class="medal-wrapper">
                   <div class="medal silver">🥈</div>
                   <div class="school-info">
-                    <h4>{{ institutes[1].name }}</h4>
-                    <p class="score">{{ institutes[1].avg_score }}%</p>
+                    <h4>{{ allInstitutes[0].institute_name }}</h4>
+                    <p class="score">{{ allInstitutes[1].average_score }}%</p>
                   </div>
                 </div>
               </div>
@@ -58,8 +58,8 @@
                 <div class="medal-wrapper">
                   <div class="medal gold">🥇</div>
                   <div class="school-info">
-                    <h4>{{ institutes[0].name }}</h4>
-                    <p class="score">{{ institutes[0].avg_score }}%</p>
+                    <h4>{{ allInstitutes[0].institute_name }}</h4>
+                    <p class="score">{{ allInstitutes[0].average_score }}%</p>
                   </div>
                 </div>
               </div>
@@ -68,12 +68,13 @@
                 <div class="medal-wrapper">
                   <div class="medal bronze">🥉</div>
                   <div class="school-info">
-                    <h4>{{ institutes[2].name }}</h4>
-                    <p class="score">{{ institutes[2].avg_score }}%</p>
+                    <h4>{{ allInstitutes[2].institute_name }}</h4>
+                    <p class="score">{{ allInstitutes[2].average_score }}%</p>
                   </div>
                 </div>
               </div>
             </div>
+            </div> -->
 
             <div class="table-container">
               <table class="performance-table">
@@ -86,15 +87,15 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="inst in institutes.slice(3)" :key="inst.name" class="table-row">
+                  <tr v-for="inst, rank in allInstitutes" :key="inst.institute_id" class="table-row">
                     <td class="rank-cell">
-                      <span class="rank-badge">{{ inst.rank }}</span>
+                      <span class="rank-badge">{{ rank + 1}}</span>
                     </td>
-                    <td class="institute-cell">{{ inst.name }}</td>
-                    <td class="score-cell">{{ inst.avg_score }}%</td>
+                    <td class="institute-cell">{{ inst.institute_name }}</td>
+                    <td class="score-cell">{{ inst.average_score }}%</td>
                     <td class="performance-cell">
                       <div class="progress-bar">
-                        <div class="progress-fill" :style="{ width: inst.avg_score + '%' }"></div>
+                        <div class="progress-fill" :style="{ width: inst.average_score + '%' }"></div>
                       </div>
                     </td>
                   </tr>
@@ -103,15 +104,12 @@
             </div>
           </div>
         </div>
-      </div>
     </div>
 
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import Sidebar from './Sidebar.vue';
-import Navbar from '../Student/Navbar.vue';
+import { ref, onMounted, watch } from 'vue';
 import { Pie } from 'vue-chartjs';
 import {
   Chart as ChartJS,
@@ -121,25 +119,32 @@ import {
   ArcElement,
 } from 'chart.js';
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement);
+import Sidebar from './Sidebar.vue';
+import Navbar from '../Student/Navbar.vue';
 
+
+let totalInstitutes = ref();
+let totalTeachers = ref();
+let totalStudents = ref();
+let allInstitutes = ref([]);
+let countClass = ref({});
+
+ChartJS.register(Title, Tooltip, Legend, ArcElement);
 const chartData = ref({
-  labels: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'],
-  datasets: [
-    {
-      label: 'Students',
-      data: [120, 100, 80, 60, 40],
-      backgroundColor: [
-        '#FF6B6B',
-        '#4ECDC4', 
-        '#45B7D1',
-        '#96CEB4',
-        '#FFEAA7'
-      ],
-      borderWidth: 0,
-      hoverOffset: 8,
-    },
-  ],
+  labels: [],
+  datasets: [{
+    label: 'Students',
+    data: [],
+    backgroundColor: [
+      '#FF6B6B',
+      '#4ECDC4',
+      '#45B7D1',
+      '#96CEB4',
+      '#FFEAA7'
+    ],
+    borderWidth: 0,
+    hoverOffset: 8,
+  }],
 });
 
 const chartOptions = ref({
@@ -160,16 +165,39 @@ const chartOptions = ref({
   },
 });
 
-const institutes = ref([
-  { name: 'Institute A', rank: 1, avg_score: 95 },
-  { name: 'Institute B', rank: 2, avg_score: 90 },
-  { name: 'Institute C', rank: 3, avg_score: 85 },
-  { name: 'Institute D', rank: 4, avg_score: 80 },
-  { name: 'Institute E', rank: 5, avg_score: 75 },
-]);
+async function adminDashboardData() {
+  try {
+    const response = await fetch("http://127.0.0.1:5000/Finance_Tutor/admin/home");
+    
+    if (!response.ok) throw new Error("Server Error");
+    
+    const data = await response.json();
 
-const totalInstitutes = ref(institutes.value.length);
-const totalStudent = ref(500);
+    totalInstitutes.value = data.total_institutes;
+    totalStudents.value = data.total_students;
+    totalTeachers.value = data.total_teachers;
+    countClass.value = data.count_class;
+
+    const sortedInstitutes = data.institute_info.sort((a, b) => b.average_score - a.average_score);
+    allInstitutes.value = sortedInstitutes;
+  } catch (e) {
+    alert("Error fetching dashboard data");
+    console.error(e);
+  }
+}
+
+// Watch countClass and update chartData reactively
+watch(countClass, (newVal) => {
+  chartData.value.labels = Object.keys(newVal);
+  chartData.value.datasets[0].data = Object.values(newVal);
+  console.log("Chart data updated:", newVal);
+}, { immediate: true });
+
+onMounted(() => {
+  adminDashboardData();
+});
+
+
 </script>
 
 <style scoped>

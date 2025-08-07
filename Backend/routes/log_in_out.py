@@ -11,6 +11,7 @@ from models.user import User
 from models.institute import Institute
 from datetime import datetime
 from flask_login import login_user, logout_user, login_required, current_user
+from flask import jsonify
 
 
 class LoginResource(Resource):
@@ -39,7 +40,8 @@ class LoginResource(Resource):
                 return {
                     "message":"Login is Successful",
                     "id":institute.id,
-                    "name":institute.name
+                    "name":institute.name,
+                    "role": "institute"
                 }
 
             # Check password (plain text comparison)
@@ -52,7 +54,8 @@ class LoginResource(Resource):
                 "message": "Login is successful",
                 "user": {
                     "id": user.id,
-                    "username": user.username
+                    "username": user.username,
+                    "role": "admin" if user.user_type == 1 else "student"
                     # Add other fields if needed
                 }
             }, 200
@@ -69,6 +72,20 @@ class LogoutResource(Resource):
             return {'message': 'Logout successful'}, 200
         except Exception as e:
             return {'error': f'Logout failed: {str(e)}'}, 500
+
+from functools import wraps
+
+def role_required(*roles):
+    def wrapper(fn):
+        @wraps(fn)
+        @login_required
+        def decorated_view(*args, **kwargs):
+            if current_user.user_type not in roles:
+                return jsonify({'error': 'Forbidden: Insufficient role'}), 403
+            return fn(*args, **kwargs)
+        return decorated_view
+    return wrapper
+
         
         
 

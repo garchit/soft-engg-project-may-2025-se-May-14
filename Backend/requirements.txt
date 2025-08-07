@@ -1,17 +1,21 @@
-    numpy==2.2.6
-    flask==3.1.1    
-    flask_sqlalchemy
-    flask_restful
-    redis
-    celery
-    flask_jwt_extended
-    flask_login
-    flask_cors
-    flask_migrate
-    flasgger
-    flask_swagger_ui
-    python-dotenv
-    torch
-    youtube-transcript-api
-    requests
-    urllib3
+numpy==2.2.6
+flask==3.1.1    
+flask_sqlalchemy
+flask_restful
+redis
+celery
+flask_jwt_extended
+flask_login
+flask_cors
+flask_migrate
+flasgger
+flask_swagger_ui
+python-dotenv
+torch
+youtube-transcript-api
+requests
+urllib3
+sentence_transformers
+langchain
+langchain-community
+chromadb

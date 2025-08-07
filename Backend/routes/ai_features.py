@@ -1,33 +1,46 @@
-from .recommended_courses import recommend_courses_semantic
-from flask_restful import  Resource
+from flask_restful import Resource
+from flask import jsonify
+from sqlalchemy.exc import SQLAlchemyError
 from models.unit import Unit as Course
 from models.user_course import UserCourse
+from .recommended_courses import recommend_courses_semantic
 from models import db
-from transformers import pipeline
 
+# Optional: Caching the course catalog if needed
+from functools import lru_cache
+
+@lru_cache(maxsize=1)
+def get_all_courses():
+    try:
+        courses = db.session.query(Course).all()
+        return {course.title: course.description for course in courses}
+    except SQLAlchemyError as e:
+        print(f"Database error fetching all courses: {str(e)}")
+        return {}
 
 class RecommendedCourses(Resource):
-    def get(self,user_id):
-        courses=db.session.query(Course).all()
-        all_courses={}
+    def get(self, user_id):
+        try:
+            all_courses = get_all_courses()
+            if not all_courses:
+                return {"error": "No course data available."}, 500
 
-        for course in courses:
-            all_courses[course.title]=course.description
-        completed_courses_id=db.session.query(UserCourse).filter(UserCourse.user_id==user_id)
-        completed_courses=[]
-        for course_user in completed_courses_id:
-            course=db.session.query(Course).filter(Course.id==course_user.course_id).first()
-            completed_courses.append(course.title)
-        recommended = recommend_courses_semantic(completed_courses, all_courses)
-        
-        return {"Recommended_Courses":recommended}
-    
+            completed_courses = (
+                db.session.query(Course.title)
+                .join(UserCourse, UserCourse.course_id == Course.id)
+                .filter(UserCourse.user_id == user_id)
+                .all()
+            )
+            completed_titles = [c.title for c in completed_courses]
 
-# Initialize once at startup
-generator = pipeline('text-generation', model='microsoft/DialoGPT-medium')
+            recommended = recommend_courses_semantic(completed_titles, all_courses)
 
-def generate_ai_response_hf(prompt):
-    response = generator(prompt, max_length=100, num_return_sequences=1)
-    return response[0]['generated_text']
+            return {"Recommended_Courses": recommended}
 
+        except SQLAlchemyError as db_err:
+            print(f"Database error: {str(db_err)}")
+            return {"error": "A database error occurred."}, 500
 
+        except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            return {"error": "An unexpected error occurred."}, 500

@@ -6,12 +6,13 @@ from .teachers_resource import TeacherResource,UserTeacherResource,TeacherWisePr
 from .unit_resource import CourseResource,CompletedCourse,CourseProgress
 from .lectures import LectureResource, UserLectureResource
 from .questions_resource import QuestionResource
-# from .ai_features import RecommendedCourses
+from .ai_features import RecommendedCourses
 from .questions_resource import AllQuestionResource
 from .streak_resource import StreakResource,StreakCalendarData
 from .badge_resource import BadgeResourse
-# from .ai_chatbot import AiChatbot
+from .ai_chatbot import AIChatbot
 from .videosummary import VideoSummaryResource
+from .admin_resources import Homepage
 
 
 
@@ -35,14 +36,15 @@ def init_routes(app):
     api.add_resource(CourseProgress, '/course_progress/<int:user_id>')
     api.add_resource(UserTeacherResource,"/user_teacher/<int:user_id>")
     api.add_resource(TeacherWiseProgress,"/teacher_wise_progress/<int:institute_id>")
-    # api.add_resource(RecommendedCourses,"/recommended_courses/<int:user_id>") 
+    api.add_resource(RecommendedCourses,"/recommended_courses/<int:user_id>") 
     api.add_resource(AllQuestionResource, '/questions/unit/<int:unit_id>')
     api.add_resource(StreakResource,'/user/streak')
     api.add_resource(StreakCalendarData,'/user/streak/calendar')
     api.add_resource(VerifyStudents,"/unverified_students/<int:institute_id>","/verify_student/<int:user_id>")
     api.add_resource(InstituteTeacher,"/institute_wise_teachers/<int:institute_id>")
     api.add_resource(BadgeResourse,"/badge","/badge/<int:id>")
-    # api.add_resource(AiChatbot,"/ai_chatbot")
+    api.add_resource(AIChatbot,"/ai_chatbot")
     api.add_resource(VideoSummaryResource, '/video_summary/<int:lecture_id>')
+    api.add_resource(Homepage,"/admin/home")
 
 

@@ -132,7 +132,7 @@ const handleOverlayClick = (event) => {
 };
 
 const handleSignIn = () => {
-  alert('👋 Sign in feature coming soon!');
+  router.push('/login');
 };
 
 const handleFeatureHover = (id, hover) => {

@@ -48,7 +48,14 @@ const instituteId = router.params.institute_id;
 
 async function fetchStudents(){
   try {
-    const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/unverified_students/${instituteId}`);
+    const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/unverified_students/${instituteId}`, {
+      method: "GET",
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to fetch Students");
@@ -180,7 +187,7 @@ h1{
   position: sticky;
   top: 0;
   /* background: linear-gradient(135deg, #4FC3F7 0%, #1976D2 100%); */
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.6);
   color: #334155;
   z-index: 1;
 }
