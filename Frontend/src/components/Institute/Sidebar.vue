@@ -7,11 +7,20 @@
       <!-- Teachers Dropdown -->
       <div class="dropdown">
         <div @click="toggleDropdown" class="dropdown-header nav-link">
-          <span>Teachers</span>
-          <i :class="['bi', isOpen ? 'bi-chevron-up' : 'bi-chevron-down']"></i>
+          <span>
+            Teachers
+             <button @click.stop="showAddTeacherForm"
+              class="round-button">
+              +
+            </button>
+          </span>
+          <i :class="['bi', isOpen ? 'bi-chevron-up' : 'bi-chevron-down']" class="ms-2"></i>
         </div>
         <ul v-if="isOpen" class="dropdown-menu">
-          <li v-for="teacher in teachers" :key="teacher.id">
+          <li v-if="teachers.length == 0">
+            No Teachers Added
+          </li>
+          <li v-else v-for="teacher in teachers" :key="teacher.id">
             <router-link 
               :to="{
                 path: `/${instituteId}/teacher-progress/${teacher.id}`, 
@@ -27,7 +36,7 @@
       </div>
 
       <router-link :to="`/${instituteId}/verify-students`" class="nav-link" exact-active-class="active">Students</router-link>
-      <router-link to="/profile" class="nav-link" exact-active-class="active">Profile</router-link>
+      <router-link :to="`/${instituteId}/institute-profile`" class="nav-link" exact-active-class="active">Profile</router-link>
     </nav>
   </aside>
 </template>
@@ -35,6 +44,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useToast } from 'vue-toast-notification'
+
 
 const isOpen = ref(false)
 const toggleDropdown = () => {
@@ -42,9 +53,18 @@ const toggleDropdown = () => {
 }
 
 const teachers = ref([])
+const toast = useToast()
 const route = useRoute() 
 const instituteId = route.params.institute_id
 
+// When + is clicked, tell parent to open the form
+const showAddTeacher = ref(false)
+const emit = defineEmits(['add-teacher'])
+const showAddTeacherForm = () => {
+  emit('add-teacher')
+}
+
+// Get all the teachers of the institute
 onMounted(async () => {
   try {
     const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/institute_wise_teachers/${instituteId}`)
@@ -57,8 +77,7 @@ onMounted(async () => {
     teachers.value = data.teachers
 
   } catch (error) {
-    console.error('Error fetching teacher data:', error)
-    alert(`Error fetching teacher data: ${error.message}`)
+    toast.error(`Error fetching teacher data: ${error.message}`)
     teachers.value = [] 
   }
 })
@@ -165,6 +184,20 @@ onMounted(async () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-height: 250px;
   overflow-y: auto;
+}
+
+.round-button{
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background-color: white;
+  color: grey;
+  font-size: 18px;
+  font-weight: 500;
+  box-shadow: 2px 2px 10px grey;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 /* Custom scrollbar styling for dropdown */

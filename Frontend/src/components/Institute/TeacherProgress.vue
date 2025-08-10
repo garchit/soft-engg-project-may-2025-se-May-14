@@ -1,6 +1,5 @@
 <template>
   <div class="teacher-progress-page">
-    <Sidebar />
     <div class="content">
       <h1 class="section-title">{{ teacherName }}'s Progress</h1>
       

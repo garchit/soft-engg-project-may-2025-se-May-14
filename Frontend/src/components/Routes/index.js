@@ -14,6 +14,8 @@ import TeacherProgress from "../Institute/TeacherProgress.vue";
 import VerifyStudents from "../Institute/VerifyStudents.vue";
 import QuizManagement from "../Admin/QuizManagement.vue";
 import InstituteProfile from "../Institute/InstituteProfile.vue";
+import AdminLayout from "../Institute/InstituteLayout.vue";
+
 
 const router = createRouter({
   history: createWebHistory(),
@@ -34,12 +36,20 @@ const router = createRouter({
     {path: "/student-practice-content" , component: PracticeContent},
     {path: "/student-profile" , component: StudentProfile},
 
-    {path: "/:institute_id/institute-home", component: InstituteHome},
-    {path: "/:institute_id/teacher-progress/:teacher_id", component: TeacherProgress},
-    {path: "/:institute_id/verify-students", component: VerifyStudents},
+    // Institute routes
+    {
+      path: '/:institute_id',
+      component: AdminLayout,
+      children: [
+        {path: "institute-home", component: InstituteHome},
+        {path: "teacher-progress/:teacher_id", component: TeacherProgress},
+        {path: "verify-students", component: VerifyStudents},
+        {path: "institute-profile" , component : InstituteProfile}
+      ]
+
+    },
     {path: "/quiz-manage" , component : QuizManagement},
 
-    {path: "/InstituteProfile" , component : InstituteProfile}
   ]
 })
 

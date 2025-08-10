@@ -39,8 +39,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
 
 const router = useRouter();
+const toast = useToast();
 
 let email = ref('');
 let password = ref('');
@@ -56,7 +58,7 @@ const goToLandingPage = () => {
     router.push('/');
 }
 
-//Handle form submission
+//Handle form submission -> Login
 const handleSubmit = async () => {
   try {
     const response = await fetch('http://127.0.0.1:5000/Finance_Tutor/login', {
@@ -76,19 +78,19 @@ const handleSubmit = async () => {
       throw new Error(data.message || 'Login failed');
     }
 
-    alert(data.message);
+    toast.success("Login Success")
     console.log('User:', data.user);
-    console.log('Role', data.user.role);
-    if(data.user.role == "admin"){
+    const role = data.role || data.user.role;
+    if(role == "admin"){
         router.push('/admin-home')
-    } else if(data.user.role == "institute"){
+    } else if(role == "institute"){
         router.push(`/${data.id}/institute-home`)
     } else{
         router.push(`/${data.user.id}/student-home`)
     }
 
   } catch (error) {
-    alert(error.message);
+    toast.error(error.message);
   }
 };
 

@@ -1,6 +1,5 @@
 <template>
   <div class="verify-students-page">
-    <Sidebar />
     <div class="verify-students-container">
       <h1>APPROVE STUDENTS</h1>
       <div class="table-container">
@@ -40,9 +39,11 @@
 import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router';
 import Sidebar from '../Institute/Sidebar.vue';
+import { useToast } from 'vue-toast-notification';
 
 const searchQuery = ref('');
 const students = ref([]);
+const toast = useToast();
 const router = useRoute();
 const instituteId = router.params.institute_id;
 
@@ -65,7 +66,7 @@ async function fetchStudents(){
     students.value = data.students;
 
   } catch (e) {
-    alert("Failed:", e.message);
+    toast.error("Failed:", e.message);
   }
 };
 
@@ -99,12 +100,12 @@ async function approveOrReject(studentId, action) {
       }
 
       const data = await response.json();
-      alert(data.message);
+      toast.success(data.message);
 
       await fetchStudents();
     }
   } catch (e) {
-    alert("Failed to verify/unverify: " + e.error);
+    toast.error("Failed to verify/unverify: " + e.error);
   }
 }
 </script>
@@ -119,8 +120,8 @@ async function approveOrReject(studentId, action) {
 }
 
 .verify-students-container{
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 }
 h1{
   padding-top: 10px;

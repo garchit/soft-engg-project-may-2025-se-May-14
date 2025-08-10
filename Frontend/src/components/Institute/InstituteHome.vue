@@ -1,6 +1,5 @@
 <template>
   <div class="institute-home-page">
-    <Sidebar />
     <div class="container">
       <h1>{{ instituteName }}</h1>
 
@@ -56,8 +55,6 @@ import {
   CategoryScale,
   LinearScale,
 } from 'chart.js';
-import Sidebar from './Sidebar.vue';
-
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 // Data
