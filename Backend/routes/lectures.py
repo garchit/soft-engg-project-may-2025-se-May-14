@@ -59,7 +59,9 @@ class LectureResource(Resource):
             lecture_id = new_lecture.id
             db.session.commit()
 
-            return {"message": "Lecture added successfully", "id": lecture_id}, 201
+            return {"message": "Lecture added successfully", "id": lecture_id,
+                    "title": title, "description": description, "link": link, "unit_id": unit_id
+                    }, 201
 
         except SQLAlchemyError as e:
             db.session.rollback()

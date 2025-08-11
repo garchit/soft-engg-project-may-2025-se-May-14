@@ -33,6 +33,8 @@ class BadgeResourse(Resource):
 
 
     def put(self,id):
+        if id==None:
+            return {"message": "Badge ID is required for update."}, 400
         try:
             data = request.get_json(force=True)
 
