@@ -5,15 +5,29 @@
         <h3 class="signup-title">Student Sign Up</h3>
         <form @submit.prevent="handleSubmit" class="signup-form">
 
-          <!-- Row 1: Username -->
+          <!-- Row 1: Student email -->
+          <div class="form-row" style="justify-content: center; align-items: center;">
+          <div class="form-group" style="width: 50%; max-width: 300px;">
+            <label class="form-label" style="text-align: center;">Student Email</label>
+            <input v-model="studentEmail" type="email" class="form-input" placeholder="Enter Student Email" required>
+          </div>
+          </div>
+          
+          <!-- Row 2: Username -->
           <div class="form-row" style="justify-content: center; align-items: center;">
           <div class="form-group" style="width: 50%; max-width: 300px;">
             <label class="form-label" style="text-align: center;">Username</label>
             <input v-model="username" type="text" class="form-input" placeholder="Enter Username" required>
           </div>
+
+          <div class="form-group" style="width: 50%; max-width: 300px;">
+            <label class="form-label" style="text-align: center;">Fullname</label>
+            <input v-model="fullname" type="text" class="form-input" placeholder="Enter Fullname" required>
+          </div>
+
         </div>
 
-          <!-- Row 2: Parent's Email and Date of Birth -->
+          <!-- Row 3: Parent's Email and Date of Birth -->
             <div class="form-row" style="align-items: center; justify-content: center;">
             <div class="form-group" style="flex: 1; text-align: center;">
               <label class="form-label" style="display: flex; justify-content: center; align-items: center; height: 100%;">Parent's Email</label>
@@ -31,7 +45,7 @@
               <label class="form-label form-label-thick" style="text-align: center;">Institute Name</label>
               <select v-model="institute" class="form-input" required>
               <option value="">Select Institute</option>
-              <option v-for="inst in institutes" :key="inst" :value="inst">{{ inst }}</option>
+              <option v-for="inst in instituteList" :key="inst.id" :value="inst.id">{{ inst.name }}</option>
               </select>
             </div>
             <div class="form-group" style="text-align: center;">
@@ -76,13 +90,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { CFormSelect } from '@coreui/vue';
+import { useToast } from 'vue-toast-notification';
 
 const router = useRouter();
+const toast = useToast();
 
-
+let fullname = ref('');
+let studentEmail = ref('');
 let username = ref('');
 let parentEmail = ref('');
 let dateOfBirth = ref('');
@@ -93,14 +110,33 @@ let institute = ref('');
 
 
 let classes = ref(['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5',
-  'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12']);
+  'Class 6', 'Class 7', 'Class 8']);
 
-let institutes = ref(['Institute A', 'Institute B', 'Institute C']);
+let instituteList = ref();
+
+async function allInstitutes(){
+  try {
+    const response = await fetch("http://127.0.0.1:5000/Finance_Tutor/all_institute");
+    
+    if (!response.ok) throw new Error("Server Error");
+    
+    const data = await response.json();
+    console.log(data)
+    instituteList.value = data.json_list;
+  } catch (e) {
+    toast.error("Error fetching Insitute Names");
+    console.error(e);
+  }
+}
+
+onMounted(() => {
+  allInstitutes();
+})
 
 // Handle form submission
 const handleSubmit = () => {
   if (password.value !== confirmPassword.value) {
-    alert('Passwords do not match!');
+    toast.error('Passwords do not match!');
     return;
   }
 
@@ -113,7 +149,7 @@ const handleSubmit = () => {
     institute: institute.value,
   });
 
-  alert('Form submitted successfully!');
+  toast.success('Form submitted successfully!');
 };
 
 

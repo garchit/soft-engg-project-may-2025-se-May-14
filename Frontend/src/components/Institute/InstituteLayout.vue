@@ -8,9 +8,10 @@
         <div class="form-box">
           <h3 class="form-title">Add Teacher</h3>
           <input v-model="teacherName" placeholder="Teacher Name" class="form-input" />
-          <input v-model="teacherClass" placeholder="Teacher Class" class="form-input" />
+          <input v-model="teacherEmail" placeholder="Teacher Email" class="form-input" type="email"/>
+          <input v-model="teacherClass" type="number" min="1" max="8" placeholder="Teacher Class" class="form-input" />
           <div class="form-actions">
-            <button @click="saveTeacher" class="btn btn-save">Save</button>
+            <button @click="addTeacher" class="btn btn-save">Save</button>
             <button @click="showAddTeacher = false" class="btn btn-cancel">Cancel</button>
           </div>
         </div>
@@ -26,16 +27,52 @@
 import { ref } from 'vue'
 import Sidebar from './Sidebar.vue'
 import { useToast } from 'vue-toast-notification'
+import { useRoute } from 'vue-router'
 
-const toast = useToast()
+const toast = useToast();
+const route = useRoute();
 
 const showAddTeacher = ref(false)
-const teacherName = ref('')
-const teacherClass = ref('')
+const instituteId = route.params.institute_id;
 
-function saveTeacher() {
-  toast.success(`Added Teacher: ${teacherName.value} (Class: ${teacherClass.value})`)
-  showAddTeacher.value = false
+
+const teacherName = ref('')
+const teacherClass = ref(null)
+const teacherEmail = ref('')
+
+
+async function addTeacher() {
+   try {
+    const response = await fetch('http://127.0.0.1:5000/Finance_Tutor/teacher', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        institute_id: instituteId,
+        name: teacherName.value,
+        class_teacher: teacherClass.value,
+        email: teacherEmail.value,
+        password: "password"
+      })
+    });
+
+    const data = await response.json();
+    showAddTeacher.value = false
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Teacher Add Failed');
+    }
+
+    toast.success(`Added Teacher: ${teacherName.value} (Class: ${teacherClass.value})`)
+    window.location.reload()
+  } catch (error) {
+    console.log(error.message)
+    toast.error(error.message);
+  }
+
+
+
 }
 </script>
 

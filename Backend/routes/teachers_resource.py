@@ -11,7 +11,7 @@ from .helper_functions import getTeachers,overall_progress
 from sqlalchemy.exc import SQLAlchemyError
 
 class TeacherResource(Resource):
-    @login_required
+    # @login_required
     def get(self,id):
         try:
             teacher = db.session.query(Teacher).filter(Teacher.id==id).first()
@@ -29,7 +29,7 @@ class TeacherResource(Resource):
             return {"error":"Internal Server Error"},500
 
         
-    @login_required
+    # @login_required
     def put(self,id):
         data=request.get_json(force=True)
         name=data.get("name")
