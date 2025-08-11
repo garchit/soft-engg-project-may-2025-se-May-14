@@ -7,6 +7,7 @@ from models.lecture import Lecture
 from models.unit import Unit  # required to check if unit_id exists
 from models.user_lecture import UserLecture
 from models.user import User
+from .badge_resource import check_and_award_badges
 
 
 class LectureResource(Resource):
@@ -128,21 +129,68 @@ class LectureResource(Resource):
             return {"error": "Internal Server Error", "details": str(e)}, 500
         
 class UserLectureResource(Resource):
-    def get(self):
-        pass
-    def post(self,user_id,lecture_id):
-        user=db.session.query(User).filter(User.id==user_id).first()
-        if user:
-            lecture=db.session.query(Lecture).filter(Lecture.id==lecture_id).first()
-            if lecture:
-                user_lecture=UserLecture(user_id=user_id,lecture_id=lecture_id)
-                db.session.add(user_lecture)
-                db.session.commit()
-                return {
-                    "message":"Succesfully Watched Lecture"
-                },200
+    def post(self, user_id, lecture_id):
+        user = db.session.query(User).filter(User.id == user_id).first()
+        if not user:
+            return {"error": "User not found"}, 404
 
+        lecture = db.session.query(Lecture).filter(Lecture.id == lecture_id).first()
+        if not lecture:
+            return {"error": "Lecture not found"}, 404
 
+        # Avoid duplicate UserLecture entry
+        existing = db.session.query(UserLecture).filter_by(user_id=user_id, lecture_id=lecture_id).first()
+        if existing:
+            return {"message": "Lecture already watched"}, 200
+
+        user_lecture = UserLecture(user_id=user_id, lecture_id=lecture_id)
+        db.session.add(user_lecture)
+        db.session.commit()
+
+        # Check and award badges if criteria met
+        newly_awarded_badges = check_and_award_badges(user_id)
+
+        response_data = {"message": "Successfully watched lecture"}
+        if newly_awarded_badges:
+            response_data["new_badges"] = [{"name": b.name, "description": b.description} for b in newly_awarded_badges]
+
+        return response_data, 200
+    
+    def get(self, user_id):
+        """
+        Retrieves all courses where the user has watched at least one lecture.
         
-        
-        
+        This method performs a series of JOIN operations to link the user's
+        watched lectures to their respective courses, ensuring a unique list of
+        courses is returned.
+        """
+        # First, verify if the user exists
+        user = db.session.query(User).filter(User.id == user_id).first()
+        if not user:
+            return {"error": "User not found"}, 404
+
+        # Join from Unit -> Lecture -> UserLecture
+        # and filter by the provided user_id
+        watched_courses = (
+            db.session.query(Unit)
+            .join(Lecture, Unit.id == Lecture.unit_id)
+            .join(UserLecture, Lecture.id == UserLecture.lecture_id)
+            .filter(UserLecture.user_id == user_id)
+            .distinct()
+            .all()
+        )
+
+        # Handle the case where no courses with watched lectures are found
+        if not watched_courses:
+            return {"course_detail": [], "message": "No courses with watched lectures found"}, 200
+
+        # Serialize the list of course objects into a dictionary format
+        course_list = []
+        for unit in watched_courses:
+            course_list.append({
+                "course_id": unit.id,
+                "course_title": unit.title,
+                "course_description": unit.description
+            })
+
+        return {"course_detail": course_list}, 200

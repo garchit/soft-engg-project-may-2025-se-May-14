@@ -5,6 +5,7 @@ from models.user_course import UserCourse
 from models.user import User
 from models.unit import Unit
 from sqlalchemy.exc import SQLAlchemyError
+# from .badge_resource import check_and_award_badges
 
 
 class UserCoursesApi(Resource):
@@ -47,64 +48,56 @@ class UserCoursesApi(Resource):
             return {"message": "An unexpected error occurred.", "error": str(e)}, 500
         
     def post(self):
-        """
-        Add or update the marks scored for a user's course.
-
-        Highest score only:
-        - If a record exists, update only if the new score is higher.
-        - If no record exists, create a new one.
-        """
         try:
             data = request.get_json()
             user_id = data.get('user_id')
             course_id = data.get('course_id')
             marks_scored = data.get('marks_scored')
 
-            # Validate required fields
-            if user_id is None or course_id is None or marks_scored is None:
-                return {
-                    "message": "Missing required data: 'user_id', 'course_id', and 'marks_scored' are all required."
-                }, 400
+            if not all([user_id, course_id, marks_scored is not None]):
+                return {"message": "Missing required data: user_id, course_id, or marks_scored."}, 400
+            
+            if not isinstance(marks_scored, (int, float)):
+                return {"message": "Invalid data type for marks_scored. Must be a number."}, 400
 
-            # Ensure marks_scored is numeric
-            try:
-                marks_scored = float(marks_scored)
-            except ValueError:
-                return {"message": "'marks_scored' must be a number."}, 400
+            user_course = UserCourse.query.filter_by(user_id=user_id, course_id=course_id).first()
+            user = User.query.get(user_id)
+            if not user:
+                return {"message": f"User with ID {user_id} not found."}, 404
 
-            # Check for existing record
-            user_course = UserCourse.query.filter_by(
-                user_id=user_id,
-                course_id=course_id
-            ).first()
+            rewards_to_add = 0
+            message = ""
 
             if user_course:
-                # Update only if higher
                 if marks_scored > user_course.marks_scored:
+                    rewards_to_add = marks_scored - user_course.marks_scored
                     user_course.marks_scored = marks_scored
-                    db.session.commit()
-                    return {
-                        "message": "User course marks updated to the new highest score."
-                    }, 200
+                    user.rewards = (user.rewards or 0) + rewards_to_add
+                    message = f"User course marks updated to the new highest score. User awarded {rewards_to_add} rewards."
                 else:
-                    return {
-                        "message": "The provided score is not higher than the existing score. No update performed."
-                    }, 200
+                    message = "The provided score is not higher than the existing score. No update performed."
             else:
-                # Create new record
-                new_user_course = UserCourse(
-                    user_id=user_id,
-                    course_id=course_id,
-                    marks_scored=marks_scored
-                )
+                rewards_to_add = marks_scored
+                new_user_course = UserCourse(user_id=user_id, course_id=course_id, marks_scored=marks_scored)
                 db.session.add(new_user_course)
-                db.session.commit()
-                return {"message": "User course record created successfully."}, 201
+                user.rewards = (user.rewards or 0) + rewards_to_add
+                message = f"User course record created successfully. User awarded {rewards_to_add} rewards."
+
+            db.session.commit()
+
+            # Badge awarding can update DB, so safe to call after commit or inside with session
+            # newly_awarded_badges = check_and_award_badges(user.id)
+
+            response_data = {"message": message, "current_rewards": user.rewards}
+            # if newly_awarded_badges:
+                # response_data["new_badges"] = [{"name": b.name, "description": b.description} for b in newly_awarded_badges]
+
+            return response_data, 200 if user_course else 201
 
         except SQLAlchemyError as e:
             db.session.rollback()
             return {
-                "message": "Database error occurred during POST operation.",
+                "message": "Database error occurred during POST operation. Please try again.",
                 "error": str(e)
             }, 500
         except Exception as e:

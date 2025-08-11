@@ -201,12 +201,18 @@ const goToNextLecture = () => {
   summary.value = ''; // Clear summary
 };
 
-const handleNextOrFinish = () => {
-  if (hasNextLecture.value) {
-    goToNextLecture();
-  } else {
-    router.push('/student-learn'); // Redirect to learn page
-  }
+const handleNextOrFinish = async () => {
+    const userId = localStorage.getItem('user_id');
+    const lectureId = activeLecture.value.lecture_id;
+    // Call the API to mark the lecture as watched
+    const response = await axios.post(`${API_BASE}/user_lecture_watched/${userId}/${lectureId}`);
+    // Handle the response if needed
+    console.log(response.data);
+    if (hasNextLecture.value) {
+      goToNextLecture();
+    } else {
+      router.push('/student-learn'); // Redirect to learn page
+    }
 };
 
 const toggleSidebar = () => {

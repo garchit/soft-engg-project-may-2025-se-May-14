@@ -3,95 +3,64 @@
     <div class="main-content">
       <header class="profile-header">
         <div class="page-heading-box">
-          <div class="page-heading">{{ unitName || 'Loading...' }}</div>
+          <div class="page-heading">Revision</div>
           <div class="page-caption">
-            Practice questions to enhance your skills and knowledge.
+            Revise to keep up with your skills and knowledge.
           </div>
         </div>
       </header>
 
-        <div v-if="isLoading" class="loading-container">
-          <div class="loading-spinner"></div>
-          <p class="loading-text">Loading questions...</p>
-        </div>
-        <div v-else-if="error" class="error-container">
-          <p class="error-text">{{ error }}</p>
-          <button class="retry-button" @click="loadQuestions">Retry</button>
-        </div>
+      <div v-if="isLoading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading questions...</p>
+      </div>
 
-        <div v-else-if="isGameOver" class="completion-container">
-          <div class="completion-card">
-            <h2 class="completion-title">Game Over!</h2>
-            <p class="game-over-text">You've lost all your lives!</p>
-            <div class="score-display">
-              <span class="score-text">Your Score:</span>
-              <span class="score-value">{{ score }}/{{ currentQuestionIndex + 1 }}</span>
+      <div v-else-if="error" class="error-container">
+        <p class="error-text">{{ error }}</p>
+        <button class="retry-button" @click="loadQuestions">Retry</button>
+      </div>
+
+      <!-- Show question card only -->
+      <div v-else-if="currentQuestion" class="question-card">
+        <div class="timer-hearts-container">
+          <div class="timer-container">
+            <div
+              class="timer-progress"
+              :style="{
+                width: `${progress}%`,
+                backgroundColor: progressColor,
+                transition: 'width 1s linear, background-color 0.3s ease'
+              }"
+            ></div>
+            <div class="timer-text">{{ formatTime(timeRemaining) }}</div>
+          </div>
+
+          <div class="lives-container">
+            <div class="hearts-wrapper">
+              <svg
+                v-for="(life, index) in lives"
+                :key="index"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                :class="[
+                  'heart-icon',
+                  life ? 'heart-alive' : 'heart-broken'
+                ]"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12.001 4.529c2.349-2.532 6.148-2.532 8.497 0 2.191 2.364 2.191 6.187 0 8.551l-7.083 7.645a1 1 0 0 1-1.428 0L3.906 13.08c-2.191-2.364-2.191-6.187 0-8.551 2.349-2.532 6.148-2.532 8.497 0l.001.001.001-.001z"
+                  clip-rule="evenodd"
+                />
+              </svg>
             </div>
-            <div class="percentage-display">
-              {{ Math.round((score / (currentQuestionIndex + 1)) * 100) }}%
-            </div>
-            <button class="restart-button" @click="resetQuiz">Try Again</button>
           </div>
         </div>
 
-        <div v-else-if="isCompleted" class="completion-container">
-          <div class="completion-card">
-            <h2 class="completion-title">Quiz Complete!</h2>
-            
-            <div class="score-display">
-              <span class="score-text">Your Score:</span>
-              <span class="score-value">{{ score }}/{{ questions.length }}</span>
-            </div>
-            
-            <div class="percentage-display">
-              <span class="percentage-text"></span>
-              <span class="percentage-value">{{ Math.round((score / questions.length) * 100) }}%</span>
-            </div>
-            
-            <button class="restart-button" @click="resetQuiz">Try Again</button>
-          </div>
-        </div>
-
-        <div v-else-if="currentQuestion" class="question-card">
-          <div class="timer-hearts-container">
-            <div class="timer-container">
-              <div
-                class="timer-progress"
-                :style="{
-                  width: `${progress}%`,
-                  backgroundColor: progressColor,
-                  transition: 'width 1s linear, background-color 0.3s ease'
-                }"
-              ></div>
-              <div class="timer-text">{{ formatTime(timeRemaining) }}</div>
-            </div>
-            
-            <div class="lives-container">
-              <div class="hearts-wrapper">
-                <svg
-                  v-for="(life, index) in lives"
-                  :key="index"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  :class="[
-                    'heart-icon',
-                    life ? 'heart-alive' : 'heart-broken'
-                  ]"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M12.001 4.529c2.349-2.532 6.148-2.532 8.497 0 2.191 2.364 2.191 6.187 0 8.551l-7.083 7.645a1 1 0 0 1-1.428 0L3.906 13.08c-2.191-2.364-2.191-6.187 0-8.551 2.349-2.532 6.148-2.532 8.497 0l.001.001.001-.001z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div class="question-content">
-            <h3 class="question-text">
-              <span style="display: inline-flex; align-items: center; gap: 8px;">
+        <div class="question-content">
+          <h3 class="question-text">
+            <span style="display: inline-flex; align-items: center; gap: 8px;">
               {{ currentQuestion.text }}
               <button 
                 @click="toggleSpeech" 
@@ -112,55 +81,59 @@
                     d="M15.54 8.46a5 5 0 010 7.07m2.83-9.9a9 9 0 010 12.73" />
                 </svg>
               </button>
-              </span>
-            </h3>
-            <div class="options-grid">
-              <div
-                v-for="(option, index) in currentQuestion.options"
-                :key="index"
-                class="option-item"
-                :class="{
-                  selected: selectedOption === index,
-                  correct: showResults && index === currentQuestion.correctAnswer,
-                  incorrect: showResults && selectedOption === index && index !== currentQuestion.correctAnswer,
-                  disabled: showResults || isProcessing
-                }"
-                @click="handleOptionSelect(index)"
-              >
-                <div class="option-number">{{ String.fromCharCode(65 + index) }}</div>
-                <div class="option-text">{{ option }}</div>
-              </div>
-            </div>
-
-            <button
-              class="continue-button"
-              :disabled="selectedOption === null || isProcessing"
-              @click="handleContinue"
+            </span>
+          </h3>
+          <div class="options-grid">
+            <div
+              v-for="(option, index) in currentQuestion.options"
+              :key="index"
+              class="option-item"
+              :class="{
+                selected: selectedOption === index,
+                correct: showResults && index === currentQuestion.correctAnswer,
+                incorrect: showResults && selectedOption === index && index !== currentQuestion.correctAnswer,
+                disabled: showResults || isProcessing
+              }"
+              @click="handleOptionSelect(index)"
             >
-              {{ isLastQuestion ? 'Finish Quiz' : 'Continue' }}
-            </button>
+              <div class="option-number">{{ String.fromCharCode(65 + index) }}</div>
+              <div class="option-text">{{ option }}</div>
+            </div>
           </div>
+
+          <button
+            class="continue-button"
+            :disabled="selectedOption === null || isProcessing"
+            @click="handleContinue"
+          >
+            {{ isLastQuestion ? 'Finish Quiz' : 'Continue' }}
+          </button>
         </div>
-        <audio ref="breakSoundRef" preload="auto">
-          <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
-        </audio>
       </div>
-  
+
+      <!-- If no questions loaded -->
+      <div v-else>
+        <p>No questions available right now.</p>
+      </div>
+
+      <audio ref="breakSoundRef" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav" />
+      </audio>
+    </div>
   </InteractiveLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';  // <-- Import router
 import InteractiveLayout from '../InteractiveLayout.vue';
 import axios from 'axios';
 
-const route = useRoute();
+const router = useRouter();  // <-- Initialize router
 
 const questions = ref([]);
 const currentQuestionIndex = ref(0);
 const selectedOption = ref(null);
-const answers = ref([]);
 const score = ref(0);
 const timeRemaining = ref(60);
 const isCompleted = ref(false);
@@ -168,17 +141,12 @@ const isLoading = ref(false);
 const error = ref(null);
 const showResults = ref(false);
 const lives = ref([true, true, true]);
-const isGameOver = ref(false);
 const isProcessing = ref(false);
-const breakSoundRef = ref(null);
-const unitName = ref(null);
-const userId = ref(localStorage.getItem('user_id') || ''); // Fetch from local storage // NOTE: Replace with the actual user ID from your auth system.
 
-const totalTime = 60; 
+const totalTime = 60;
 let timerInterval = null;
 
-const API_BASE = '/Finance_Tutor'; 
-const API_URL = `${API_BASE}/user_courses`;
+const API_BASE = '/Finance_Tutor';
 
 const currentQuestion = computed(() => questions.value[currentQuestionIndex.value]);
 const isLastQuestion = computed(() => currentQuestionIndex.value === questions.value.length - 1);
@@ -227,29 +195,15 @@ const loadQuestions = async () => {
   error.value = null;
 
   try {
-    const unitId = route.params.unitId;
-    if (!unitId) {
-        throw new Error("Unit ID not found in route parameters.");
-    }
-
-    const courseUrl = `${API_BASE}/course/${unitId}`;
-    const courseResponse = await axios.get(courseUrl);
-    
-    if (courseResponse.status !== 200) {
-      throw new Error(`Failed to fetch course details. Status: ${courseResponse.status}`);
-    }
-
-    unitName.value = courseResponse.data.course_details.course_title;
-
-    const questionsUrl = `${API_BASE}/questions/unit/${unitId}`;
+    const questionsUrl = `${API_BASE}/random_questions`;
     const questionsResponse = await axios.get(questionsUrl);
-    
+
     if (questionsResponse.status !== 200) {
       throw new Error(`Failed to fetch questions. Status: ${questionsResponse.status}`);
     }
-    
+
     const data = questionsResponse.data;
-    
+
     if (data.questions && data.questions.length > 0) {
       questions.value = data.questions.map(q => ({
         id: q.id,
@@ -260,7 +214,7 @@ const loadQuestions = async () => {
       }));
       resetTimer();
     } else {
-      error.value = 'No questions found for this unit.';
+      error.value = 'No questions found.';
       questions.value = [];
     }
   } catch (err) {
@@ -269,6 +223,96 @@ const loadQuestions = async () => {
   } finally {
     isLoading.value = false;
   }
+};
+
+const breakHeart = () => {
+  const index = lives.value.lastIndexOf(true);
+  if (index !== -1) {
+    lives.value[index] = false;
+    playBreakSound();
+  }
+};
+
+const playBreakSound = () => {
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.5);
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+  } catch (error) {
+    console.log('Audio not supported');
+  }
+};
+
+const checkGameOver = () => {
+  if (lives.value.filter(Boolean).length === 0) {
+    handleGameOver();
+    return true;
+  }
+  return false;
+};
+
+const handleOptionSelect = (index) => {
+  if (showResults.value || isProcessing.value) return;
+  selectedOption.value = index;
+};
+
+const handleContinue = () => {
+  if (isProcessing.value) return;
+
+  isProcessing.value = true;
+  showResults.value = true;
+
+  if (selectedOption.value !== null && selectedOption.value !== -1) {
+    if (selectedOption.value === currentQuestion.value.correctAnswer) {
+      score.value += 1;
+    } else {
+      breakHeart();
+      if (checkGameOver()) {
+        isProcessing.value = false;
+        return;
+      }
+    }
+  } else {
+    breakHeart();
+    if (checkGameOver()) {
+      isProcessing.value = false;
+      return;
+    }
+  }
+
+  setTimeout(() => {
+    if (isLastQuestion.value) {
+      finishQuiz();
+    } else {
+      currentQuestionIndex.value += 1;
+      selectedOption.value = null;
+      showResults.value = false;
+      resetTimer();
+    }
+    isProcessing.value = false;
+  }, 2000);
+};
+
+const finishQuiz = () => {
+  if (timerInterval) clearInterval(timerInterval);
+  router.push('/student-practice-content');  // <-- Redirect on finish
+};
+
+const handleGameOver = () => {
+  if (timerInterval) clearInterval(timerInterval);
+  router.push('/student-practice-content');  // <-- Redirect on game over
 };
 
 let isSpeaking = false;
@@ -323,132 +367,13 @@ if (typeof window !== "undefined") {
   };
 }
 
-const breakHeart = () => {
-  const index = lives.value.lastIndexOf(true);
-  if (index !== -1) {
-    lives.value[index] = false;
-    playBreakSound();
-  }
-};
-
-const playBreakSound = () => {
-  try {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.5);
-    
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.5);
-  } catch (error) {
-    console.log('Audio not supported');
-  }
-};
-
-const handleGameOver = () => {
-  isGameOver.value = true;
-  if (timerInterval) clearInterval(timerInterval);
-  
-  // Calculate score for game over state
-  const percentage = Math.round((score.value / (currentQuestionIndex.value + 1)) * 100);
-  submitScore(percentage);
-};
-
-
-const checkGameOver = () => {
-  if (lives.value.filter(Boolean).length === 0) {
-    handleGameOver();
-    return true;
-  }
-  return false;
-};
-
-const handleOptionSelect = (index) => {
-  if (showResults.value || isGameOver.value || isProcessing.value) return;
-  selectedOption.value = index;
-};
-
-const handleContinue = async () => {
-  if (isGameOver.value || isProcessing.value) return;
-  
-  isProcessing.value = true;
-  showResults.value = true;
-  
-  if (selectedOption.value !== null && selectedOption.value !== -1) {
-    answers.value.push(selectedOption.value);
-    if (selectedOption.value === currentQuestion.value.correctAnswer) {
-      score.value += 1;
-    } else {
-      breakHeart();
-      if (checkGameOver()) {
-        isProcessing.value = false;
-        return;
-      }
-    }
-  } else {
-    breakHeart();
-    if (checkGameOver()) {
-      isProcessing.value = false;
-      return;
-    }
-  }
-
-  setTimeout(async () => {
-    if (isLastQuestion.value) {
-      finishQuiz();
-    } else {
-      currentQuestionIndex.value += 1;
-      selectedOption.value = null;
-      showResults.value = false;
-      resetTimer();
-    }
-    isProcessing.value = false;
-  }, 2000);
-};
-
-// New function to submit the score to the API
-const submitScore = async (percentage) => {
-  try {
-    const unitId = route.params.unitId;
-    const payload = {
-      user_id: userId.value,
-      course_id: unitId,
-      marks_scored: percentage
-    };
-    
-    const response = await axios.post(API_URL, payload);
-    console.log('Score submitted successfully:', response.data);
-  } catch (err) {
-    console.error('Error submitting quiz results:', err);
-  }
-};
-
-const finishQuiz = () => {
-  if (timerInterval) clearInterval(timerInterval);
-  isCompleted.value = true;
-
-  // Calculate the final percentage and submit to the API
-  const percentage = Math.round((score.value / questions.value.length) * 100);
-  submitScore(percentage);
-};
-
 const resetQuiz = () => {
   currentQuestionIndex.value = 0;
   selectedOption.value = null;
-  answers.value = [];
   score.value = 0;
   isCompleted.value = false;
   showResults.value = false;
   lives.value = [true, true, true];
-  isGameOver.value = false;
   isProcessing.value = false;
   error.value = null;
   resetTimer();
@@ -462,7 +387,6 @@ onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval);
 });
 </script>
-
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');

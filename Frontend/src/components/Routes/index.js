@@ -20,6 +20,7 @@ import StudentProfile from "../Student/StudentProfile.vue";
 import Learn from "../Student/Learn.vue";
 import LearnVideos from "../Student/LearnVideos.vue";
 import StudentPractice from "../Student/StudentPractice.vue";
+import StudentPractice2 from "../Student/StudentPractice2.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -37,6 +38,7 @@ const router = createRouter({
     {path: "/student-learn" , component: Learn},
     {path: "/student-learn/:unitId", component: LearnVideos},
     {path: '/student-unit-practice/:unitId', component: StudentPractice},
+    {path: '/revisit-courses', component: StudentPractice2},
 
     {path : "/videos-upload" , component : VideosUploadPage},
 

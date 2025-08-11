@@ -4,6 +4,8 @@ from flask_restful import Resource
 from flask import request
 from models.unit import Unit
 from sqlalchemy.exc import SQLAlchemyError
+import random
+
 class QuestionResource(Resource):
     def get(self,id):
         try:
@@ -23,6 +25,7 @@ class QuestionResource(Resource):
         except SQLAlchemyError as e:
             db.session.rollback()        
             return {"error":"Internal Server Error","details":str(e)},500
+        
     def post(self):
         data=request.get_json(force=True)
         unit_id=data.get("unit_id")
@@ -150,3 +153,44 @@ class AllQuestionResource(Resource):
             db.session.rollback()
             return {"error": "Internal Server Error", "details": str(e)}, 500
         
+
+class RandomQuestionsResource(Resource):
+    def get(self):
+        try:
+            # Get total number of questions
+            total_questions = db.session.query(Question).count()
+            if total_questions == 0:
+                return {"message": "No questions found in the database"}, 404
+            
+            # If less than 10 questions, fetch all; else fetch 10 random
+            limit = 10 if total_questions >= 10 else total_questions
+            
+            # Fetch all question IDs to pick random from
+            question_ids = [q.id for q in db.session.query(Question.id).all()]
+            
+            random_ids = random.sample(question_ids, limit)
+            
+            # Fetch the questions with those random IDs
+            questions = db.session.query(Question).filter(Question.id.in_(random_ids)).all()
+            
+            question_list = []
+            for q in questions:
+                question_list.append({
+                    "id": q.id,
+                    "unit_id": q.unit_id,
+                    "description": q.description,
+                    "option_a": q.option_a,
+                    "option_b": q.option_b,
+                    "option_c": q.option_c,
+                    "option_d": q.option_d,
+                    "correct_option": q.correct_option
+                })
+
+            return {
+                "message": f"{limit} random questions fetched successfully",
+                "questions": question_list
+            }, 200
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"error": "Internal Server Error", "details": str(e)}, 500

@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="layout-page">
     <Navbar />
     <div class="layout">
@@ -23,6 +24,28 @@
         <router-view />
       </main>
     </div>
+=======
+  <div class="layout">
+    <Sidebar @add-teacher="showAddTeacher = true" />
+
+    <main class="main-content">
+      <!-- Overlay Form -->
+      <div v-if="showAddTeacher" class="overlay">
+        <div class="form-box">
+          <h3 class="form-title">Add Teacher</h3>
+          <input v-model="teacherName" placeholder="Teacher Name" class="form-input" />
+          <input v-model="teacherClass" placeholder="Teacher Class" class="form-input" />
+          <div class="form-actions">
+            <button @click="saveTeacher" class="btn btn-save">Save</button>
+            <button @click="showAddTeacher = false" class="btn btn-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page-specific content -->
+      <router-view />
+    </main>
+>>>>>>> 8260f32 (Add user reward logic, badge earning API, and lecture-wise practice integration)
   </div>
 </template>
 
@@ -30,6 +53,7 @@
 import { ref } from 'vue'
 import Sidebar from './Sidebar.vue'
 import { useToast } from 'vue-toast-notification'
+<<<<<<< HEAD
 import { useRoute } from 'vue-router'
 import Navbar from '../Student/Navbar.vue'
 
@@ -77,6 +101,18 @@ async function addTeacher() {
 
 
 
+=======
+
+const toast = useToast()
+
+const showAddTeacher = ref(false)
+const teacherName = ref('')
+const teacherClass = ref('')
+
+function saveTeacher() {
+  toast.success(`Added Teacher: ${teacherName.value} (Class: ${teacherClass.value})`)
+  showAddTeacher.value = false
+>>>>>>> 8260f32 (Add user reward logic, badge earning API, and lecture-wise practice integration)
 }
 </script>
 

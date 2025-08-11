@@ -11,7 +11,7 @@ from .log_in_out import role_required
 from flask_login import login_required
 
 class UserApi(Resource):
-    @role_required(0)
+    # @role_required(0)
     def get(self, id):
         user = db.session.query(User).filter(User.id == id).first()
         if not user:

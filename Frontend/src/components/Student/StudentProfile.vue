@@ -1,67 +1,69 @@
 <template>
   <InteractiveLayout>
-  <div class="profile-layout">
-    <div class="main-content">
-      <header class="profile-header">
-        <div class="page-heading-box">
-          <div class="page-heading">All About You!</div>
-          <div class="page-caption">
-            This is your space to tweak your details and admire your achievements.
-          </div>
-        </div>
-      </header>
-      <div class="profile-grid">
-        <section class="profile-card-section">
-          <div class="profile-card">
-            <img class="profile-avatar" :src="defaultAvatar" alt="Profile Picture" />
-            <div class="profile-fields">
-              <label>USERNAME
-                <input type="text" v-model="user.username" />
-              </label>
-              <label>PARENT'S EMAIL
-                <input type="email" v-model="user.parentEmail" />
-              </label>
-              <label>PASSWORD
-                <input type="password" v-model="user.password" />
-              </label>
+    <div class="profile-layout">
+      <div class="main-content">
+        <header class="profile-header">
+          <div class="page-heading-box">
+            <div class="page-heading">All About You!</div>
+            <div class="page-caption">
+              This is your space to tweak your details and admire your achievements.
             </div>
-            <button class="edit-btn" @click="editProfile">EDIT PROFILE</button>
           </div>
-        </section>
+        </header>
+        <div class="profile-grid">
+          <section class="profile-card-section">
+            <div class="profile-card">
+              <img class="profile-avatar" :src="user.avatar || defaultAvatar" alt="Profile Picture" />
+              <div class="profile-fields">
+                <label>USERNAME
+                  <input type="text" v-model="user.username" />
+                </label>
+                <label>PARENT'S EMAIL
+                  <input type="email" v-model="user.parentEmail" />
+                </label>
+                <label>PASSWORD
+                  <input type="password" v-model="user.password" />
+                </label>
+              </div>
+              <button class="edit-btn" @click="editProfile">EDIT PROFILE</button>
+            </div>
+          </section>
 
-        <section class="badges-section">
-          <div class="badges-card">
-            <h2 style="margin-bottom:0;">Badge Collection</h2>
-            <hr class="badge-divider" style="margin-top:0;" />
-            <div class="badges-list-vertical">
-              <div v-for="badge in badges" :key="badge.label" class="badge-vertical">
-                <img :src="badge.icon" :alt="badge.label" class="badge-img" />
-                <div class="badge-info">
-                  <div class="badge-label">{{ badge.label }}</div>
-                  <div class="badge-desc">{{ badge.description }}</div>
-                  <div class="badge-points">Points: {{ badge.points }}</div>
+          <section class="badges-section">
+            <div class="badges-card">
+              <h2 style="margin-bottom:0;">Badge Collection</h2>
+              <hr class="badge-divider" style="margin-top:0;" />
+              <div class="badges-list-vertical">
+                <div v-for="badge in displayedBadges" :key="badge.id || badge.name" class="badge-vertical">
+                  <img 
+                    :src="`https://api.iconify.design/${getIconName(badge.name)}.svg`" 
+                    :alt="badge.name" 
+                    class="badge-img"
+                  />
+                  <div class="badge-info">
+                    <div class="badge-label">{{ badge.name }}</div>
+                    <div class="badge-desc">{{ badge.description }}</div>
+                    <div class="badge-points">Points: {{ badge.points }}</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
     </div>
-  </div>
   </InteractiveLayout>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import InteractiveLayout from '../InteractiveLayout.vue'
 import axios from 'axios'
 
 const API_BASE = '/Finance_Tutor'
 
-// Default avatar if no user avatar is found
 const defaultAvatar = 'https://randomuser.me/api/portraits/lego/2.jpg'
 
-// Reactive user data
 const user = ref({
   avatar: defaultAvatar,
   username: '',
@@ -69,15 +71,34 @@ const user = ref({
   parentEmail: ''
 })
 
-// Reactive badges array
-const badges = ref([])
+const allBadges = ref([])      // all badges from /badges
+const userBadges = ref([])     // user earned badges from /user_badges/:id
+
+// Map badge names to icon names for Iconify API
+const getIconName = (badgeName) => {
+  const iconMap = {
+    'First Login': 'fluent-emoji:grinning-face', // A happy face for first login
+    'Week Warrior': 'twemoji:fire', // A colorful fire emoji
+    'Month Master': 'twemoji:calendar', // A calendar icon
+    'Rising Star': 'twemoji:shooting-star', // A bright star
+    'Pro Player': 'twemoji:trophy', // A shiny trophy
+    'Bronze Champion': 'twemoji:sparkles', // A bronze medal
+    'Silver Champion': 'twemoji:star', // A silver medal
+    'Gold Champion': 'twemoji:trophy', // A gold medal
+    'Centurion': 'twemoji:shield', // A colorful shield
+    'Halfway Hero': 'fluent-emoji:party-popper', // A half moon for halfway
+    'Reward Legend': 'twemoji:star-struck', // A star-struck emoji
+    'Quick Learner': 'twemoji:light-bulb', // A colorful book
+    'Consistent Learner': 'twemoji:open-book', // An open book
+    'Knowledge Collector': 'twemoji:scroll', // A scroll icon
+  }
+  return iconMap[badgeName] || 'twemoji:question';  // Fallback to a question mark emoji
+}
 
 async function fetchUserProfile() {
   try {
     const currentUserid = localStorage.getItem('user_id') || '1'
     const res = await axios.get(`${API_BASE}/User/${currentUserid}`)
-    console.log("User profile API Response:", res.data)
-
     user.value.username = res.data.username || ''
     user.value.avatar = res.data.avatar || defaultAvatar
     user.value.password = res.data.password || ''
@@ -87,64 +108,66 @@ async function fetchUserProfile() {
   }
 }
 
-// Fetch badges from API
-async function fetchBadges() {
+// Fetch all badges (definitions)
+async function fetchAllBadges() {
   try {
     const res = await axios.get(`${API_BASE}/badge`)
-    badges.value = res.data.badges || []
-
-    // Check if the badges array is empty. If so, add a default badge.
-    if (badges.value.length === 0) {
-      console.log('No badges found, adding a default "First Login" badge.')
-      badges.value.push({
-        label: 'First Login',
-        description: 'You have logged in for the first time!',
-        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjRkZCNzAwIj4KICAgIDxwYXRoIGQ9Ik0xMiAyTDE1LjA5IDguMjZMMjIgOS4yN0wxNyAxNC4xNEwxOC4xOCAyMS4wMkwxMiAxNy43N0w1Ljg2IDIxLjAzTDcgMTQuMTRM MiA5LjI3TDguOTEgOC4yNkwxMiAyWiIvPgo8L3N2Zz4=', // Placeholder icon
-        points: 5
-      })
-    }
+    allBadges.value = res.data.list_badges || []
   } catch (err) {
-    console.error('Failed to fetch badges:', err)
-    // Optional: Add the default badge even if the API call fails
-    if (badges.value.length === 0) {
-      console.log('API call failed, adding a default "First Login" badge.')
-      badges.value.push({
-        label: 'First Login',
-        description: 'You have logged in for the first time!',
-        icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGRDc0MjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTEyIDJMMTUuMDkgOC4yNkwyMiA5LjI3TDE3IDE0LjE0TDE4LjE4IDIxLjAyTDEyIDE3Ljc3TDUuODIgMjEuMDJMNyAxNC4xNEwyIDkuMjdMOC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjRkZENzAwIiBzdHJva2U9IiNGRkQ3MDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=',
-        points: 5
-      })
-    }
+    console.error('Failed to fetch all badges:', err)
+    // Fallback to a minimal hardcoded list if API fails
+    allBadges.value = [
+      { id: 14, name: 'First Login', description: "Let's start!", points: 5 }
+    ]
   }
 }
+
+// Fetch badges earned by user
+async function fetchUserBadges() {
+  try {
+    const currentUserid = localStorage.getItem('user_id') || '1'
+    const res = await axios.get(`${API_BASE}/user_badges/${currentUserid}`)
+    userBadges.value = res.data.badges || []
+  } catch (err) {
+    console.error('Failed to fetch user badges:', err)
+    userBadges.value = []
+  }
+}
+
+// Combine user badges with all badge definitions
+const displayedBadges = computed(() => {
+  return userBadges.value.map(ub => {
+    // Match badge by id or name to get full info (description, points)
+    let badgeDef = allBadges.value.find(b => b.id === ub.id || b.name === ub.name)
+    if (!badgeDef) {
+      // fallback: use user badge data only
+      badgeDef = ub
+    }
+    return badgeDef
+  })
+})
 
 // Edit profile handler
 async function editProfile() {
   try {
-    const currentUserid = localStorage.getItem('user_id') || '1';
-    
-    // Construct the payload with the updated user data
+    const currentUserid = localStorage.getItem('user_id') || '1'
     const updatedUser = {
       username: user.value.username,
       parents_email: user.value.parentEmail,
       password: user.value.password
-    };
-    
-    // Send a PUT request to update the user profile
-    const res = await axios.put(`${API_BASE}/User/${currentUserid}`, updatedUser);
-    
-    console.log("Profile updated successfully:", res.data);
-    alert('Profile updated!');
+    }
+    const res = await axios.put(`${API_BASE}/User/${currentUserid}`, updatedUser)
+    alert('Profile updated!')
   } catch (err) {
-    console.error('Failed to update user profile:', err);
-    alert('Failed to update profile. Please try again.');
+    console.error('Failed to update user profile:', err)
+    alert('Failed to update profile. Please try again.')
   }
 }
 
-// Load data on mount
-onMounted(() => {
-  fetchUserProfile()
-  fetchBadges()
+onMounted(async () => {
+  await fetchUserProfile()
+  await fetchAllBadges()
+  await fetchUserBadges()
 })
 </script>
 

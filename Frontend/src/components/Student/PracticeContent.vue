@@ -11,7 +11,7 @@
         <div class="mascot-container">
             <div class="mascot-box">
                 <div class="speech-bubble">REVISIT<br/> COURSES!</div>
-                <div class="mascot" @click.prevent="trynowfeature">
+                <div class="mascot" @click="$router.push(`/revisit-courses`)">
                   <img src="/src/assets/ReviseAvatar.png" alt="Savvy Mascot" class="mascot-face" />
                 </div>
             </div>
@@ -86,8 +86,11 @@
                     <template v-if="numUnits === 0">
                       Learn a topic to unlock exciting practice sessions!
                     </template>
-                    <template v-else>
+                    <template v-else-if="numUnits === 15">
                       Congrats! You have unlocked all practices.
+                    </template>
+                    <template v-else>
+                      Keep going! Finish a topic to unlock practice and level up.
                     </template>
                   </div>
                 </div>
@@ -192,27 +195,6 @@ const svgViewBox = computed(() => `0 0 1000 ${svgHeight.value}`);
 
 const selectedUnit = ref(null);
 
-const selectUnit = async (unitId) => {
-  selectedUnit.value = unitId;
-  try {
-    const res = await axios.get(`${API_BASE}/course/${unitId}`);
-    // Check if course_detail exists and is not empty before accessing
-    if (res.data && res.data.course_detail && res.data.course_detail.length > 0) {
-      const courseDetails = res.data.course_detail[0];
-      console.log(`Starting Unit ${unitId}: ${courseDetails.course_title}`);
-      console.log("Unit Details:", courseDetails);
-    } else {
-      console.log(`No details found for unit ${unitId}`);
-    }
-  } catch (err) {
-    console.error(`Failed to fetch details for unit ${unitId}:`, err);
-  }
-};
-
-const trynowfeature = () => {
-  console.log('This feature is coming soon!');
-};
-
 // Scroll handling logic remains the same
 const contentContainer = ref(null);
 const scrollOffset = ref(0);
@@ -241,11 +223,9 @@ const handleScroll = () => {
   }
 };
 
-// New function to fetch all courses from the API
 const fetchCourses = async () => {
   try {
-    const res = await axios.get(`${API_BASE}/course`);
-    // Correctly access the course_detail array from the response object
+    const res = await axios.get(`${API_BASE}/user_lecture_watched/${localStorage.getItem('user_id')}`);
     if (res.data && res.data.course_detail) {
       courses.value = res.data.course_detail;
       console.log("Fetched courses:", courses.value);
@@ -253,11 +233,10 @@ const fetchCourses = async () => {
       console.log("No courses found in the response.");
     }
   } catch (err) {
-    console.error('Failed to fetch courses:', err);
+    console.error('Failed to fetch coursesz', err);
   }
 };
 
-// On mount, fetch the courses and set up the scroll handler
 onMounted(async () => {
   await fetchCourses();
   await nextTick();
