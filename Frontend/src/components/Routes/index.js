@@ -39,11 +39,6 @@ const router = createRouter({
     {path: '/student-unit-practice/:unitId', component: StudentPractice},
 
     {path : "/videos-upload" , component : VideosUploadPage},
-<<<<<<< HEAD
-
-
-    {path: "/student-practice-content" , component: PracticeContent},
-    {path: "/student-profile" , component: StudentProfile},
 
     // Institute routes
     {
@@ -57,11 +52,6 @@ const router = createRouter({
       ]
 
     },
-=======
-    {path: "/:institute_id/institute-home", component: InstituteHome},
-    {path: "/:institute_id/teacher-progress/:teacher_id", component: TeacherProgress},
-    {path: "/:institute_id/verify-students", component: VerifyStudents},
->>>>>>> d5fc6726454ca6be5778fd3a122eaf72a73f1c91
     {path: "/quiz-manage" , component : QuizManagement},
 
   ]

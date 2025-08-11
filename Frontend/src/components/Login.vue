@@ -80,20 +80,8 @@ const handleSubmit = async () => {
 
     toast.success("Login Success")
     console.log('User:', data.user);
-<<<<<<< HEAD
     const role = data.role || data.user.role;
     if(role == "admin"){
-=======
-    console.log('Role', data.user.role);
-
-    // Store login info in localStorage
-    localStorage.setItem('username', data.user.username || '');
-    localStorage.setItem('email', data.user.email || '');
-    localStorage.setItem('role', data.user.role || '');
-    localStorage.setItem('user_id', data.user.id || '');
-
-    if(data.user.role == "admin"){
->>>>>>> d5fc6726454ca6be5778fd3a122eaf72a73f1c91
         router.push('/admin-home')
     } else if(role == "institute"){
         router.push(`/${data.id}/institute-home`)
