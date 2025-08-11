@@ -1,7 +1,7 @@
 from flask_restful import Api
 from .user import UserApi,VerifyStudents
 from .log_in_out import LoginResource,LogoutResource
-from .institute_resource import InstituteResource,AllInstitute,ToggleBlockInstitute,InstituteTeacher
+from .institute_resource import InstituteResource,AllInstitute,ToggleBlockInstitute,InstituteTeacher,InstituteInfo
 from .teachers_resource import TeacherResource,UserTeacherResource,TeacherWiseProgress
 from .unit_resource import CourseResource,CompletedCourse,CourseProgress
 from .lectures import LectureResource, UserLectureResource
@@ -50,5 +50,6 @@ def init_routes(app):
     api.add_resource(Homepage,"/admin/home")
     api.add_resource(UserCoursesApi, '/user_courses')
     api.add_resource(UserCoursesByUserApi, '/user_courses/<int:user_id>')
+    api.add_resource(InstituteInfo, '/institute_info/<int:institute_id>')
 
 

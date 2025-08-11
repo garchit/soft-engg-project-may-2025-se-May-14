@@ -146,21 +146,22 @@ class TeacherWiseProgress(Resource):
             for teacher_id in teachers:
                 all_progress=[]
                 students=db.session.query(UserTeacher).filter(UserTeacher.teacher_id==teacher_id)
-
+                total=0
                 for student in students:
                     user_id=student.user_id
                     student_details=db.session.query(User).filter(User.id==user_id).first()
                     progress=overall_progress(user_id=user_id)
+                    total+=progress
                     print(student_details.dob)
                     all_progress.append({"student_name":student_details.full_name,
                                         "dob":str(student_details.dob),
                                         "student_id":student_details.id,
                                         "student_name":student_details.full_name,
                                         "overall_progress":progress})
-                    
-                teacher_wise.append({"teacher_id":teacher_id,"student_details":all_progress})
+                average=total/students.count() if students.count() > 0 else 0
+                teacher_wise.append({"teacher_id":teacher_id,"student_details":all_progress,"teacher_progress":round(average,2)})
             return {"teacher_progress":teacher_wise}
-        except SQLAlchemyError as e:
+        except SQLAlchemyError as e:    
             return {"error":"internal server error","details":str(e)},500
         
 
