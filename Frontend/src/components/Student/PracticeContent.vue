@@ -1,14 +1,22 @@
 <template>
   <InteractiveLayout>
         <div class="main-container">
-        <div class="page-heading-container">
-            <div class="page-heading-box">
-                <div class="page-heading">Your Practice Roadmap</div>
-                    <div class="page-caption">
-                        Follow this roadmap to practice smarter and master concepts step by step. Every correct answer earns you points, helping you climb the leaderboard. Stay consistent, challenge yourself, and see your progress turn into rewards!
-                    </div>
+        <header class="profile-header">
+        <div class="page-heading-box">
+          <div class="page-heading">Your Practice Roadmap</div>
+            <div class="page-caption">
+              Practice smart, earn XP, level up, and race your way to leaderboard glory!
+            </div>
+          </div>
+        <div class="mascot-container">
+            <div class="mascot-box">
+                <div class="speech-bubble">REVISIT<br/> COURSES!</div>
+                <div class="mascot" @click.prevent="trynowfeature">
+                  <img src="/src/assets/ReviseAvatar.png" alt="Savvy Mascot" class="mascot-face" />
                 </div>
+            </div>
         </div>
+      </header>
 
           <!-- Main Content -->
           <div class="content" ref="contentContainer">
@@ -57,9 +65,9 @@
                     :key="unit.id"
                     class="unit absolute cursor-pointer transition-all duration-300 hover:scale-110"
                     :style="{ bottom: unit.position.bottom, left: unit.position.left }"
-                    @click="selectUnit(unit.id)"
+                    @click="$router.push(`/student-unit-practice/${unit.id}`)"
                 >
-                    <div
+                   <div
                     :class="[
                         'unit-circle',
                         unit.color,
@@ -78,34 +86,15 @@
                     <template v-if="numUnits === 0">
                       Learn a topic to unlock exciting practice sessions!
                     </template>
-                    <template v-else-if="numUnits === 15">
-                      Congrats! You have unlocked all practices.
-                    </template>
                     <template v-else>
-                      Keep going! Finish a topic to unlock practice and level up.
+                      Congrats! You have unlocked all practices.
                     </template>
                   </div>
                 </div>
                 </div>
 
               </div>
-            <!-- Character Mascot -->
-            <div class="mascot-container">
-            <!-- Left Column -->
-            <div class="mascot-left">
-                <div class="speech-bubble">
-                REVISIT WEAK<br />CONCEPTS!
-                </div>
-                <div class="mascot">
-                <img src="/src/assets/ReviseAvatar.png" alt="Savvy Mascot" class="mascot-face" />
-                </div>
-            </div>
-
-            <!-- Right Column -->
-            <div class="mascot-right">
-                <button class="try-now-btn" @click.prevent="trynowfeature">TRY NOW</button>
-            </div>
-            </div>
+            
 
             <!-- Scroll Controls -->
             <div class="scroll-controls">
@@ -117,12 +106,16 @@
   </InteractiveLayout>
 </template>
 
+
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import InteractiveLayout from '../InteractiveLayout.vue';
+import axios from 'axios';
 
-// Number of units (set this dynamically as needed)
-const numUnits = ref(10); // Change this value to test different cases (0-15)
+const API_BASE = '/Finance_Tutor';
+
+// Reactive state for the courses fetched from the API
+const courses = ref([]);
 
 // Road segments: each segment extends the previous, so the path for n units is the first n segments joined
 const roadSegments = [
@@ -163,19 +156,23 @@ const bubblePositions = [
   { bottom: '4020px', left: '70%' }
 ];
 
+const numUnits = computed(() => courses.value.length);
+
 const nextBubblePosition = computed(() => {
   return bubblePositions[numUnits.value] || { bottom: '0px', left: '50%' };
 });
 
+// A computed property to format the courses for display
 const units = computed(() => {
-  return Array.from({ length: numUnits.value }, (_, i) => ({
-    id: i + 1,
-    title: `Unit ${i + 1}`,
+  return courses.value.map((course, i) => ({
+    id: course.course_id,
+    title: course.course_title,
     color: ['green', 'blue', 'pink', 'yellow'][i % 4],
     position: bubblePositions[i] || { bottom: '0px', left: '50%' }
   }));
 });
 
+// The SVG path now depends on the number of courses fetched
 const svgPath = computed(() => {
   if (numUnits.value <= 1) {
     return roadSegments.slice(0, 3).join(' ');
@@ -183,13 +180,9 @@ const svgPath = computed(() => {
   return roadSegments.slice(0, numUnits.value + 3).join(' ');
 });
 
-
 const dynamicHeight = computed(() => {
   if (numUnits.value === 0) return 550;
-
-  // Start at 300, decrease to 270 as numUnits goes from 1 to 15
   const unitHeight = 300 - (30 * Math.min(numUnits.value, 15) / 15);
-
   return Math.min(Math.max((numUnits.value + 1) * unitHeight, 650), 4200);
 });
 
@@ -197,54 +190,84 @@ const roadmapContainerHeight = computed(() => `${dynamicHeight.value}px`);
 const svgHeight = dynamicHeight;
 const svgViewBox = computed(() => `0 0 1000 ${svgHeight.value}`);
 
-const selectedUnit = ref(null)
+const selectedUnit = ref(null);
 
-const selectUnit = (unitNumber) => {
-  selectedUnit.value = unitNumber
-  const unit = units.value.find(u => u.id === unitNumber)
-  alert(`Starting ${unitNumber}: ${unit?.title || 'Unknown Title'}`)
-}
+const selectUnit = async (unitId) => {
+  selectedUnit.value = unitId;
+  try {
+    const res = await axios.get(`${API_BASE}/course/${unitId}`);
+    // Check if course_detail exists and is not empty before accessing
+    if (res.data && res.data.course_detail && res.data.course_detail.length > 0) {
+      const courseDetails = res.data.course_detail[0];
+      console.log(`Starting Unit ${unitId}: ${courseDetails.course_title}`);
+      console.log("Unit Details:", courseDetails);
+    } else {
+      console.log(`No details found for unit ${unitId}`);
+    }
+  } catch (err) {
+    console.error(`Failed to fetch details for unit ${unitId}:`, err);
+  }
+};
 
 const trynowfeature = () => {
-  alert('This feature is coming soon!')
-}
+  console.log('This feature is coming soon!');
+};
 
-const contentContainer = ref(null)
-const scrollOffset = ref(0)
+// Scroll handling logic remains the same
+const contentContainer = ref(null);
+const scrollOffset = ref(0);
 
 const scrollToTop = () => {
   if (contentContainer.value) {
-    contentContainer.value.scrollTop = 0
-    scrollOffset.value = 300
+    contentContainer.value.scrollTop = 0;
+    scrollOffset.value = 300;
   }
-}
+};
 
 const scrollToBottom = () => {
   if (contentContainer.value) {
-    const maxScroll = contentContainer.value.scrollHeight - contentContainer.value.clientHeight
-    contentContainer.value.scrollTop = maxScroll
-    scrollOffset.value = 0
+    const maxScroll = contentContainer.value.scrollHeight - contentContainer.value.clientHeight;
+    contentContainer.value.scrollTop = maxScroll;
+    scrollOffset.value = 0;
   }
-}
+};
 
 const handleScroll = () => {
   if (contentContainer.value) {
-    const scrollTop = contentContainer.value.scrollTop
-    const maxScroll = contentContainer.value.scrollHeight - contentContainer.value.clientHeight
-    const scrollPercent = scrollTop / maxScroll
-    scrollOffset.value = (1 - scrollPercent) * 10
+    const scrollTop = contentContainer.value.scrollTop;
+    const maxScroll = contentContainer.value.scrollHeight - contentContainer.value.clientHeight;
+    const scrollPercent = scrollTop / maxScroll;
+    scrollOffset.value = (1 - scrollPercent) * 10;
   }
-}
+};
 
+// New function to fetch all courses from the API
+const fetchCourses = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/course`);
+    // Correctly access the course_detail array from the response object
+    if (res.data && res.data.course_detail) {
+      courses.value = res.data.course_detail;
+      console.log("Fetched courses:", courses.value);
+    } else {
+      console.log("No courses found in the response.");
+    }
+  } catch (err) {
+    console.error('Failed to fetch courses:', err);
+  }
+};
+
+// On mount, fetch the courses and set up the scroll handler
 onMounted(async () => {
-  await nextTick()
+  await fetchCourses();
+  await nextTick();
   if (contentContainer.value) {
-    contentContainer.value.addEventListener('scroll', handleScroll)
-    scrollToBottom()
+    contentContainer.value.addEventListener('scroll', handleScroll);
+    scrollToBottom();
   }
-})
-
+});
 </script>
+
 
 <style scoped>
 * {
@@ -254,29 +277,34 @@ onMounted(async () => {
 }
 
 .main-container {
-  display: flex;
-  flex: 1; 
-  height: 100%; 
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  width: 100%; 
   overflow: hidden;
+  padding: 0 12px;
+  box-sizing: border-box;
 }
 
-.page-heading-container {
-  position: absolute;
-  top: 4.5rem;
-  left: 20%;
-  width: 100%;
-  text-align: center;
-  z-index: 20;
+.profile-header {
+  width: 87%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 22px auto 15px auto;
+  flex-wrap: wrap;
 }
 
 .page-heading-box {
-  width: 60%;
-  padding: 0.75rem 3rem 1.1rem;
+  flex: 4;
+  width: 83%;
+  padding: 1rem 0 2rem 0;
   border-radius: 20px;
   border: 2px solid rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 
 .page-heading {
@@ -293,16 +321,82 @@ onMounted(async () => {
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
   margin-top: -0.5rem;
 }
+.mascot-container {
+  flex: 1; 
+  max-width: 16%;
+  flex-shrink: 0;
+  position: static;
+  z-index: 100;
+  display: flex;
+  flex-direction: column; /* stack speech-bubble + face vertically */
+  align-items: self-end; /* center horizontally */
+  justify-content: center; /* center vertically if needed */
+  text-align: center; /* center text inside speech bubble */
+}
+
+
+.mascot-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.speech-bubble {
+  background: #4a90e2;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  position: relative;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 75%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #4a90e2;
+}
+
+.mascot {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* animation: bounce 2s infinite; */
+}
+
+.mascot-face {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+.mascot-face:hover {
+  transform: scale(1.1);
+}
 
 .content {
-  flex: 1;
+  flex: unset;
   overflow-y: auto;
   overflow-x: hidden;
-  margin: 170px 20px 20px 20px;
-  height: 76%;
-  border-radius: 20px;
-  background: #ffffff4b;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.249);
+  height: unset;
+  border-radius: 25px;
+  background: #ffffff4d;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  margin: 5px 20px 80px 20px;
 }
 
 .roadmap-container {
@@ -420,100 +514,11 @@ onMounted(async () => {
     linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4);
 }
 
-.mascot-container {
-  position: fixed;
-  top: 4.3rem;
-  right: 3.75rem;
-  z-index: 100;
-  display: flex;
-  flex-direction: row; 
-  align-items: stretch; 
-  gap: 0.5rem;
-}
-
-.mascot-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.mascot-right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px; 
-  z-index: 50;
-
-}
-
-.speech-bubble {
-  background: #4a90e2;
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-align: center;
-  position: relative;
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
-}
-
-.speech-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 75%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 10px solid #4a90e2;
-}
-
-.mascot {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* animation: bounce 2s infinite; */
-}
-
-.mascot-face {
-  width: 150px;
-  height: 150px;
-  object-fit: contain;
-}
 
 @keyframes bounce {
   0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
   40% { transform: translateY(-10px); }
   60% { transform: translateY(-5px); }
-}
-
-.try-now-btn {
-  width: 40px;
-  height: 150px;
-  background: #7fb069;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  writing-mode: vertical-rl;   
-  text-orientation: upright;    
-  text-align: center;
-  box-shadow: 0 0 6px #0000006c;
-}
-
-.try-now-btn:hover {
-  background: #6a9454;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .scroll-controls {
