@@ -4,11 +4,7 @@ import Login from "../Login.vue";
 import SignUpArchit from "../Institute/SignUp-Archit.vue";
 import SignUp from "../Student/SignUp-Tanuja.vue";
 import AdminHome from "../Admin/AdminDashboard.vue";
-import StudentHome from "../Student/StudentHome.vue";
-import PracticeContent from "../Student/PracticeContent.vue";
-import StudentProfile from "../Student/StudentProfile.vue";
 import VideosUploadPage from "../Admin/VideosUploadPage.vue";
-import StudentPractice from "../Student/StudentPractice.vue";
 import InstituteHome from "../Institute/InstituteHome.vue";
 import TeacherProgress from "../Institute/TeacherProgress.vue";
 import VerifyStudents from "../Institute/VerifyStudents.vue";
@@ -16,6 +12,14 @@ import QuizManagement from "../Admin/QuizManagement.vue";
 import InstituteProfile from "../Institute/InstituteProfile.vue";
 import AdminLayout from "../Institute/InstituteLayout.vue";
 
+
+import StudentHome from "../Student/StudentHome.vue";
+import PracticeContent from "../Student/PracticeContent.vue";
+import LeaderBoard from "../Student/LeaderBoard.vue";
+import StudentProfile from "../Student/StudentProfile.vue";
+import Learn from "../Student/Learn.vue";
+import LearnVideos from "../Student/LearnVideos.vue";
+import StudentPractice from "../Student/StudentPractice.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -25,12 +29,17 @@ const router = createRouter({
     {path: "/student" , component:SignUp},
     {path: "/login", component: Login},
     {path: "/admin-home" , component: AdminHome},
-    {path: "/:student_id/student-home" , component: StudentHome},
-    // {path: "/student-practice" , component: StudentPractice},
-
-    // {path : "/studentprofile" , component: StudentProfile},
+    
+    {path: "/student-home" , component: StudentHome},
+    {path: "/student-practice-content" , component: PracticeContent},
+    {path: "/student-leaderboard" , component: LeaderBoard},
+    {path: "/student-profile" , component: StudentProfile},
+    {path: "/student-learn" , component: Learn},
+    {path: "/student-learn/:unitId", component: LearnVideos},
+    {path: '/student-unit-practice/:unitId', component: StudentPractice},
 
     {path : "/videos-upload" , component : VideosUploadPage},
+<<<<<<< HEAD
 
 
     {path: "/student-practice-content" , component: PracticeContent},
@@ -48,6 +57,11 @@ const router = createRouter({
       ]
 
     },
+=======
+    {path: "/:institute_id/institute-home", component: InstituteHome},
+    {path: "/:institute_id/teacher-progress/:teacher_id", component: TeacherProgress},
+    {path: "/:institute_id/verify-students", component: VerifyStudents},
+>>>>>>> d5fc6726454ca6be5778fd3a122eaf72a73f1c91
     {path: "/quiz-manage" , component : QuizManagement},
 
   ]

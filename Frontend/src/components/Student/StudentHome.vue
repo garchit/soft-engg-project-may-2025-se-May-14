@@ -1,11 +1,6 @@
 <template>
-  <div class="app-container">
-
-
-    <Navbar class="navbar" />
-
+  <InteractiveLayout>
     <div class="student-page">
-      <StudentSidebar />
 
       <div class="student-content">
         <h1 class="dashboard-title" style="text-align: center; font-family: 'poppins'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">Welcome, Donna</h1><br /><br />
@@ -94,8 +89,7 @@
         </div>
       </div>
     </div>
-
-  </div>
+  </InteractiveLayout>
 </template>
 
 <script setup>
@@ -105,6 +99,7 @@ import StreakCalendar from './Calendar.vue';
 import StudentSidebar from './StudentSidebar.vue';
 import { CCard, CCardImage, CCardBody, CCardText } from '@coreui/vue';
 import DonutChart from '../donutChart.vue'; 
+import InteractiveLayout from '../InteractiveLayout.vue';
 </script>
 
 <style scoped>
@@ -131,13 +126,13 @@ import DonutChart from '../donutChart.vue';
 .student-page {
   display: flex;
   flex-direction: row;
-  padding-top: 60px; 
+  /* padding-top: 60px;  */
 }
 
 .student-content {
   flex: 1;
   padding: 20px;
-  margin-left: 250px; 
+  /* margin-left: 250px;  */
 }
 
 .main-container {
@@ -147,7 +142,7 @@ import DonutChart from '../donutChart.vue';
   padding: 30px;
   border-radius: 15px;
   box-shadow: 5px 10px rgba(30, 29, 29, 0.2);
-  margin: 20px auto;
+  /* margin: 20px auto; */
   width: 1000px;
   height: 1000px;
   justify-content: center;

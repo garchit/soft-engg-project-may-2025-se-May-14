@@ -1,8 +1,8 @@
 <template>
 
     <div class="admin-page">
-      <Navbar />
-      <Sidebar />
+      <Navbar/>
+      <Sidebar/>
 
       <div class="admin-content">
         <div class="main-container">
@@ -87,7 +87,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="inst, rank in allInstitutes" :key="inst.institute_id" class="table-row">
+                  <tr v-for="(inst, rank) in allInstitutes" :key="inst.institute_id" class="table-row">
                     <td class="rank-cell">
                       <span class="rank-badge">{{ rank + 1}}</span>
                     </td>
@@ -186,11 +186,23 @@ async function adminDashboardData() {
   }
 }
 
-// Watch countClass and update chartData reactively
-watch(countClass, (newVal) => {
-  chartData.value.labels = Object.keys(newVal);
-  chartData.value.datasets[0].data = Object.values(newVal);
-  console.log("Chart data updated:", newVal);
+  watch(countClass, (newVal) => {
+  chartData.value = {
+    labels: Object.keys(newVal),
+    datasets: [{
+      label: 'Students',
+      data: Object.values(newVal),
+      backgroundColor: [
+        '#FF6B6B',
+        '#4ECDC4',
+        '#45B7D1',
+        '#96CEB4',
+        '#FFEAA7'
+      ],
+      borderWidth: 0,
+      hoverOffset: 8,
+    }],
+  };
 }, { immediate: true });
 
 onMounted(() => {

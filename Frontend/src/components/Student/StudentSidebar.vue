@@ -14,10 +14,10 @@
         </li>
         <li class="nav-item">
           <router-link 
-            to="/student-lectures" 
+            to="/student-learn" 
             class="nav-link" 
             :class="{ active: activeLink === 'LEARN' }"
-            @click="setActiveLink('student-lectures')"
+            @click="setActiveLink('student-learn')"
           >
             LEARN
           </router-link>
@@ -32,7 +32,16 @@
             PRACTICE
           </router-link>
         </li>
-
+        <li class="nav-item">
+          <router-link 
+            to="/student-leaderboard" 
+            class="nav-link" 
+            :class="{ active: activeLink === 'LEADERBOARD' }"
+            @click="setActiveLink('student-leaderboard')"
+          >
+            LEADERBOARD
+          </router-link>
+        </li>
           <li class="nav-item">
           <router-link 
             to="/student-profile" 
@@ -45,6 +54,14 @@
         </li>
       </ul>
     </nav>
+     <div class="mascot-container">
+      <div class="speech-bubble">
+        ASK ME ANYTHING!
+      </div>
+      <div class="mascot" @click="handleMascotClick">
+        <img src="/src/assets/ReviseAvatar.png" alt="Savvy Mascot" class="mascot-face" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -55,6 +72,10 @@ const activeLink = ref('home');
 
 const setActiveLink = (linkName) => {
   activeLink.value = linkName;
+};
+
+const handleMascotClick = () => {
+  alert('This feature will be available soon!');
 };
 </script>
 
@@ -87,7 +108,7 @@ const setActiveLink = (linkName) => {
 .nav-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-bottom: 0px;
   width: 100%;
 }
 
@@ -101,18 +122,15 @@ const setActiveLink = (linkName) => {
   width: 100%;
   padding: 15px 20px;
   text-decoration: none;
-  color: #ffffff;
-  font-size: 20px;
-  font-weight: 700;
-  font-family: 'Poppins', sans-serif;
-  text-align: center;
+  color: #ffffff !important;
+  font-size: 17px;
+  text-align: center !important;
   transition: all 0.3s ease;
   position: relative;
 }
 
 .nav-link:hover {
-  background-color: #e54c9196;
-  text-decoration: none;
+  background-color: #e54c9164 !important;
 }
 
 .nav-link.active {
@@ -122,6 +140,54 @@ const setActiveLink = (linkName) => {
 
 .nav-link.active:hover {
   color: #E54C91;
+}
+
+.mascot-container {
+  position: absolute;
+  bottom: 5px; 
+  left: 17%;
+  text-align: center;
+}
+
+.speech-bubble {
+  background: #4a90e2;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  position: relative;
+  margin-bottom: -2rem;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 20%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #4a90e2;
+}
+
+.mascot {
+  display: flex;
+  justify-content: center;
+}
+
+.mascot-face {
+  width: 110px;
+  height: auto;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.mascot-face:hover {
+  transform: scale(1.1);
 }
 
 @media (max-width: 768px) {
