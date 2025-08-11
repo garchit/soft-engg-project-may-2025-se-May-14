@@ -44,8 +44,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { Bar } from 'vue-chartjs';
+import { useRoute } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
 import {
   Chart as ChartJS,
   Title,
@@ -57,22 +59,66 @@ import {
 } from 'chart.js';
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
+const toast = useToast();
+const route = useRoute();
+
 // Data
-const instituteName = ref('VIMAL HRIDAY CONVENT SCHOOL');
+const instituteId = route.params.institute_id;
+const instituteName = ref('');
+const totalTeachers = ref(null);
+const averageInstituteScore = ref(null);
+const totalStudents = ref(null);
+let teacherProgressData = ref([]);
+
+async function instituteDashboard() {
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/institute_info/${instituteId}`);
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Error fetching institute dashboard data");
+
+    instituteName.value = data.name;
+    totalTeachers.value = data.total_teachers;
+    averageInstituteScore.value = data.average_institute_score;
+    totalStudents.value = data.total_students;
+
+  } catch (e) {
+    toast.error(e.message || e.toString());
+  }
+}
+
+async function instituteTeacherData(){
+  try{
+    const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/teacher_wise_progress/${instituteId}`);
+  
+    const data = await response.json();
+    teacherProgressData = data.teacher_progress;
+    if(!response.ok) throw new Error(data.error || "Error fetching Teacher Data");
+
+    console.log(teacherProgressData);
+  } catch(e){
+    toast.error(e.message || e.toString());
+  }
+}
+
+onMounted(() => {
+  instituteDashboard();
+  instituteTeacherData();
+})
 
 const cardsData = ref([
-  { title: 'Total Teachers', value: 190 },
-  { title: 'Average Class Score', value: 75 },
-  { title: 'Most Frequent Topic', value: 'STOCKS' },
+  { title: 'Total Teachers', value: totalTeachers },
+  { title: 'Average Institute Score', value: averageInstituteScore },
+  { title: 'Total Students', value: totalStudents },
 ]);
 
 // Chart Data
 const topTeachersData = {
-  labels: ['Mr. Sharma', 'Ms. Rao', 'Mr. Mehta'],
+  labels: teacherProgressData.value.map(teacher => teacher.name),
   datasets: [
     {
       label: 'Performance',
-      data: [95, 91, 88],
+      data: teacherProgressData.value.map(teacher => teacher.teacher_progress),
       backgroundColor: '#007bff',
     },
   ],

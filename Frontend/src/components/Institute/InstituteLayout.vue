@@ -1,25 +1,28 @@
 <template>
-  <div class="layout">
-    <Sidebar @add-teacher="showAddTeacher = true" />
+  <div class="layout-page">
+    <Navbar />
+    <div class="layout">
+      <Sidebar @add-teacher="showAddTeacher = true" />
 
-    <main class="main-content">
-      <!-- Overlay Form -->
-      <div v-if="showAddTeacher" class="overlay">
-        <div class="form-box">
-          <h3 class="form-title">Add Teacher</h3>
-          <input v-model="teacherName" placeholder="Teacher Name" class="form-input" />
-          <input v-model="teacherEmail" placeholder="Teacher Email" class="form-input" type="email"/>
-          <input v-model="teacherClass" type="number" min="1" max="8" placeholder="Teacher Class" class="form-input" />
-          <div class="form-actions">
-            <button @click="addTeacher" class="btn btn-save">Save</button>
-            <button @click="showAddTeacher = false" class="btn btn-cancel">Cancel</button>
+      <main class="main-content">
+        <!-- Overlay Form -->
+        <div v-if="showAddTeacher" class="overlay">
+          <div class="form-box">
+            <h3 class="form-title">Add Teacher</h3>
+            <input v-model="teacherName" placeholder="Teacher Name" class="form-input" />
+            <input v-model="teacherEmail" placeholder="Teacher Email" class="form-input" type="email"/>
+            <input v-model="teacherClass" type="number" min="1" max="8" placeholder="Teacher Class" class="form-input" />
+            <div class="form-actions">
+              <button @click="addTeacher" class="btn btn-save">Save</button>
+              <button @click="showAddTeacher = false" class="btn btn-cancel">Cancel</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Page-specific content -->
-      <router-view />
-    </main>
+        <!-- Page-specific content -->
+        <router-view />
+      </main>
+    </div>
   </div>
 </template>
 
@@ -28,6 +31,7 @@ import { ref } from 'vue'
 import Sidebar from './Sidebar.vue'
 import { useToast } from 'vue-toast-notification'
 import { useRoute } from 'vue-router'
+import Navbar from '../Student/Navbar.vue'
 
 const toast = useToast();
 const route = useRoute();

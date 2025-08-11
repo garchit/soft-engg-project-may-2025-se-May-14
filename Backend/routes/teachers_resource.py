@@ -7,7 +7,7 @@ from flask_login import login_required
 from models import db
 from models.user_teacher import UserTeacher
 from models.user import User
-from .helper_functions import getTeachers,overall_progress
+from .helper_functions import getTeachers,overall_progress, getTeacherName
 from sqlalchemy.exc import SQLAlchemyError
 
 class TeacherResource(Resource):
@@ -146,6 +146,7 @@ class TeacherWiseProgress(Resource):
             for teacher_id in teachers:
                 all_progress=[]
                 students=db.session.query(UserTeacher).filter(UserTeacher.teacher_id==teacher_id)
+                name = getTeacherName(teacher_id)
                 total=0
                 for student in students:
                     user_id=student.user_id
@@ -159,7 +160,7 @@ class TeacherWiseProgress(Resource):
                                         "student_name":student_details.full_name,
                                         "overall_progress":progress})
                 average=total/students.count() if students.count() > 0 else 0
-                teacher_wise.append({"teacher_id":teacher_id,"student_details":all_progress,"teacher_progress":round(average,2)})
+                teacher_wise.append({"teacher_id":teacher_id, "teacher_name": name, "student_details":all_progress,"teacher_progress":round(average,2)})
             return {"teacher_progress":teacher_wise}
         except SQLAlchemyError as e:    
             return {"error":"internal server error","details":str(e)},500

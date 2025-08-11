@@ -1,7 +1,7 @@
 from flask_restful import Api
 from .user import UserApi,VerifyStudents
 from .log_in_out import LoginResource,LogoutResource
-from .institute_resource import InstituteResource,AllInstitute,ToggleBlockInstitute,InstituteTeacher,InstituteInfo
+from .institute_resource import InstituteResource,AllInstitute,ToggleBlockInstitute,InstituteTeacher, InstituteInfo
 from .teachers_resource import TeacherResource,UserTeacherResource,TeacherWiseProgress
 from .unit_resource import CourseResource,CompletedCourse,CourseProgress
 from .lectures import LectureResource, UserLectureResource

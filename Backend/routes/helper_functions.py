@@ -74,6 +74,12 @@ def getTeachers(institute_id):
         for teacher in teachers:
                 ids.append(teacher.id)
         return ids
+
+def getTeacherName(teacher_id):
+       teacher = db.session.query(Teacher).filter(Teacher.id==teacher_id).first()
+       
+       if teacher: return teacher.name
+       else: return "No teacher"
 def user_score(user_id):
     try:
         # Check if user exists

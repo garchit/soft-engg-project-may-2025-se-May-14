@@ -1,6 +1,5 @@
 <template>
   <aside class="sidebar">
-    <h2 class="title">SAVVY</h2>
     <nav class="nav-links">
       <router-link :to="`/${instituteId}/institute-home`" class="nav-link" exact-active-class="active">Home</router-link>
 
@@ -113,6 +112,8 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-top: 100px;
+
 }
 
 .nav-link {
