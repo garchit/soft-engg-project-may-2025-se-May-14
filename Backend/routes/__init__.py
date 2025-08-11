@@ -14,8 +14,7 @@ from .ai_chatbot import AIChatbot
 from .videosummary import VideoSummaryResource
 from .admin_resources import Homepage
 from .user_leaderboard import LeaderboardApi,UserRankApi
-
-
+from .user_course import UserCoursesApi, UserCoursesByUserApi
 
 
 def init_routes(app):
@@ -49,5 +48,7 @@ def init_routes(app):
     api.add_resource(LeaderboardApi,'/user_leaderboard')
     api.add_resource(UserRankApi,'/user_rank/<string:username>')
     api.add_resource(Homepage,"/admin/home")
+    api.add_resource(UserCoursesApi, '/user_courses')
+    api.add_resource(UserCoursesByUserApi, '/user_courses/<int:user_id>')
 
 
