@@ -1,14 +1,14 @@
 <template>
-  <div class="app-container">
-    <Sidebar />
+  <InteractiveLayout>
     <div class="main-content">
-      <Navbar />
-      <div class="practice-content">
-        <h1 class="practice-title">PRACTICE</h1>
-
-        <div class="unit-container">
-          <p class="unit-text">{{ currentQuestion?.unit || 'Loading...' }}</p>
+      <header class="profile-header">
+        <div class="page-heading-box">
+          <div class="page-heading">{{ unitName || 'Loading...' }}</div>
+          <div class="page-caption">
+            Practice questions to enhance your skills and knowledge.
+          </div>
         </div>
+      </header>
 
         <div v-if="isLoading" class="loading-container">
           <div class="loading-spinner"></div>
@@ -35,22 +35,22 @@
         </div>
 
         <div v-else-if="isCompleted" class="completion-container">
-  <div class="completion-card">
-    <h2 class="completion-title">Quiz Complete!</h2>
-    
-    <div class="score-display">
-      <span class="score-text">Your Score:</span>
-      <span class="score-value">{{ score }}/{{ questions.length }}</span>
-    </div>
-    
-    <div class="percentage-display">
-      <span class="percentage-text"></span>
-      <span class="percentage-value">{{ Math.round((score / questions.length) * 100) }}%</span>
-    </div>
-    
-    <button class="restart-button" @click="resetQuiz">Try Again</button>
-  </div>
-</div>
+          <div class="completion-card">
+            <h2 class="completion-title">Quiz Complete!</h2>
+            
+            <div class="score-display">
+              <span class="score-text">Your Score:</span>
+              <span class="score-value">{{ score }}/{{ questions.length }}</span>
+            </div>
+            
+            <div class="percentage-display">
+              <span class="percentage-text"></span>
+              <span class="percentage-value">{{ Math.round((score / questions.length) * 100) }}%</span>
+            </div>
+            
+            <button class="restart-button" @click="resetQuiz">Try Again</button>
+          </div>
+        </div>
 
         <div v-else-if="currentQuestion" class="question-card">
           <div class="timer-hearts-container">
@@ -119,90 +119,21 @@
             </button>
           </div>
         </div>
-
-
         <audio ref="breakSoundRef" preload="auto">
           <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
         </audio>
       </div>
-    </div>
-  </div>
+  
+  </InteractiveLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import Sidebar from './StudentSidebar.vue';
-import Navbar from './Navbar.vue';
+import { useRoute } from 'vue-router';
+import InteractiveLayout from '../InteractiveLayout.vue';
+import axios from 'axios';
 
-
-const mockQuestions = [
-  {
-    id: 1,
-    text: 'What is demand in economics?',
-    options: [
-      'The desire to own goods and services backed by purchasing power',
-      'The total amount of money in circulation',
-      'The cost of producing goods',
-      'The interest rate on savings'
-    ],
-    correctAnswer: 0,
-    unit: 'UNIT 1: INTRODUCTION TO FINANCE',
-    difficulty: 'easy'
-  },
-  {
-    id: 2,
-    text: 'What is supply in economics?',
-    options: [
-      'The amount of money in circulation',
-      'The quantity of goods and services available for sale',
-      'The cost of production',
-      'The interest rate on loans'
-    ],
-    correctAnswer: 1,
-    unit: 'UNIT 1: INTRODUCTION TO FINANCE',
-    difficulty: 'easy'
-  },
-  {
-    id: 3,
-    text: 'What is the primary purpose of a budget?',
-    options: [
-      'To maximize spending',
-      'To plan and control income and expenses',
-      'To invest in stocks',
-      'To calculate taxes'
-    ],
-    correctAnswer: 1,
-    unit: 'UNIT 2: BUDGETING AND PLANNING',
-    difficulty: 'medium'
-  },
-  {
-    id: 4,
-    text: 'What is inflation?',
-    options: [
-      'A decrease in prices',
-      'An increase in unemployment',
-      'A general increase in prices over time',
-      'A decrease in interest rates'
-    ],
-    correctAnswer: 2,
-    unit: 'UNIT 2: BUDGETING AND PLANNING',
-    difficulty: 'medium'
-  },
-  {
-    id: 5,
-    text: 'What is compound interest?',
-    options: [
-      'Interest calculated only on the principal amount',
-      'Interest calculated on principal and accumulated interest',
-      'A type of loan',
-      'A banking fee'
-    ],
-    correctAnswer: 1,
-    unit: 'UNIT 3: INVESTING AND SAVINGS',
-    difficulty: 'hard'
-  }
-];
-
+const route = useRoute();
 
 const questions = ref([]);
 const currentQuestionIndex = ref(0);
@@ -218,10 +149,14 @@ const lives = ref([true, true, true]);
 const isGameOver = ref(false);
 const isProcessing = ref(false);
 const breakSoundRef = ref(null);
+const unitName = ref(null);
+const userId = ref(localStorage.getItem('user_id') || ''); // Fetch from local storage // NOTE: Replace with the actual user ID from your auth system.
 
 const totalTime = 60; 
 let timerInterval = null;
 
+const API_BASE = '/Finance_Tutor'; 
+const API_URL = `${API_BASE}/user_courses`;
 
 const currentQuestion = computed(() => questions.value[currentQuestionIndex.value]);
 const isLastQuestion = computed(() => currentQuestionIndex.value === questions.value.length - 1);
@@ -232,10 +167,13 @@ const progressColor = computed(() => {
   return '#ef4444';
 });
 
-// Timer functions
+const letterToNumber = (letter) => {
+  const letters = ['a', 'b', 'c', 'd'];
+  return letters.indexOf(letter.toLowerCase());
+};
+
 const startTimer = () => {
   if (timerInterval) clearInterval(timerInterval);
-
   timerInterval = setInterval(() => {
     if (timeRemaining.value > 0) {
       timeRemaining.value -= 1;
@@ -252,7 +190,7 @@ const resetTimer = () => {
 
 const handleTimeUp = () => {
   if (timerInterval) clearInterval(timerInterval);
-  selectedOption.value = -1; // Auto-submit with no answer
+  selectedOption.value = -1;
   handleContinue();
 };
 
@@ -262,29 +200,59 @@ const formatTime = (seconds) => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-
 const loadQuestions = async () => {
-  try {
-    isLoading.value = true;
-    error.value = null;
+  isLoading.value = true;
+  error.value = null;
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    questions.value = mockQuestions;
-    resetTimer();
+  try {
+    const unitId = route.params.unitId;
+    if (!unitId) {
+        throw new Error("Unit ID not found in route parameters.");
+    }
+
+    const courseUrl = `${API_BASE}/course/${unitId}`;
+    const courseResponse = await axios.get(courseUrl);
+    
+    if (courseResponse.status !== 200) {
+      throw new Error(`Failed to fetch course details. Status: ${courseResponse.status}`);
+    }
+
+    unitName.value = courseResponse.data.course_details.course_title;
+
+    const questionsUrl = `${API_BASE}/questions/unit/${unitId}`;
+    const questionsResponse = await axios.get(questionsUrl);
+    
+    if (questionsResponse.status !== 200) {
+      throw new Error(`Failed to fetch questions. Status: ${questionsResponse.status}`);
+    }
+    
+    const data = questionsResponse.data;
+    
+    if (data.questions && data.questions.length > 0) {
+      questions.value = data.questions.map(q => ({
+        id: q.id,
+        text: q.description,
+        options: [q.option_a, q.option_b, q.option_c, q.option_d],
+        correctAnswer: letterToNumber(q.correct_option),
+        unit: q.unit_id
+      }));
+      resetTimer();
+    } else {
+      error.value = 'No questions found for this unit.';
+      questions.value = [];
+    }
   } catch (err) {
-    error.value = 'Failed to load questions';
     console.error('Error loading questions:', err);
+    error.value = `Failed to load questions: ${err.message}. Please try again.`;
   } finally {
     isLoading.value = false;
   }
 };
 
-
 const breakHeart = () => {
   const index = lives.value.lastIndexOf(true);
   if (index !== -1) {
     lives.value[index] = false;
-
     playBreakSound();
   }
 };
@@ -311,15 +279,23 @@ const playBreakSound = () => {
   }
 };
 
+const handleGameOver = () => {
+  isGameOver.value = true;
+  if (timerInterval) clearInterval(timerInterval);
+  
+  // Calculate score for game over state
+  const percentage = Math.round((score.value / (currentQuestionIndex.value + 1)) * 100);
+  submitScore(percentage);
+};
+
+
 const checkGameOver = () => {
   if (lives.value.filter(Boolean).length === 0) {
-    isGameOver.value = true;
-    if (timerInterval) clearInterval(timerInterval);
+    handleGameOver();
     return true;
   }
   return false;
 };
-
 
 const handleOptionSelect = (index) => {
   if (showResults.value || isGameOver.value || isProcessing.value) return;
@@ -330,13 +306,10 @@ const handleContinue = async () => {
   if (isGameOver.value || isProcessing.value) return;
   
   isProcessing.value = true;
-  
-
   showResults.value = true;
   
   if (selectedOption.value !== null && selectedOption.value !== -1) {
     answers.value.push(selectedOption.value);
-
     if (selectedOption.value === currentQuestion.value.correctAnswer) {
       score.value += 1;
     } else {
@@ -356,7 +329,7 @@ const handleContinue = async () => {
 
   setTimeout(async () => {
     if (isLastQuestion.value) {
-      await finishQuiz();
+      finishQuiz();
     } else {
       currentQuestionIndex.value += 1;
       selectedOption.value = null;
@@ -367,22 +340,30 @@ const handleContinue = async () => {
   }, 2000);
 };
 
-const finishQuiz = async () => {
-  if (timerInterval) clearInterval(timerInterval);
-  isCompleted.value = true;
-
+// New function to submit the score to the API
+const submitScore = async (percentage) => {
   try {
-    const results = {
-      unitId: 1,
-      answers: answers.value,
-      score: score.value,
-      timeSpent: questions.value.length * totalTime - timeRemaining.value
+    const unitId = route.params.unitId;
+    const payload = {
+      user_id: userId.value,
+      course_id: unitId,
+      marks_scored: percentage
     };
-
-    console.log('Quiz results:', results);
+    
+    const response = await axios.post(API_URL, payload);
+    console.log('Score submitted successfully:', response.data);
   } catch (err) {
     console.error('Error submitting quiz results:', err);
   }
+};
+
+const finishQuiz = () => {
+  if (timerInterval) clearInterval(timerInterval);
+  isCompleted.value = true;
+
+  // Calculate the final percentage and submit to the API
+  const percentage = Math.round((score.value / questions.value.length) * 100);
+  submitScore(percentage);
 };
 
 const resetQuiz = () => {
@@ -399,7 +380,6 @@ const resetQuiz = () => {
   resetTimer();
 };
 
-// Lifecycle hooks
 onMounted(() => {
   loadQuestions();
 });
@@ -409,28 +389,58 @@ onUnmounted(() => {
 });
 </script>
 
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-.app-container {
-  display: flex;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #E54C91 0%, #FFC800 100%);
-  position: relative;
-}
-
 .main-content {
-  margin-left: 250px;
-  margin-top: 60px; 
-  padding: 20px;
-  flex: 1;
-  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  width: 100%; 
+  overflow: hidden;
+  padding: 0 12px;
+  box-sizing: border-box;
 }
 
+.profile-header {
+  width: 87%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 22px auto 15px auto;
+  flex-wrap: wrap;
+}
 
+.page-heading-box {
+  flex: 4;
+  width: 83%;
+  padding: 1rem 0 2rem 0;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.page-heading {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.page-caption {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #ffffffcc;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  margin-top: -0.5rem;
+}
 
 .practice-content {
-  margin-top: 80px;
+  /* margin-top: 80px; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -444,7 +454,7 @@ onUnmounted(() => {
 }
 
 .practice-title {
-  color: black;
+  color: white;
   font-size: 32px;
   font-weight: bold;
   text-align: center;
@@ -525,7 +535,7 @@ onUnmounted(() => {
 }
 
 .retry-button:hover {
-  background: #2563eb;
+  background: #cccccde7;
   transform: translateY(-2px);
 }
 
@@ -617,16 +627,15 @@ onUnmounted(() => {
 }
 
 .question-card {
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 20px;
-  padding: 30px;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  font-family: 'Poppins', sans-serif;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 2;
+  flex: unset;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: unset;
+  border-radius: 25px;
+  background: #ffffff5d;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  margin: 10px 50px 100px 50px;
+  padding: 40px 50px 30px 50px;
   position: relative;
 }
 
@@ -719,12 +728,14 @@ onUnmounted(() => {
 
 .question-content {
   color: #ffffff;
+  text-shadow: #0000004e 0px 2px 4px;
 }
 
 .question-text {
-  font-size: 22px;
+  font-size: 25px;
   font-weight: bold;
-  margin-bottom: 25px;
+  margin-top: 20px;
+  margin-bottom: 10px;
   text-align: center;
   line-height: 1.4;
   font-family: 'Poppins', sans-serif;
@@ -734,13 +745,13 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 1fr;
   gap: 15px;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 
 .option-item {
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, #ff9a44 0%, #fc6076 100%);
+  background: linear-gradient(135deg, #ff9b44 0%, #fc6075 100%);
   border-radius: 12px;
   padding: 15px 20px;
   cursor: pointer;
@@ -751,14 +762,14 @@ onUnmounted(() => {
 }
 
 .option-item:hover:not(.disabled) {
-  background: linear-gradient(135deg, #ff8419 0%, #f42d48 100%);
+  background: linear-gradient(135deg, #ff8419ab 0%, #f42d48ab 100%);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .option-item.selected {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border: 2px solid #60a5fa;
+  background: linear-gradient(135deg, #ff8419 0%, #f42d48 100%);;
+  border: 2px solid #ffffff;
 }
 
 .option-item.correct {
@@ -795,8 +806,8 @@ onUnmounted(() => {
   display: block;
   margin: 0 auto;
   padding: 15px 30px;
-  background: #3b82f6;
-  border: none;
+  background: #20ba59;
+  border: white;
   border-radius: 12px;
   color: white;
   font-family: 'Poppins', sans-serif;
@@ -807,21 +818,16 @@ onUnmounted(() => {
 }
 
 .continue-button:hover:not(:disabled) {
-  background: #2563eb;
+  background: linear-gradient(135deg,rgb(254, 202, 156)4 0%, #e756e2 100%);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .continue-button:disabled {
-  background: #6b7280;
+  background: #6b728092;
   cursor: not-allowed;
   transform: none;
 }
-
-
-
-
-
 
 @media (max-width: 768px) {
   .main-content {

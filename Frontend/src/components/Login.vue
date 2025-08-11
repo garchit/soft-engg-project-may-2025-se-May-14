@@ -79,12 +79,19 @@ const handleSubmit = async () => {
     alert(data.message);
     console.log('User:', data.user);
     console.log('Role', data.user.role);
+
+    // Store login info in localStorage
+    localStorage.setItem('username', data.user.username || '');
+    localStorage.setItem('email', data.user.email || '');
+    localStorage.setItem('role', data.user.role || '');
+    localStorage.setItem('user_id', data.user.id || '');
+
     if(data.user.role == "admin"){
         router.push('/admin-home')
     } else if(data.user.role == "institute"){
         router.push(`/${data.id}/institute-home`)
     } else{
-        router.push(`/${data.user.id}/student-home`)
+        router.push(`/student-home`)
     }
 
   } catch (error) {
