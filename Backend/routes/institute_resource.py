@@ -6,7 +6,7 @@ from models import db
 from models.institute import Institute
 from models.user import User
 from flask_login import login_required
-from .helper_functions import to_dict,count_students
+from .helper_functions import to_dict,count_students,average_institute_score
 from sqlalchemy.exc import SQLAlchemyError
 from models.teacher import Teacher
 
@@ -170,7 +170,31 @@ class InstituteTeacher(Resource):
                 "error": str(e)
             }, 500
               
+class InstituteInfo(Resource):
+    def get(self, institute_id):
+       try:
+              institute = db.session.query(Institute).filter_by(id=institute_id).first()
+              if not institute:
+                     return {"error": "Institute not found"}, 404
               
+              # Fetching the number of students
+              total_students = count_students(institute_id)
+              total_teachers = db.session.query(Teacher).filter(Teacher.institute_id == institute_id).count()
+              average_score=average_institute_score(institute_id)
+              return {
+                     "id": institute.id,
+                     "name": institute.name,
+                     "email": institute.email,
+                     "address": institute.address,
+                     "total_students": total_students,
+                     "total_teachers": total_teachers,
+                     "blocked": institute.blocked,
+                     "average_institute_score": average_score
+              }, 200
+
+       except SQLAlchemyError as e:
+              db.session.rollback()
+              return {"error": "Internal Server Error", "details": str(e)}, 500
 
 
 
