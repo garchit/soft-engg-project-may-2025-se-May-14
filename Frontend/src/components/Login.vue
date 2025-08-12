@@ -34,12 +34,12 @@
     </div>
 </template>
 
-
-
 <script setup>
-import { ref } from 'vue'
+// THIS IS THE FINAL, CORRECTED SCRIPT. IT USES THE PROXY AND SAVES THE USERNAME.
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
+import axios from 'axios';
 
 const router = useRouter();
 const toast = useToast();
@@ -48,55 +48,49 @@ let email = ref('');
 let password = ref('');
 const showPassword = ref(false);
 
-
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
 }
 
-//Go to landing page if no account
 const goToLandingPage = () => {
     router.push('/');
 }
 
-//Handle form submission -> Login
 const handleSubmit = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:5000/Finance_Tutor/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: email.value,
-        password: password.value
-      })
+    // Use axios with the proxied URL for consistent, reliable requests
+    const response = await axios.post('/Finance_Tutor/login', {
+      email: email.value,
+      password: password.value
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Login failed');
+    if (response.status === 200) {
+      toast.success("Login Success");
+      
+      const user = response.data.user;
+      
+      // CRITICAL: Save the username to localStorage so other pages can use it
+      if (user && user.username) {
+          localStorage.setItem('username', user.username);
+      } else {
+          console.log("Logged in user did not have a username (e.g., an Institute).");
+      }
+      
+      // Use the role from the API response to redirect
+      if (user.role === "admin") {
+          router.push('/admin-home');
+      } else if (user.role === "institute") {
+          router.push(`/${user.id}/institute-home`);
+      } else {
+          router.push(`/student-home`);
+      }
     }
-
-    toast.success("Login Success")
-    console.log('User:', data.user);
-    const role = data.role || data.user.role;
-    if(role == "admin"){
-        router.push('/admin-home')
-    } else if(role == "institute"){
-        router.push(`/${data.id}/institute-home`)
-    } else{
-        router.push(`/student-home`)
-    }
-
   } catch (error) {
-    toast.error(error.message);
+    const errorMessage = error.response ? error.response.error : error.message;
+    toast.error(errorMessage || 'Login failed. Please check your credentials.');
   }
 };
-
 </script>
-
-
 
 <style scoped>
 body{

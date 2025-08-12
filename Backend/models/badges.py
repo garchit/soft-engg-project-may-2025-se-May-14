@@ -1,4 +1,4 @@
-from models import db
+from extension import db
 
 badge_user = db.Table('badge_user',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),

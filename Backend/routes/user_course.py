@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from models import db
+from extension import db
 from models.user_course import UserCourse
 from models.user import User
 from models.unit import Unit

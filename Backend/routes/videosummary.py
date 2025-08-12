@@ -5,7 +5,7 @@ from urllib.parse import urlparse, parse_qs
 from youtube_transcript_api import YouTubeTranscriptApi  # type: ignore
 from transformers import pipeline  # type: ignore
 from datetime import datetime
-from models import db
+from extension import db
 from models.lecture import Lecture
 import re
 

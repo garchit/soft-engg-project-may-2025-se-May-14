@@ -2,7 +2,7 @@ from flask import request
 from flask_restful import Resource
 from flask_login import login_required
 from sqlalchemy.exc import SQLAlchemyError
-from models import db
+from extension import db
 from models.lecture import Lecture
 from models.unit import Unit  # required to check if unit_id exists
 from models.user_lecture import UserLecture

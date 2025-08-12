@@ -1,4 +1,4 @@
-from models import db
+from extension import db
 
 class Question(db.Model):
     __tablename__ = 'questions'

@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from models import db
+from extension import db
 from models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -68,6 +68,7 @@ class UserRankApi(Resource):
                     return {
                         "id": student.id,
                         "username": student.username,
+                        "full_name": student.full_name, # ✅ ADD THIS LINE
                         "rewards": student.rewards,
                         "rank": idx,
                         "streak": student.streak,
@@ -75,6 +76,13 @@ class UserRankApi(Resource):
                     }, 200
 
             return {"message": f"User '{username}' not found."}, 404
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"message": "Database error occurred.", "error": str(e)}, 500
+
+        except Exception as e:
+            return {"message": "An unexpected error occurred.", "error": str(e)}, 500
 
         except SQLAlchemyError as e:
             db.session.rollback()

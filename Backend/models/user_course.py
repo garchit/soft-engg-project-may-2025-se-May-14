@@ -1,4 +1,4 @@
-from models import db
+from extension import db
 
 class UserCourse(db.Model):
     __tablename__ = 'user_course'

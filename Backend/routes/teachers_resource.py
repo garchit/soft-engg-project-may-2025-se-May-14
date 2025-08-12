@@ -4,7 +4,7 @@ import json
 from models.teacher import Teacher
 from models.institute import Institute
 from flask_login import login_required
-from models import db
+from extension import db
 from models.user_teacher import UserTeacher
 from models.user import User
 from .helper_functions import getTeachers,overall_progress, getTeacherName

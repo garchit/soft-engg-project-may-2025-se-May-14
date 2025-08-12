@@ -1,5 +1,5 @@
 from models.user import User
-from models import db
+from extension import db
 from models.lecture import Lecture
 from models.unit import Unit
 from models.user_lecture import UserLecture

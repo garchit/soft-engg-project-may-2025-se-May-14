@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import  Resource
 import json
-from models import db
+from extension import db
 from models.institute import Institute
 from models.user import User
 from flask_login import login_required

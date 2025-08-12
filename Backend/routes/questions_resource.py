@@ -1,5 +1,5 @@
 from models.questions import Question
-from models import db
+from extension import db
 from flask_restful import Resource
 from flask import request
 from models.unit import Unit

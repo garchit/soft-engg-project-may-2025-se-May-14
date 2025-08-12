@@ -2,7 +2,7 @@ from flask import request
 from flask_restful import Resource
 from models.institute import Institute
 from models.teacher import Teacher
-from models import db
+from extension import db
 from models.user import User
 from .helper_functions import overall_progress
 from sqlalchemy.exc import SQLAlchemyError

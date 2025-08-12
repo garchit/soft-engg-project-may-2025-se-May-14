@@ -1,4 +1,4 @@
-from models import db
+from extension import db
 
 class Unit(db.Model):
     __tablename__ = 'unit'
