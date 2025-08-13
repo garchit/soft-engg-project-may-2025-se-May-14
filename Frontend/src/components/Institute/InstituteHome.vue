@@ -1,47 +1,68 @@
 <template>
-  <div class="institute-home-page">
-    <div class="container">
-      <h1>{{ instituteName }}</h1>
-
-      <!-- Info Cards -->
-      <div class="cards-container">
-        <div class="card" v-for="data in cardsData" :key="data.title">
-          <h2>{{ data.title }}</h2>
-          <p class="card-value">{{ data.value }}</p>
-        </div>
+    <div class="learn-container">
+      <div class="main-content">
+        <header class="profile-header">
+          <div class="page-heading-box">
+            <div class="page-heading">{{ instituteName }}</div>
+            <div class="page-caption">
+              Overview of the institute's performance and top teachers.
+            </div>
+          </div>
+        </header>
       </div>
+      <div class="course-content">
+        <div class="top-teachers-podium">
+          <div class="top-card " >
+            <!-- v-if="topTeachers[2]"> -->
+            <div class="medal-icon bronze">🥉</div>
+            <div class="info">
+              <!-- <div class="name">{{ topTeachers[2].name }}</div>-->
+              <div class="name">Teacher03</div>
+            </div>
+          </div>
+          <div class="top-card " >
+          <!-- v-if="topTeachers[0]"> -->
+            <div class="medal-icon gold">🥇</div>
+            <div class="info">
+              <!-- <div class="name">{{ topTeachers[0].name }}</div>-->
+              <div class="name">Teacher01</div>
+            </div>
+          </div>
+          <div class="top-card ">
+           <!-- v-if="topTeachers[1]"> -->
+            <div class="medal-icon silver">🥈</div>
+            <div class="info">
+              <!-- <div class="name">{{ topTeachers[1].name }}</div> -->
+              <div class="name">Teacher02</div>
+            </div>
+          </div>
+          <div class="unit-divider"></div>
+        </div>
 
-      <!-- Charts -->
-      <div class="charts-container">
-        <div class="chart-card">
-          <Bar :data="topTeachersData" :options="horizontalBarOptions" />
+        <div class="charts-container">
+          <div class="chart-card">
+            <Bar :data="topTeachersData" :options="horizontalBarOptions" :width="0" :height="10" />
+          </div>
+          <div class="chart-card">
+            <Bar :data="scoreDistributionData" :width="0" :height="10" />
+          </div>
+          <div class="chart-card">
+            <Bar :data="topicFrequencyData" :width="0" :height="10" />
+          </div>
         </div>
-        <div class="chart-card">
-          <Bar :data="scoreDistributionData" />
-        </div>
-        <div class="chart-card">
-          <Bar :data="topicFrequencyData" />
-        </div>
-      </div>
 
-      <!-- Medal Cards -->
-      <div class="top-teachers-cards">
-        <div class="gold medal-card">
-          <div class="medal-icon">🥇</div>
-          <p>Mr. Sharma</p>
-        </div>
-        <div class="silver medal-card">
-          <div class="medal-icon">🥈</div>
-          <p>Ms. Rao</p>
-        </div>
-        <div class="bronze medal-card">
-          <div class="medal-icon">🥉</div>
-          <p>Mr. Mehta</p>
+        <div class="unit-cards">
+          <div class="unit-card" v-for="data in cardsData" :key="data.title">
+            <div class="unit-divider"></div>
+            <div class="unit-header">
+              <p>{{ data.title }}</p> <p class="unit-description">{{ data.value }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 </template>
+
 
 <script setup>
 import { onMounted, ref } from 'vue';
@@ -108,7 +129,7 @@ onMounted(() => {
 
 const cardsData = ref([
   { title: 'Total Teachers', value: totalTeachers },
-  { title: 'Average Institute Score', value: averageInstituteScore },
+  { title: 'Your Score', value: averageInstituteScore },
   { title: 'Total Students', value: totalStudents },
 ]);
 
@@ -157,100 +178,187 @@ const topicFrequencyData = {
 </script>
 
 <style scoped>
-.institute-home-page {
-  height: 100vh;
+.learn-container {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 100vh;
 }
-.container {
-  height: 100%;
+
+.main-content {
+  display: flex;
+  align-items: center;
   width: 100%;
-  backdrop-filter: blur(12px);
-  padding-bottom: 100px;
 }
-h1 {
-  text-align: center;
-  font-size: 42px;
-  padding-top: 10px;
-  color: white;
-}
-.cards-container {
+
+.profile-header {
+  width: 100%;
   display: flex;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
-  margin: 50px auto;
-  border: 1px solid #cbd5e1;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 20px;
-  width: 80%;
-  background-color: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
+  justify-content: center;
+  align-items: center;
+  margin: 23px 0 18px;
 }
-.card {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  width: 250px;
-  padding: 20px 0;
-  margin: 10px 0;
-  background-color: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
+
+.page-heading-box {
+  width: 85%;
+  padding: 1rem 0 2rem 0;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   text-align: center;
 }
-.card:hover {
-  transform: scale(1.05);
+
+.page-heading {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
-.card-value {
+
+.page-caption {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #ffffffcc;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  margin-top: -0.5rem;
+}
+
+.course-content {
+  background: #ffffff3d;
+  height: calc(100vh - 280px);
+  margin: 10px 32px 0 32px;
+  border-radius: 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 40px;
+  overflow-y: auto;
+}
+
+.unit-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.unit-card {
+  border-radius: 15px;
+  padding: 10px 20px 20px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.unit-divider {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(to right,rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1));
+  margin: 2px 0 10px 0;
+  border: none;
+}
+
+.unit-header {
+  font-size: 1.4rem;
+  background: white; 
+  background-clip: text;
+  color: white;
+  text-align: center;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+}
+.unit-header p {
+  display: inline;
+  margin: 0 5px; /* small gap between them */
+}
+
+.unit-description {
   font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
 
 .charts-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  width: 90%;
-  margin: 50px auto;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  margin: 0px 10px 0px 10px;
 }
+
 .chart-card {
-  width: 30%;
-  min-width: 280px;
-  margin: 10px;
-  padding: 20px;
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  height: 250px;
+  flex: 1 1 0;
+  background: #ffffff4d;
 }
 
-.top-teachers-cards {
-  width: 80%;
-  margin: 50px auto;
+.top-teachers-podium {
   display: flex;
-  justify-content: space-evenly;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
-.medal-card {
-  width: 250px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  text-align: center;
-  backdrop-filter: blur(10px);
+.top-card {
+  display: flex;
+  align-items: center;
+  width: 280px;
+  padding: 10px 15px 0 15px;
+  border-radius: 15px;
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+  font-weight: bold;
+  font-size: 2rem;
+  /* background: rgba(255, 255, 255, 0.2); */
+  /* transition: transform 0.3s ease; */
+  /* border: 3px solid #ffffff3d; */
+  /* background-color: #ffffff1d; */
+  /* box-shadow: 0 0 2px #cd7f32, 0 0 20px rgba(205, 127, 50, 0.4); */
 }
-.medal-card:hover {
-  transform: scale(1.05);
-}
+
 .medal-icon {
-  font-size: 48px;
+  font-size: 2.7rem;
+  margin-right: 8px;
+  text-shadow: 1px 2px 5px rgba(0, 0, 0, 0.3);
 }
-.gold {
-  background: linear-gradient(135deg, #f6e27a, #e6c200, #d4af37);
+
+.medal-icon.gold {
+  text-shadow: 0 0 12px #ffd7004d, 0 0 24px #ffd7004d;
+  transform: scale(1.2);
 }
-.silver {
-  background: linear-gradient(135deg, #b8b8b8, #e6e6e6, #ffffff);
-  border: 1px solid #a9a9a9;
+.medal-icon.silver {
+  text-shadow: 0 0 12px #c0c0c04d, 0 0 24px #c0c0c04d;
+  transform: scale(0.9);
 }
-.bronze {
-  background: linear-gradient(135deg, #cd7f32, #b87333, #a97142);
-  border: 1px solid #8b5e3c;
+.medal-icon.bronze {
+  text-shadow: 0 0 12px #cd7f324d, 0 0 24px #cd7f324d;
+  transform: scale(0.9);
 }
+
+.info {
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; 
+  gap: 1px; 
+}
+
+.name {
+  font-size: 1.1rem;
+  color: #ffffff;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
 </style>

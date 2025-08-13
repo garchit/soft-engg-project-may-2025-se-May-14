@@ -12,7 +12,7 @@ import QuizManagement from "../Admin/QuizManagement.vue";
 import InstituteProfile from "../Institute/InstituteProfile.vue";
 import AdminLayout from "../Institute/InstituteLayout.vue";
 
-
+import InstituteTable from "../Admin/InstituteTable.vue";
 import StudentHome from "../Student/StudentHome.vue";
 import PracticeContent from "../Student/PracticeContent.vue";
 import LeaderBoard from "../Student/LeaderBoard.vue";
@@ -20,7 +20,6 @@ import StudentProfile from "../Student/StudentProfile.vue";
 import Learn from "../Student/Learn.vue";
 import LearnVideos from "../Student/LearnVideos.vue";
 import StudentPractice from "../Student/StudentPractice.vue";
-import StudentPractice2 from "../Student/StudentPractice2.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -30,7 +29,7 @@ const router = createRouter({
     {path: "/student" , component:SignUp},
     {path: "/login", component: Login},
     {path: "/admin-home" , component: AdminHome},
-    
+    {path: "/admin-institute", component: InstituteTable},
     {path: "/student-home" , component: StudentHome},
     {path: "/student-practice-content" , component: PracticeContent},
     {path: "/student-leaderboard" , component: LeaderBoard},
@@ -38,8 +37,6 @@ const router = createRouter({
     {path: "/student-learn" , component: Learn},
     {path: "/student-learn/:unitId", component: LearnVideos},
     {path: '/student-unit-practice/:unitId', component: StudentPractice},
-    {path: '/revisit-courses', component: StudentPractice2},
-
     {path : "/videos-upload" , component : VideosUploadPage},
 
     // Institute routes

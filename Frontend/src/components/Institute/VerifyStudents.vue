@@ -1,38 +1,43 @@
 <template>
-  <div class="verify-students-page">
-    <div class="verify-students-container">
-      <h1>APPROVE STUDENTS</h1>
-      <div class="table-container">
-        <!-- Search Bar -->
-        <input type="text" v-model="searchQuery" class="search-bar" placeholder="Search by name..." />
-
-        <div class="table-scroll">
-          <!-- Table -->
-          <table class="student-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Class</th>
-                <th>Date of Birth</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="student in filteredStudents" :key="student.id">
-                <td>{{ student.name }}</td>
-                <td>{{ student.class }}</td>
-                <td>{{ student.dob }}</td>
-                <td>
-                  <button class="action-btn tick" @click="approveOrReject(student.id, 1)"><i class="bi bi-check-lg"></i></button> 
-                  <button class="action-btn cross" @click="approveOrReject(student.id, -1)"><i class="bi bi-x-lg"></i></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+  <div class="learn-container">
+    <div class="main-content">
+      <header class="profile-header">
+        <div class="page-heading-box">
+          <div class="page-heading">Approve Students</div>
+          <div class="page-caption">
+            Manage student approvals efficiently.
+          </div>
         </div>
+      </header>
       </div>
-    </div>
-  </div>
+      <div class="course-content">
+        <input type="text" v-model="searchQuery" class="search-bar" placeholder="Search by name..." />
+        <div class="table-container">
+            <!-- Table -->
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Class</th>
+                  <th>Date of Birth</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="student in filteredStudents" :key="student.id">
+                  <td>{{ student.name }}</td>
+                  <td>{{ student.class }}</td>
+                  <td>{{ student.dob }}</td>
+                  <td>
+                    <button class="action-btn tick" @click="approveOrReject(student.id, 1)"><i class="bi bi-check-lg"></i></button>
+                    <button class="action-btn cross" @click="approveOrReject(student.id, -1)"><i class="bi bi-x-lg"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+      </div>
 </template>
 
 <script setup>
@@ -112,17 +117,19 @@ async function approveOrReject(studentId, action) {
 
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-.verify-students-page{
-  height: 100vh;
+.learn-container {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 100vh;
 }
 
-.verify-students-container{
-  height: 100%;
+.main-content {
+  display: flex;
+  align-items: center;
   width: 100%;
 }
+
 h1{
   padding-top: 10px;
   text-align: center;
@@ -130,53 +137,77 @@ h1{
   color: white;
 }
 
-.table-container {
-  max-width: 800px;
-  height: 70vh;
-  margin: 50px auto;
-  padding: 20px;
-  border-radius: 12px;
-
-  background-color: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-
-  border: 1px solid #cbd5e1;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.course-content {
+  background: #ffffff3d;
+  height: calc(100vh - 280px);
+  margin: 10px 32px 0 32px;
+  border-radius: 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  padding: 15px 40px;
+  overflow-y: auto;
+}
+
+.table-container {
+  max-height: 450px;
+  width: 100%;
+  overflow-y: auto;
+  border-radius: 15px;
+  background: #ffffff2d;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: center;
+  font-size: 20px;
+  color: #000000a5;
+
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  background: #ffddc8;
+}
+
+th {
+  padding: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+td {
+  padding: 10px;
+}
+
+tr {
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+tr:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.01);
 }
 
 .search-bar {
-  width: 300px; 
-  margin: 0 auto; 
+  width: 35%; 
+  margin: 2px 0 10px 10px; 
   display: block;    
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #0ea5e9;
+  padding: 8px 10px;
+  font-size: 12px;
+  background: #ffffff67;
+  border: 1px solid #ffffff2d;
   border-radius: 6px;
   box-sizing: border-box;
-}
-.search-bar:focus {
-  outline: none;
-  border-color: #0369a1;
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
-}
-
-.table-scroll {
-  overflow-y: auto;
-  flex-grow: 1;
-}
-
-.table-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.table-scroll::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-.table-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+  align-self: flex-end;
 }
 
 .student-table {
@@ -212,9 +243,9 @@ h1{
 
 .action-btn {
   border: none;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
   font-size: 18px;
   cursor: pointer;
   display: inline-flex;
@@ -225,7 +256,7 @@ h1{
 }
 
 .tick {
-  background-color: #10b981;
+  background-color: #10b981cc;
   color: white;
 }
 .tick:hover {
@@ -234,7 +265,7 @@ h1{
 }
 
 .cross {
-  background-color: #ef4444;
+  background-color: #ef4444cc;
   color: white;
   margin-left: 10px;
 }
@@ -243,5 +274,37 @@ h1{
   transform: scale(1.05);
 }
 
+.profile-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 23px 0 18px;
+}
 
+.page-heading-box {
+  width: 85%;
+  padding: 1rem 0 2rem 0;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.page-heading {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.page-caption {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #ffffffcc;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  margin-top: -0.5rem;
+}
 </style>
