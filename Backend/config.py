@@ -18,3 +18,20 @@ SESSION_COOKIE_SECURE = False
 WTF_CSRF_ENABLED = False
 SWAGGER_URL = '/api/docs'
 API_URL = '/static/documentation.yaml'
+
+
+
+# config.py
+
+class Config:
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+    
+    SMTP_SERVER = 'localhost'     # MailHog or your real SMTP server
+    SMTP_PORT = 1025              # MailHog default port
+    FROM_EMAIL = 'savvyapp@study.in'
+    PDFKIT_CONFIG = None 
+    # GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+
+
