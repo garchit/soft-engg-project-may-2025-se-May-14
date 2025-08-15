@@ -38,7 +38,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import Sidebar from './Sidebar.vue'
 import { useToast } from 'vue-toast-notification'
 import { useRoute } from 'vue-router'
-import Navbar from '../Student/Navbar.vue'
+import Navbar from './Navbar.vue'
 
 const toast = useToast();
 const route = useRoute();

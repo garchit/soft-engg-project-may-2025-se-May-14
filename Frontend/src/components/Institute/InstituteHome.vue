@@ -235,7 +235,6 @@ const topicFrequencyData = {
   flex-direction: column;
   align-items: center;
   padding: 15px 40px;
-  overflow-y: auto;
 }
 
 .unit-cards {
