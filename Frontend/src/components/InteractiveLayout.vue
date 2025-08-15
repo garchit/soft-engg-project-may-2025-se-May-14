@@ -1,4 +1,3 @@
-<!-- InteractiveLayout.vue -->
 <template>
   <div ref="backgroundRef" class="interactive-background">
     <Navbar class="navbar" />
@@ -11,10 +10,14 @@
     ></div>
 
     <div class="student-page">
-      <StudentSidebar />
+      <StudentSidebar @open-chatbot="isChatbotOpen = true" />
       <div class="student-content">
         <slot />
       </div>
+    </div>
+
+    <div v-if="isChatbotOpen" class="chatbot-modal-overlay" @click.self="isChatbotOpen = false">
+      <Chatbot @close="isChatbotOpen = false" />
     </div>
   </div>
 </template>
@@ -23,6 +26,11 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Navbar from './Student/Navbar.vue'
 import StudentSidebar from './Student/StudentSidebar.vue'
+// 1. Import the Chatbot component
+import Chatbot from './Chatbot.vue'
+
+// 2. Add state to control the chatbot's visibility
+const isChatbotOpen = ref(false);
 
 const backgroundRef = ref(null)
 const ripples = ref([])
@@ -127,5 +135,20 @@ onUnmounted(() => {
   display: flex;
   padding: 0 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+.chatbot-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; 
+  backdrop-filter: blur(5px);
 }
 </style>
