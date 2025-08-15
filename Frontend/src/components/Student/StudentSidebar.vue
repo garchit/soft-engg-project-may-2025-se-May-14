@@ -3,9 +3,9 @@
     <nav class="sidebar-nav">
       <ul class="nav-list">
         <li class="nav-item">
-          <router-link 
-            to="/student-home" 
-            class="nav-link" 
+          <router-link
+            to="/student-home"
+            class="nav-link"
             :class="{ active: activeLink === 'HOME' }"
             @click="setActiveLink('home')"
           >
@@ -13,9 +13,9 @@
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link 
-            to="/student-learn" 
-            class="nav-link" 
+          <router-link
+            to="/student-learn"
+            class="nav-link"
             :class="{ active: activeLink === 'LEARN' }"
             @click="setActiveLink('student-learn')"
           >
@@ -23,9 +23,9 @@
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link 
-            to="/student-practice-content" 
-            class="nav-link" 
+          <router-link
+            to="/student-practice-content"
+            class="nav-link"
             :class="{ active: activeLink === 'PRACTICE' }"
             @click="setActiveLink('student-practice')"
           >
@@ -33,19 +33,19 @@
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link 
-            to="/student-leaderboard" 
-            class="nav-link" 
+          <router-link
+            to="/student-leaderboard"
+            class="nav-link"
             :class="{ active: activeLink === 'LEADERBOARD' }"
             @click="setActiveLink('student-leaderboard')"
           >
             LEADERBOARD
           </router-link>
         </li>
-          <li class="nav-item">
-          <router-link 
-            to="/student-profile" 
-            class="nav-link" 
+        <li class="nav-item">
+          <router-link
+            to="/student-profile"
+            class="nav-link"
             :class="{ active: activeLink === 'PROFILE' }"
             @click="setActiveLink('studentprofile')"
           >
@@ -54,10 +54,8 @@
         </li>
       </ul>
     </nav>
-     <div class="mascot-container">
-      <div class="speech-bubble">
-        ASK ME ANYTHING!
-      </div>
+    <div class="mascot-container">
+      <div class="speech-bubble">ASK ME ANYTHING!</div>
       <div class="mascot" @click="handleMascotClick">
         <img src="/src/assets/ReviseAvatar.png" alt="Savvy Mascot" class="mascot-face" />
       </div>
@@ -68,14 +66,18 @@
 <script setup>
 import { ref } from 'vue';
 
+// 1. Define the event this component will send to its parent
+const emit = defineEmits(['open-chatbot']);
+
 const activeLink = ref('home');
 
 const setActiveLink = (linkName) => {
   activeLink.value = linkName;
 };
 
+// 2. This function now emits the event instead of showing an alert
 const handleMascotClick = () => {
-  alert('This feature will be available soon!');
+  emit('open-chatbot');
 };
 </script>
 
@@ -134,19 +136,20 @@ const handleMascotClick = () => {
 }
 
 .nav-link.active {
-  background-color: #81AB40;
+  background-color: #81ab40;
   color: #e54c917b;
 }
 
 .nav-link.active:hover {
-  color: #E54C91;
+  color: #e54c91;
 }
 
 .mascot-container {
   position: absolute;
-  bottom: 5px; 
+  bottom: 5px;
   left: 17%;
   text-align: center;
+  cursor: pointer; /* Added for better UX */
 }
 
 .speech-bubble {
