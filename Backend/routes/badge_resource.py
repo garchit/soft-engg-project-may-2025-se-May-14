@@ -1,4 +1,4 @@
-from models import db
+from extension import db
 from models.badges import badge_user, Badge
 from models.user import User
 from models.streaklog import StreakLog
