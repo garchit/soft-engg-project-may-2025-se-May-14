@@ -4,8 +4,5 @@
 # Python cache
 __pycache__/
 
-# Database files
-Backend/db_directory/database.sqlite3
-
 # Temporary scripts
 Backend/new.py
