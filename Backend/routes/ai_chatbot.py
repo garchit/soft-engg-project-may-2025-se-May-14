@@ -1,12 +1,12 @@
 import os
 from flask import request, jsonify
 from flask_restful import Resource
-from langchain.vectorstores import Chroma
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-from langchain.llms import HuggingFacePipeline
-from langchain.document_loaders import TextLoader
+from langchain_community.llms import HuggingFacePipeline
+from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
 
@@ -21,7 +21,11 @@ if os.path.exists(persist_dir) and os.listdir(persist_dir):
     db = Chroma(persist_directory=persist_dir, embedding_function=embedding_model)
 else:
     print("Creating new vector store from documents...")
-    file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'documents', 'examples.txt'))
+    # Correctly locate the documents folder relative to this file
+    base_dir = os.path.dirname(os.path.abspath(__file__)) # Gets the 'routes' directory
+    project_root = os.path.dirname(base_dir) # Goes up to the 'Backend' directory
+    file_path = os.path.join(project_root, 'documents', 'examples.txt')
+    
     loader = TextLoader(file_path, encoding="utf-8")
     documents = loader.load()
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
