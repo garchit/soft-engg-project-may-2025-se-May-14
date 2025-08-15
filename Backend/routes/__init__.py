@@ -43,7 +43,7 @@ def init_routes(app):
     api.add_resource(VerifyStudents,"/unverified_students/<int:institute_id>","/verify_student/<int:user_id>")
     api.add_resource(InstituteTeacher,"/institute_wise_teachers/<int:institute_id>")
     api.add_resource(BadgeResource,"/badge","/badge/<int:id>")
-    api.add_resource(AIChatbot,"/ai_chatbot")
+    api.add_resource(AIChatbot,"/chatbot")
     api.add_resource(VideoSummaryResource, '/video_summary/<int:lecture_id>')
     api.add_resource(LeaderboardApi,'/user_leaderboard')
     api.add_resource(UserRankApi,'/user_rank/<string:username>')
