@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from models import db
+from extension import db
 from flask_restful import Api, Resource
 from flask_login import LoginManager, UserMixin, login_user, current_user, login_required
 from datetime import datetime, timedelta, date
