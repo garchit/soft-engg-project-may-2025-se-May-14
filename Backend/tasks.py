@@ -2,7 +2,7 @@ import os
 import re
 from celery_worker import celery
 from factory import create_app
-from models import db
+from extension import db
 from models.teacher import Teacher
 from models.user_teacher import UserTeacher
 from models.user import User
@@ -501,4 +501,5 @@ def test_class_reports():
         return result
     except Exception as e:
         print(f"Failed to queue class reports task: {e}")
+
         return None
