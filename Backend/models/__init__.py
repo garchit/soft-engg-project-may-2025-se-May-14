@@ -1,4 +1,3 @@
-# In models/__init__.py
 
 # This file's purpose is to ensure all models are known to SQLAlchemy
 # in the correct order before your application runs.
@@ -10,6 +9,7 @@ from .teacher import Teacher
 from .badges import Badge
 from .unit import Unit
 from .questions import Question
+
 
 # Now import models that have relationships to the ones above.
 from .lecture import Lecture
