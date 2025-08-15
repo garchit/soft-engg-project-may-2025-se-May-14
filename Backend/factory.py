@@ -3,10 +3,10 @@ from extension import login_manager
 from flasgger import Swagger
 from flask_cors import CORS
 from flask_migrate import Migrate
-from extension import db # ✅ CORRECTED IMPORT
+from extension import db 
 from routes import init_routes
 from models.user import User
-from models.institute import Institute # ✅ ADDED IMPORT
+from models.institute import Institute
 from flask_swagger_ui import get_swaggerui_blueprint
 from config import SWAGGER_URL, API_URL
 
