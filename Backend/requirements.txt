@@ -8,7 +8,6 @@ flask_restful
 flask_sqlalchemy
 flasgger
 flask_swagger_ui
-numpy==2.2.6
 python-dotenv
 redis
 requests
