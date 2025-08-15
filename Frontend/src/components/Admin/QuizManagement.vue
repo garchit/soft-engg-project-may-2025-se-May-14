@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, reactive, watch, nextTick } from 'vue'
-// import { useQuizStore } from './stores/quizStore' // We'll create this
+import axios from 'axios' // Make sure to install axios: npm install axios
 import Sidebar from './Sidebar.vue'
 import {
   CTable,
@@ -12,33 +12,43 @@ import {
   CButton,
   CBadge
 } from '@coreui/vue'
-// Store (you can implement Pinia later)
+import InteractiveLayout from './AdminLayout.vue'
+
+// API Configuration
+const API_BASE_URL = 'http://localhost:5000/Finance_Tutor' // Update with your API URL
+
+// Store
 const quiz = reactive({
   questions: [],
+  units: [], // For storing units data
   filters: {
     search: '',
-    difficulty: 'all'
+    unit: 'all'
   }
 })
 
-// Form states
+// Form states - Updated to match API structure
 const forms = reactive({
   add: {
-    question: '',
-    options: ['', '', '', ''],
-    correct: 0,
-    difficulty: 'medium',
-    category: 'general',
-    explanation: ''
+    unit_name: '',
+    description: '',
+    marks: 1,
+    option_a: '',
+    option_b: '',
+    option_c: '',
+    option_d: '',
+    correct_option: ''
   },
   edit: {
-    index: null,
-    question: '',
-    options: ['', '', '', ''],
-    correct: 0,
-    difficulty: 'medium',
-    category: 'general',
-    explanation: ''
+    id: null,
+    unit_name: '',
+    description: '',
+    marks: 1,
+    option_a: '',
+    option_b: '',
+    option_c: '',
+    option_d: '',
+    correct_option: ''
   }
 })
 
@@ -66,9 +76,9 @@ const ui = reactive({
 // Computed properties
 const filteredQuestions = computed(() => {
   return quiz.questions.filter(q => {
-    const matchesSearch = q.question.toLowerCase().includes(quiz.filters.search.toLowerCase())
-    const matchesDifficulty = quiz.filters.difficulty === 'all' || q.difficulty === quiz.filters.difficulty
-    return matchesSearch && matchesDifficulty
+    const matchesSearch = q.description.toLowerCase().includes(quiz.filters.search.toLowerCase())
+    const matchesUnit = quiz.filters.unit === 'all' || q.unit_name == quiz.filters.unit
+    return matchesSearch && matchesUnit
   })
 })
 
@@ -76,32 +86,108 @@ const totalQuestions = computed(() => quiz.questions.length)
 
 const questionsStats = computed(() => {
   const stats = { easy: 0, medium: 0, hard: 0 }
-  quiz.questions.forEach(q => stats[q.difficulty]++)
+  // Since your API doesn't have difficulty levels, we'll categorize by marks
+  quiz.questions.forEach(q => {
+    if (q.marks <= 1) stats.easy++
+    else if (q.marks <= 3) stats.medium++
+    else stats.hard++
+  })
   return stats
 })
 
 // Validation
 const isAddFormValid = computed(() => {
-  return forms.add.question.trim() &&
-         forms.add.options.every(opt => opt.trim()) &&
-         forms.add.correct >= 0 && forms.add.correct < 4
+  return forms.add.unit_name &&
+         forms.add.description.trim() &&
+        //  forms.add.marks > 0 &&
+         forms.add.option_a.trim() &&
+         forms.add.option_b.trim() &&
+         forms.add.option_c.trim() &&
+         forms.add.option_d.trim() &&
+         ['a', 'b', 'c', 'd'].includes(forms.add.correct_option)
 })
 
 const isEditFormValid = computed(() => {
-  return forms.edit.question.trim() &&
-         forms.edit.options.every(opt => opt.trim()) &&
-         forms.edit.correct >= 0 && forms.edit.correct < 4
+  return forms.edit.unit_name &&
+         forms.edit.description.trim() &&
+         forms.edit.option_a.trim() &&
+         forms.edit.option_b.trim() &&
+         forms.edit.option_c.trim() &&
+         forms.edit.option_d.trim() &&
+         ['a', 'b', 'c', 'd'].includes(forms.edit.correct_option)
 })
+
+// API Methods
+const fetchUnits = async () => {
+  try {
+    ui.loading = true
+    const response = await axios.get(`${API_BASE_URL}/course`)
+    console.log("res",response.data);
+    if (response.data && response.data.course_detail) {
+      // Map the course data to match the expected units structure
+      quiz.units = response.data.course_detail.map(course => ({
+        id: course.id,
+        name: course.name || course.course_name || course.course_title // Adjust based on your course model
+      }))
+    }
+
+  } catch (error) {
+    console.error('Error fetching courses:', error)
+    showNotification('Error fetching courses', 'error')
+    
+    // Fallback to hardcoded units
+  
+  } finally {
+    ui.loading = false
+  }
+}
+
+
+
+const fetchQuestions = async (unitId = null) => {
+  try {
+    ui.loading = true
+    
+    // Always use the single questionsall endpoint
+    const response = await axios.get(`${API_BASE_URL}/questionsall`)
+    console.log("response", response.data);
+    
+    if (response.data.questions) {
+      // If unitId is provided, filter questions for that specific unit
+      if (unitId) {
+        console.log("Filtering questions for unit:", unitId)
+        quiz.questions = response.data.questions.filter(q => q.unit_id == unitId)
+      } else {
+        // If no unitId provided, show all questions
+        quiz.questions = response.data.questions
+      }
+    } else {
+      quiz.questions = []
+    }
+    
+  } catch (error) {
+    console.error('Error fetching questions:', error)
+    showNotification('Error fetching questions', 'error')
+    quiz.questions = []
+  } finally {
+    ui.loading = false
+  }
+}
+
+
+
 
 // Methods
 const resetAddForm = () => {
   Object.assign(forms.add, {
-    question: '',
-    options: ['', '', '', ''],
-    correct: 0,
-    difficulty: 'medium',
-    category: 'general',
-    explanation: ''
+    unit_name: '',
+    description: '',
+    marks: 1,
+    option_a: '',
+    option_b: '',
+    option_c: '',
+    option_d: '',
+    correct_option: ''
   })
 }
 
@@ -113,124 +199,232 @@ const showNotification = (message, type = 'success') => {
 }
 
 const addQuestion = async () => {
+  console.log("chl gya ki naa")
   if (!isAddFormValid.value) return
   
   ui.loading = true
   
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  const newQuestion = {
-    id: Date.now(),
-    question: forms.add.question,
-    options: [...forms.add.options],
-    correct: forms.add.correct,
-    difficulty: forms.add.difficulty,
-    category: forms.add.category,
-    explanation: forms.add.explanation,
-    createdAt: new Date().toISOString()
+  try {
+    const response = await axios.post(`${API_BASE_URL}/question`, {
+      unit_name: forms.add.unit_name,
+      description: forms.add.description,
+      marks: parseInt(forms.add.marks),
+      option_a: forms.add.option_a,
+      option_b: forms.add.option_b,
+      option_c: forms.add.option_c,
+      option_d: forms.add.option_d,
+      correct_option: forms.add.correct_option
+    })
+    console.log("response", response.data);
+    // Refresh questions list
+    await fetchQuestions()
+    
+    // Trigger animation
+    ui.animation.newQuestion = true
+    await nextTick()
+    
+    setTimeout(() => {
+      ui.animation.newQuestion = false
+    }, 600)
+    
+    resetAddForm()
+    modals.add = false
+    showNotification('Question added successfully!', 'success')
+    
+  } catch (error) {
+    console.error('Error adding question:', error)
+    showNotification(error.response?.data?.error || 'Error adding question', 'error')
+  } finally {
+    ui.loading = false
   }
-  
-  quiz.questions.push(newQuestion)
-  
-  // Trigger animation
-  ui.animation.newQuestion = true
-  await nextTick()
-  
-  setTimeout(() => {
-    ui.animation.newQuestion = false
-  }, 600)
-  
-  resetAddForm()
-  modals.add = false
-  ui.loading = false
-  
-  showNotification('Question added successfully!', 'success')
 }
 
-const deleteQuestion = async (index) => {
+const deleteQuestion = async (questionId) => {
   ui.loading = true
   
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 300))
-  
-  quiz.questions.splice(index, 1)
-  modals.delete = false
-  ui.loading = false
-  
-  showNotification('Question deleted successfully!', 'info')
+  try {
+    await axios.delete(`${API_BASE_URL}/question/${questionId}`)
+    
+    // Remove from local state
+    const index = quiz.questions.findIndex(q => q.id === questionId)
+    if (index !== -1) {
+      quiz.questions.splice(index, 1)
+    }
+    
+    modals.delete = false
+    showNotification('Question deleted successfully!', 'info')
+    
+  } catch (error) {
+    console.error('Error deleting question:', error)
+    showNotification(error.response?.data?.error || 'Error deleting question', 'error')
+  } finally {
+    ui.loading = false
+  }
 }
 
-const openEditModal = (index) => {
-  const question = quiz.questions[index]
+const fetchName = async (id) =>{
+  console.log("id", id)
+    if (!id && id !== 0) return ''
+
+  try {
+    const { data } = await axios.get(`${API_BASE_URL}/course/${id}`)
+
+    // backend returns { course_details: {...} }
+    const details = data?.course_details ?? {}
+    console.log("Course details fetched:", details)
+    return (
+           // if your model uses `name`
+      details.course_title   // fallback field names
+      
+    )
+  } catch (err) {
+    console.error(`Failed to fetch course ${id}:`, err)
+    return ''
+  }
+}
+
+// const openEditModal = (question) => {
+//   console.log("Editing question:", question)
+//   forms.edit = {
+//     id: question.id,
+//     unit_name: fetchName(question.unit_id),
+//     description: question.description,
+//     marks: question.marks || 1,
+//     option_a: question.option_a,
+//     option_b: question.option_b,
+//     option_c: question.option_c,
+//     option_d: question.option_d,
+//     correct_option: question.correct_option
+//   }
+//   modals.edit = true
+//    console.log("Editing question  dd:", question)
+// }
+
+const openEditModal = async (question) => {
+  console.log("Editing question:", question)
+
+  const name = await fetchName(question.unit_id)   // ← await here
+
   forms.edit = {
-    index,
-    question: question.question,
-    options: [...question.options],
-    correct: question.correct,
-    difficulty: question.difficulty,
-    category: question.category,
-    explanation: question.explanation || ''
+    id:           question.id,
+    unit_name:    name,                            // real string
+    description:  question.description,
+    marks:        question.marks || 1,
+    option_a:     question.option_a,
+    option_b:     question.option_b,
+    option_c:     question.option_c,
+    option_d:     question.option_d,
+    correct_option: question.correct_option
   }
   modals.edit = true
 }
+
 
 const updateQuestion = async () => {
   if (!isEditFormValid.value) return
   
   ui.loading = true
   
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  const updatedQuestion = {
-    ...quiz.questions[forms.edit.index],
-    question: forms.edit.question,
-    options: [...forms.edit.options],
-    correct: forms.edit.correct,
-    difficulty: forms.edit.difficulty,
-    category: forms.edit.category,
-    explanation: forms.edit.explanation,
-    updatedAt: new Date().toISOString()
+  try {
+    await axios.put(`${API_BASE_URL}/question/${forms.edit.id}`, {
+      unit_name: forms.edit.unit_name,
+      description: forms.edit.description,
+      marks: parseInt(forms.edit.marks),
+      option_a: forms.edit.option_a,
+      option_b: forms.edit.option_b,
+      option_c: forms.edit.option_c,
+      option_d: forms.edit.option_d,
+      correct_option: forms.edit.correct_option
+    })
+    
+    // Update local state
+    const index = quiz.questions.findIndex(q => q.id === forms.edit.id)
+    if (index !== -1) {
+      quiz.questions[index] = {
+        ...quiz.questions[index],
+        unit_name: forms.edit.unit_name,
+        description: forms.edit.description,
+        marks: parseInt(forms.edit.marks),
+        option_a: forms.edit.option_a,
+        option_b: forms.edit.option_b,
+        option_c: forms.edit.option_c,
+        option_d: forms.edit.option_d,
+        correct_option: forms.edit.correct_option
+      }
+    }
+    
+    modals.edit = false
+    showNotification('Question updated successfully!', 'success')
+    
+  } catch (error) {
+    console.error('Error updating question:', error)
+    showNotification(error.response?.data?.error || 'Error updating question', 'error')
+  } finally {
+    ui.loading = false
   }
-  
-  quiz.questions[forms.edit.index] = updatedQuestion
-  
-  modals.edit = false
-  ui.loading = false
-  
-  showNotification('Question updated successfully!', 'success')
 }
 
-// Watchers
-// watch(() => quiz.filters.search, (newVal) => {
-//   // Debounce search
-//   clearTimeout(window.searchTimeout)
-//   window.searchTimeout = setTimeout(() => {
-//     console.log('Searching for:', newVal)
-//   }, 300)
-// })
+// Helper functions
+const getUnitName = (unitId) => {
+  const unit = quiz.units.find(u => u.id === unitId)
+  return unit ? unit.name : 'Unknown Unit'
+}
 
-// Categories and difficulties
-const categories = ['general', 'science', 'history', 'sports', 'technology']
-const difficulties = ['easy', 'medium', 'hard']
+const getDifficultyByMarks = (marks) => {
+  if (marks <= 1) return 'easy'
+  if (marks <= 3) return 'medium'
+  return 'hard'
+}
+
+const getDifficultyColor = (marks) => {
+  const difficulty = getDifficultyByMarks(marks)
+  return difficulty === 'easy' ? 'success' : 
+         difficulty === 'medium' ? 'warning' : 'danger'
+}
+
+const getCorrectOptionText = (question) => {
+  const optionMap = {
+    'a': question.option_a,
+    'b': question.option_b,
+    'c': question.option_c,
+    'd': question.option_d
+  }
+  return optionMap[question.correct_option] || ''
+}
+
+// Initialize data
+const initializeData = async () => {
+  await fetchUnits()
+  await fetchQuestions()
+}
+
+// Call initialization
+initializeData()
+
+// Options for correct answer mapping
+const correctOptions = [
+  { value: 'a', label: 'A' },
+  { value: 'b', label: 'B' },
+  { value: 'c', label: 'C' },
+  { value: 'd', label: 'D' }
+]
 </script>
 
 <template>
-  <div class="d-flex">
-    <Sidebar />
-    
-    <!-- Notification Toast -->
-    <Transition name="notification">
-      <div 
+  <InteractiveLayout>
+    <div class="d-flex">
+      
+      <!-- Notification Toast -->
+      <Transition name="notification">
+        <div 
         v-if="ui.notification.show" 
         :class="`notification notification-${ui.notification.type}`"
-      >
+        >
         <i :class="`fas ${ui.notification.type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}`"></i>
         {{ ui.notification.message }}
       </div>
     </Transition>
-
+    
     <div class="main-content">
       <div class="container-fluid">
         <!-- Header Section -->
@@ -244,15 +438,15 @@ const difficulties = ['easy', 'medium', 'hard']
               <p class="text-muted">Manage your quiz questions and track performance</p>
             </div>
             <button 
-              class="btn btn-primary btn-lg add-btn"
-              @click="modals.add = true"
-              :disabled="ui.loading"
+            class="btn btn-primary btn-lg add-btn"
+            @click="modals.add = true"
+            :disabled="ui.loading"
             >
-              <i class="fas fa-plus me-2"></i>
-              Add Question
+            <i class="fas fa-plus me-2"></i>
+            Add Question
             </button>
           </div>
-
+          
           <!-- Stats Cards -->
           <div class="row mb-4">
             <div class="col-md-3">
@@ -273,7 +467,7 @@ const difficulties = ['easy', 'medium', 'hard']
                 </div>
                 <div class="stats-content">
                   <h3>{{ questionsStats.easy }}</h3>
-                  <p>Easy Questions</p>
+                  <p>Easy Questions (1 mark)</p>
                 </div>
               </div>
             </div>
@@ -284,7 +478,7 @@ const difficulties = ['easy', 'medium', 'hard']
                 </div>
                 <div class="stats-content">
                   <h3>{{ questionsStats.medium }}</h3>
-                  <p>Medium Questions</p>
+                  <p>Medium Questions (2-3 marks)</p>
                 </div>
               </div>
             </div>
@@ -295,13 +489,13 @@ const difficulties = ['easy', 'medium', 'hard']
                 </div>
                 <div class="stats-content">
                   <h3>{{ questionsStats.hard }}</h3>
-                  <p>Hard Questions</p>
+                  <p>Hard Questions (4+ marks)</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
+        
         <!-- Filters Section -->
         <div class="filters-section mb-4">
           <div class="row">
@@ -309,112 +503,122 @@ const difficulties = ['easy', 'medium', 'hard']
               <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
                 <input
-                  v-model="quiz.filters.search"
-                  type="text"
-                  class="form-control search-input"
-                  placeholder="Search questions..."
+                v-model="quiz.filters.search"
+                type="text"
+                class="form-control search-input"
+                placeholder="Search questions..."
                 />
               </div>
             </div>
             <div class="col-md-3">
-              <select v-model="quiz.filters.difficulty" class="form-select">
-                <option value="all">All Difficulties</option>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
+              <select v-model="quiz.filters.unit" class="form-select">
+                <option value="all">All Units</option>
+                <option v-for="unit in quiz.units" :key="unit.id" :value="unit.name">
+                  {{ unit.name }}
+                </option>
               </select>
+              
             </div>
-            <div class="col-md-3">
+            <!-- <div class="col-md-3">
               <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm" @click="fetchQuestions()">
+                  <i class="fas fa-refresh me-1"></i>Refresh
+                </button>
                 <button class="btn btn-outline-secondary btn-sm">
                   <i class="fas fa-download me-1"></i>Export
                 </button>
-                <button class="btn btn-outline-secondary btn-sm">
-                  <i class="fas fa-upload me-1"></i>Import
-                </button>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
-
-
-<div class="table-section">
-  <CTable hover responsive>
-    <CTableHead>
-      <CTableRow>
-        <CTableHeaderCell scope="col" style="width: 5%">#</CTableHeaderCell>
-        <CTableHeaderCell scope="col" style="width: 30%">Question</CTableHeaderCell>
-        <CTableHeaderCell scope="col" style="width: 30%">Options</CTableHeaderCell>
-        <CTableHeaderCell scope="col" style="width: 15%">Difficulty</CTableHeaderCell>
-        <CTableHeaderCell scope="col" style="width: 10%">Category</CTableHeaderCell>
-        <CTableHeaderCell scope="col" style="width: 10%">Actions</CTableHeaderCell>
-      </CTableRow>
-    </CTableHead>
-    <CTableBody>
-      <CTableRow v-for="(question, index) in filteredQuestions" 
-                 :key="question.id"
-                 :class="{ 'new-question': ui.animation.newQuestion && index === quiz.questions.length - 1 }">
-        <CTableDataCell class="text-center">{{ index + 1 }}</CTableDataCell>
-        <CTableDataCell>
-          <div class="question-content">
-            <p class="question-text mb-1">{{ question.question }}</p>
-            <small class="text-muted">
-              Created: {{ new Date(question.createdAt).toLocaleDateString() }}
-            </small>
-          </div>
-        </CTableDataCell>
-        <CTableDataCell>
-          <div class="options-list">
-            <div v-for="(option, optIndex) in question.options" 
-                 :key="optIndex"
-                 :class="{ 'correct-option': optIndex === question.correct }"
-                 class="option-item">
-              {{ String.fromCharCode(65 + optIndex) }}. {{ option }}
-              <i v-if="question.correct === optIndex" 
-                 class="fas fa-check-circle text-success ms-1"></i>
+        
+        <div class="table-section">
+          <CTable hover responsive>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell scope="col" style="width: 5%">#</CTableHeaderCell>
+                <CTableHeaderCell scope="col" style="width: 30%">Question</CTableHeaderCell>
+                <CTableHeaderCell scope="col" style="width: 25%">Options</CTableHeaderCell>
+                <CTableHeaderCell scope="col" style="width: 10%">Marks</CTableHeaderCell>
+                <CTableHeaderCell scope="col" style="width: 15%">Course</CTableHeaderCell>
+                <CTableHeaderCell scope="col" style="width: 10%">Correct</CTableHeaderCell>
+                <CTableHeaderCell scope="col" style="width: 5%">Actions</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              <CTableRow v-for="(question, index) in filteredQuestions" 
+              :key="question.id"
+              :class="{ 'new-question': ui.animation.newQuestion && index === quiz.questions.length - 1 }">
+              <CTableDataCell class="text-center">{{ index + 1 }}</CTableDataCell>
+              <CTableDataCell>
+                <div class="question-content">
+                  <p class="question-text mb-1">{{ question.description }}</p>
+                </div>
+              </CTableDataCell>
+              <CTableDataCell>
+                <div class="options-list">
+                  <div class="option-item">A. {{ question.option_a }}</div>
+              <div class="option-item">B. {{ question.option_b }}</div>
+              <div class="option-item">C. {{ question.option_c }}</div>
+              <div class="option-item">D. {{ question.option_d }}</div>
             </div>
-          </div>
-        </CTableDataCell>
-        <CTableDataCell>
-          <CBadge :color="question.difficulty === 'easy' ? 'success' : 
-                         question.difficulty === 'medium' ? 'warning' : 'danger'">
-            {{ question.difficulty.toUpperCase() }}
-          </CBadge>
-        </CTableDataCell>
-        <CTableDataCell>
-          <CBadge color="secondary">{{ question.category }}</CBadge>
-        </CTableDataCell>
-        <CTableDataCell>
-          <div class="d-flex gap-2">
-            <CButton color="primary" 
-                    size="sm" 
-                    @click="openEditModal(index)"
-                    :disabled="ui.loading">
-                    Edit
+          </CTableDataCell>
+          <CTableDataCell>
+            <CBadge :color="getDifficultyColor(question.marks)">
+              {{ question.marks }} {{ question.marks === 1 ? 'mark' : 'marks' }}
+            </CBadge>
+          </CTableDataCell>
+          <CTableDataCell>
+            <!-- Display the fetched course name -->
+            <CBadge color="secondary" :title="`Course ID: ${question.unit_id}`">
+              {{ question.unit_name || `Course ${question.unit_id}` }}
+            </CBadge>
+          </CTableDataCell>
+          <CTableDataCell>
+            <div class="correct-answer">
+              <strong>{{ question.correct_option.toUpperCase() }}.</strong>
+              <small class="text-success d-block">{{ getCorrectOptionText(question) }}</small>
+            </div>
+          </CTableDataCell>
+          <CTableDataCell>
+            <div class="d-flex gap-2">
+              <CButton color="primary" 
+              size="sm" 
+              @click="openEditModal(question)"
+              :disabled="ui.loading">
               <i class="fas fa-edit"></i>
             </CButton>
-            <CButton color="danger" 
-                    size="sm" 
-                    @click="deleteQuestion(index)"
-                    :disabled="ui.loading">
-                    Delete
-              <i class="fas fa-trash"></i>
-            </CButton>
-          </div>
-        </CTableDataCell>
-      </CTableRow>
+              <CButton color="danger" 
+                      size="sm" 
+                      @click="deleteQuestion(question.id)"
+                      :disabled="ui.loading">
+                      <i class="fas fa-trash"></i>
+                    </CButton>
+                  </div>
+          </CTableDataCell>
+        </CTableRow>
 
-      <!-- Empty state row -->
-      <CTableRow v-if="filteredQuestions.length === 0">
-        <CTableDataCell colspan="6" class="text-center py-5">
-          <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
-          <h4 class="text-muted">No questions found</h4>
-          <p class="text-muted mb-4">
-            {{ quiz.filters.search ? 'Try adjusting your search criteria' : 'Start by adding your first question' }}
-          </p>
-          <CButton v-if="!quiz.filters.search" 
-                   color="primary"
-                   @click="modals.add = true">
+        <!-- Loading state with course name fetching -->
+        <CTableRow v-if="ui.loading">
+          <CTableDataCell colspan="7" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Loading questions and course details...</p>
+          </CTableDataCell>
+        </CTableRow>
+        
+        <!-- Empty state -->
+        <CTableRow v-if="filteredQuestions.length === 0 && !ui.loading">
+          <CTableDataCell colspan="7" class="text-center py-5">
+            <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No questions found</h4>
+            <p class="text-muted mb-4">
+              {{ quiz.filters.search ? 'Try adjusting your search criteria' : 'Start by adding your first question' }}
+            </p>
+            <CButton v-if="!quiz.filters.search" 
+            color="primary"
+            @click="modals.add = true">
             <i class="fas fa-plus me-2"></i>Add Your First Question
           </CButton>
         </CTableDataCell>
@@ -422,7 +626,7 @@ const difficulties = ['easy', 'medium', 'hard']
     </CTableBody>
   </CTable>
 </div>
-      </div>
+</div>
 
       <!-- Add Question Modal -->
       <Teleport to="body">
@@ -439,39 +643,124 @@ const difficulties = ['easy', 'medium', 'hard']
               
               <div class="modal-body">
                 <form @submit.prevent="addQuestion">
+                  <div class="row mb-3">
+                    <div class="col-md-8">
+                      <label class="form-label">Unit *</label>
+                      <select v-model="forms.add.unit_name" class="form-select" required>
+                        <option value="">Select Unit</option>
+                        <option v-for="unit in quiz.units" :key="unit.id" :value="unit.name">
+                          {{ unit.name }}
+                        </option>
+                      </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                      <label class="form-label">Marks</label>
+                      <input
+                      v-model.number="forms.add.marks"
+                      type="number"
+                      class="form-control"
+                      min="1"
+                      max="10"
+                      />
+                    </div>
+                  </div>
+                  
                   <div class="form-group mb-3">
                     <label class="form-label">Question *</label>
                     <textarea
-                      v-model="forms.add.question"
-                      class="form-control"
-                      rows="3"
+                    v-model="forms.add.description"
+                    class="form-control"
+                    rows="3"
                       placeholder="Enter your question here..."
                       required
                     ></textarea>
                   </div>
-
+                  
                   <div class="form-group mb-3">
                     <label class="form-label">Options *</label>
                     <div class="options-input">
-                      <div 
-                        v-for="(option, index) in forms.add.options" 
-                        :key="index"
-                        class="option-input-group mb-2"
-                      >
+                      <div class="option-input-group mb-2">
                         <div class="input-group">
-                          <span class="input-group-text">{{ String.fromCharCode(65 + index) }}</span>
+                          <span class="input-group-text">A</span>
                           <input
-                            v-model="forms.add.options[index]"
+                          v-model="forms.add.option_a"
                             type="text"
                             class="form-control"
-                            :placeholder="`Option ${String.fromCharCode(65 + index)}`"
+                            placeholder="Option A"
                             required
+                            />
+                          <div class="input-group-text">
+                            <input
+                              v-model="forms.add.correct_option"
+                              type="radio"
+                              value="a"
+                              name="correct"
+                              class="form-check-input mt-0"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="option-input-group mb-2">
+                          <div class="input-group">
+                            <span class="input-group-text">B</span>
+                            <input
+                            v-model="forms.add.option_b"
+                            type="text"
+                            class="form-control"
+                            placeholder="Option B"
+                            required
+                            />
+                          <div class="input-group-text">
+                            <input
+                            v-model="forms.add.correct_option"
+                            type="radio"
+                            value="b"
+                            name="correct"
+                            class="form-check-input mt-0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="option-input-group mb-2">
+                        <div class="input-group">
+                          <span class="input-group-text">C</span>
+                          <input
+                          v-model="forms.add.option_c"
+                          type="text"
+                          class="form-control"
+                          placeholder="Option C"
+                          required
                           />
                           <div class="input-group-text">
                             <input
-                              v-model="forms.add.correct"
-                              type="radio"
-                              :value="index"
+                            v-model="forms.add.correct_option"
+                            type="radio"
+                            value="c"
+                            name="correct"
+                            class="form-check-input mt-0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="option-input-group mb-2">
+                        <div class="input-group">
+                          <span class="input-group-text">D</span>
+                          <input
+                          v-model="forms.add.option_d"
+                          type="text"
+                          class="form-control"
+                          placeholder="Option D"
+                          required
+                          />
+                          <div class="input-group-text">
+                            <input
+                            v-model="forms.add.correct_option"
+                            type="radio"
+                              value="d"
                               name="correct"
                               class="form-check-input mt-0"
                             />
@@ -481,55 +770,26 @@ const difficulties = ['easy', 'medium', 'hard']
                     </div>
                     <small class="text-muted">Select the radio button for the correct answer</small>
                   </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label class="form-label">Difficulty</label>
-                      <select v-model="forms.add.difficulty" class="form-select">
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Category</label>
-                      <select v-model="forms.add.category" class="form-select">
-                        <option v-for="cat in categories" :key="cat" :value="cat">
-                          {{ cat.charAt(0).toUpperCase() + cat.slice(1) }}
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="form-group mb-3">
-                    <label class="form-label">Explanation (Optional)</label>
-                    <textarea
-                      v-model="forms.add.explanation"
-                      class="form-control"
-                      rows="2"
-                      placeholder="Provide an explanation for the correct answer..."
-                    ></textarea>
-                  </div>
                 </form>
               </div>
-
+              
               <div class="modal-footer">
                 <button 
-                  type="button" 
-                  class="btn btn-secondary me-2"
-                  @click="modals.add = false"
-                  :disabled="ui.loading"
+                type="button" 
+                class="btn btn-secondary me-2"
+                @click="modals.add = false"
+                :disabled="ui.loading"
                 >
-                  Cancel
-                </button>
+                Cancel
+              </button>
                 <button 
                   type="button"
                   class="btn btn-primary"
                   @click="addQuestion"
                   :disabled="!isAddFormValid || ui.loading"
                 >
-                  <span v-if="ui.loading" class="spinner-border spinner-border-sm me-2"></span>
-                  <i v-else class="fas fa-plus me-2"></i>
+                <span v-if="ui.loading" class="spinner-border spinner-border-sm me-2"></span>
+                <i v-else class="fas fa-plus me-2"></i>
                   {{ ui.loading ? 'Adding...' : 'Add Question' }}
                 </button>
               </div>
@@ -553,39 +813,124 @@ const difficulties = ['easy', 'medium', 'hard']
               
               <div class="modal-body">
                 <form @submit.prevent="updateQuestion">
+                  <div class="row mb-3">
+                    <div class="col-md-8">
+                      <label class="form-label">Unit *</label>
+                      <select v-model="forms.edit.unit_name" class="form-select" required>
+                        <option value="">Select Unit</option>
+                        <option v-for="unit in quiz.units" :key="unit.id" :value="unit.name">
+                          {{ unit.name }}
+                        </option>
+                      </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                      <label class="form-label">Marks</label>
+                      <input
+                        v-model.number="forms.edit.marks"
+                        type="number"
+                        class="form-control"
+                        min="1"
+                        max="10"
+                      />
+                    </div>
+                  </div>
+
                   <div class="form-group mb-3">
                     <label class="form-label">Question *</label>
                     <textarea
-                      v-model="forms.edit.question"
+                      v-model="forms.edit.description"
                       class="form-control"
                       rows="3"
                       placeholder="Enter your question here..."
                       required
-                    ></textarea>
-                  </div>
+                      ></textarea>
+                    </div>
 
-                  <div class="form-group mb-3">
-                    <label class="form-label">Options *</label>
+                    <div class="form-group mb-3">
+                      <label class="form-label">Options *</label>
                     <div class="options-input">
-                      <div 
-                        v-for="(option, index) in forms.edit.options" 
-                        :key="index"
-                        class="option-input-group mb-2"
-                      >
+                      <div class="option-input-group mb-2">
                         <div class="input-group">
-                          <span class="input-group-text">{{ String.fromCharCode(65 + index) }}</span>
+                          <span class="input-group-text">A</span>
                           <input
-                            v-model="forms.edit.options[index]"
+                            v-model="forms.edit.option_a"
                             type="text"
                             class="form-control"
-                            :placeholder="`Option ${String.fromCharCode(65 + index)}`"
+                            placeholder="Option A"
                             required
                           />
                           <div class="input-group-text">
                             <input
-                              v-model="forms.edit.correct"
+                              v-model="forms.edit.correct_option"
                               type="radio"
-                              :value="index"
+                              value="a"
+                              name="editCorrect"
+                              class="form-check-input mt-0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="option-input-group mb-2">
+                        <div class="input-group">
+                          <span class="input-group-text">B</span>
+                          <input
+                            v-model="forms.edit.option_b"
+                            type="text"
+                            class="form-control"
+                            placeholder="Option B"
+                            required
+                            />
+                          <div class="input-group-text">
+                            <input
+                              v-model="forms.edit.correct_option"
+                              type="radio"
+                              value="b"
+                              name="editCorrect"
+                              class="form-check-input mt-0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="option-input-group mb-2">
+                        <div class="input-group">
+                          <span class="input-group-text">C</span>
+                          <input
+                            v-model="forms.edit.option_c"
+                            type="text"
+                            class="form-control"
+                            placeholder="Option C"
+                            required
+                            />
+                          <div class="input-group-text">
+                            <input
+                            v-model="forms.edit.correct_option"
+                            type="radio"
+                              value="c"
+                              name="editCorrect"
+                              class="form-check-input mt-0"
+                              />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="option-input-group mb-2">
+                        <div class="input-group">
+                          <span class="input-group-text">D</span>
+                          <input
+                            v-model="forms.edit.option_d"
+                            type="text"
+                            class="form-control"
+                            placeholder="Option D"
+                            required
+                            />
+                            <div class="input-group-text">
+                              <input
+                              v-model="forms.edit.correct_option"
+                              type="radio"
+                              value="d"
                               name="editCorrect"
                               class="form-check-input mt-0"
                             />
@@ -593,35 +938,6 @@ const difficulties = ['easy', 'medium', 'hard']
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label class="form-label">Difficulty</label>
-                      <select v-model="forms.edit.difficulty" class="form-select">
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Category</label>
-                      <select v-model="forms.edit.category" class="form-select">
-                        <option v-for="cat in categories" :key="cat" :value="cat">
-                          {{ cat.charAt(0).toUpperCase() + cat.slice(1) }}
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="form-group mb-3">
-                    <label class="form-label">Explanation (Optional)</label>
-                    <textarea
-                      v-model="forms.edit.explanation"
-                      class="form-control"
-                      rows="2"
-                      placeholder="Provide an explanation for the correct answer..."
-                    ></textarea>
                   </div>
                 </form>
               </div>
@@ -632,15 +948,15 @@ const difficulties = ['easy', 'medium', 'hard']
                   class="btn btn-secondary me-2"
                   @click="modals.edit = false"
                   :disabled="ui.loading"
-                >
+                  >
                   Cancel
                 </button>
                 <button 
-                  type="button"
+                type="button"
                   class="btn btn-primary"
                   @click="updateQuestion"
                   :disabled="!isEditFormValid || ui.loading"
-                >
+                  >
                   <span v-if="ui.loading" class="spinner-border spinner-border-sm me-2"></span>
                   <i v-else class="fas fa-save me-2"></i>
                   {{ ui.loading ? 'Updating...' : 'Update Question' }}
@@ -652,32 +968,25 @@ const difficulties = ['easy', 'medium', 'hard']
       </Teleport>
     </div>
   </div>
+  </InteractiveLayout>
 </template>
 
 <style scoped>
 /* Main Layout */
 .main-content {
-  margin-left: 250px;
-  width: calc(100% - 250px);
-  min-height: 100vh;
-  background: #FDF9E2 ;
+  margin: 20px;
+  border-radius: 5px;
+  background-color: #ffffff3d;  
   padding: 0;
+  height: calc(100vh - 250px);
 }
 
 .container-fluid {
   padding: 2rem;
+  overflow-y: auto;
 }
 
 /* Header Section */
-.header-section {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
 .page-title {
   color: #2d3748;
   font-weight: 700;
@@ -774,60 +1083,12 @@ const difficulties = ['easy', 'medium', 'hard']
 }
 
 /* Table Section */
-
 .table-section {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.question-content {
-  max-width: 300px;
-}
-
-.options-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.option-item {
-  padding: 0.25rem;
-  border-radius: 4px;
-}
-
-.option-item.correct-option {
-  background-color: rgba(56, 161, 105, 0.1);
-  color: #38a169;
-  font-weight: 500;
-}
-
-
-
-
-.questions-table {
-  margin: 0;
-}
-
-.questions-table thead th {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  font-weight: 600;
-  padding: 1rem;
-  text-align: center;
-}
-
-.question-row {
-  transition: all 0.3s ease;
-  border: none;
-}
-
-.question-row:hover {
-  background-color: #f7fafc;
-  transform: scale(1.01);
 }
 
 .question-content {
@@ -841,63 +1102,29 @@ const difficulties = ['easy', 'medium', 'hard']
 }
 
 .options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   font-size: 0.9rem;
 }
 
 .option-item {
-  padding: 0.25rem 0;
-  display: flex;
-  align-items: center;
+  padding: 0.125rem 0;
 }
 
-.option-letter {
-  font-weight: 600;
-  margin-right: 0.5rem;
-  color: #4a5568;
+.correct-answer {
+  text-align: center;
 }
 
-.correct-option {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 5px;
-  font-weight: 500;
+.correct-answer strong {
+  color: #38a169;
+  font-size: 1.1rem;
 }
 
-/* Difficulty Badges */
-.difficulty-easy {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-}
-
-.difficulty-medium {
-  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-  color: white;
-}
-
-.difficulty-hard {
-  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-  color: white;
-}
-
-/* Action Buttons */
-.action-buttons {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.action-buttons .btn {
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.action-buttons .btn:hover {
-  transform: translateY(-2px);
-}
-
-/* Empty State */
-.empty-state {
-  padding: 4rem 2rem;
+.correct-answer small {
+  font-size: 0.75rem;
+  max-width: 100px;
+  word-wrap: break-word;
 }
 
 /* Modern Modal */
@@ -933,7 +1160,7 @@ const difficulties = ['easy', 'medium', 'hard']
   color: white;
   padding: 1.5rem 2rem;
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -968,7 +1195,6 @@ const difficulties = ['easy', 'medium', 'hard']
 }
 
 .modal-body {
-    
   padding: 2rem;
   overflow-y: auto;
   flex: 1;
@@ -1064,15 +1290,6 @@ const difficulties = ['easy', 'medium', 'hard']
   transform: scale(0.8) translateY(-50px);
 }
 
-.question-list-enter-active {
-  transition: all 0.6s ease;
-}
-
-.question-list-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
 .new-question {
   animation: highlightNew 2s ease-in-out;
 }
@@ -1097,10 +1314,6 @@ const difficulties = ['easy', 'medium', 'hard']
     padding: 1rem;
   }
   
-  .header-section {
-    padding: 1.5rem;
-  }
-  
   .stats-card {
     margin-bottom: 1rem;
   }
@@ -1112,35 +1325,6 @@ const difficulties = ['easy', 'medium', 'hard']
   
   .modal-body {
     padding: 1rem;
-  }
-  
-  .table-responsive {
-    font-size: 0.9rem;
-  }
-  
-  .question-content {
-    max-width: 200px;
-  }
-}
-
-@media (max-width: 576px) {
-  .page-title {
-    font-size: 1.5rem;
-  }
-  
-  .add-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
-  
-  .stats-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
-  }
-  
-  .stats-content h3 {
-    font-size: 1.5rem;
   }
 }
 </style>

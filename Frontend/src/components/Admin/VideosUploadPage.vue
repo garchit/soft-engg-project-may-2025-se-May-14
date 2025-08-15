@@ -15,6 +15,7 @@ import { useToast } from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
 import Swal from 'sweetalert2' // Add this import
 import pen from '@/assets/pen.png'
+import InteractiveLayout from './AdminLayout.vue'
 
 const activeTab = ref('lectures')
 
@@ -411,249 +412,279 @@ onMounted(fetchCourses)
 </script>
 
 <template>
-  <div style="display: flex; min-height: 100vh;">
-    <!-- Sidebar -->
-    <Sidebar />
-    <!-- Main Content -->
-    <div style="flex: 1; background: linear-gradient(135deg, #E54C91 0%, #FFC800 100%);">
-      <div v-if="activeTab === 'dashboard'" style="padding:2rem">
-        <h2>Dashboard</h2>
-        <p>Dashboard content here.</p>
-      </div>
-      <div v-else-if="activeTab === 'institute'" style="padding:2rem">
-        <h2>Institute</h2>
-        <p>Institute content here.</p>
-      </div>
-      <div v-else>
-        <!-- Lectures Content -->
-        <h1 class="heading">ADD YOUR CONTENT HERE</h1>
-        <div class="accordion-container">
-          <div style="text-align: right; margin-bottom: 1rem;">
-            <CButton class="btn btn-warning" color="primary" @click="visible = true">+ New Course</CButton>
-          </div>
-          <CAccordion flush>
-            <CAccordionItem v-for="(Course, index) in Courses" :key="Course.course_id || index">
-              <CAccordionHeader>
-                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                  <span>{{ Course.course_title }}</span>
+  <InteractiveLayout>
+    <div style="display: flex; min-height: 100vh;">
+      <!-- Main Content -->
+      <div style="flex: 1;">
+        <div v-if="activeTab === 'dashboard'" style="padding:2rem">
+          <h2>Dashboard</h2>
+          <p>Dashboard content here.</p>
+        </div>
+        <div v-else-if="activeTab === 'institute'" style="padding:2rem">
+          <h2>Institute</h2>
+          <p>Institute content here.</p>
+        </div>
+        <div v-else>
+          <!-- Lectures Content -->
+          <!-- <h1 class="heading">ADD YOUR CONTENT HERE</h1> -->
+          <div class="accordion-container">
+            <div style="text-align: right; margin-bottom: 1rem;">
+              <CButton class="btn-outline-white" variant="outline" @click="visible = true">+ New Course</CButton>
+            </div>
+            <CAccordion>
+              <CAccordionItem v-for="(Course, index) in Courses" :key="Course.course_id || index">
+                <CAccordionHeader class="accordion-header">
+                  <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; padding: 4px 15px 0 20px;">
+                    <span>{{ Course.course_id }}.</span>
+                    <span style="flex: 1; text-align: left; padding-left: 35px;">{{ Course.course_title }}</span>
+                    <div class="course-actions">
+                      <CButton 
+                        size="sm" 
+                        class="btn-outline-light" 
+                        variant="outline" 
+                        @click.stop="openLectureModal(index, Course.course_id)"
+                      >
+                        Add Lecture
+                      </CButton>
 
-                  <div style="display: flex; gap: 10px; align-items: center;">
+                      <CButton 
+                        size="sm" 
+                        class="btn-danger-custom" 
+                        @click.stop="deleteCourse(index, Course.course_id)"
+                        title="Delete Course"
+                      >
+                        Delete
+                      </CButton>
 
-                    
-                    <CButton size="sm" color="info" @click.stop="openLectureModal(index, Course.course_id)">+ Add Lecture
-                    </CButton>
-                    
-                    <CButton @click.stop="deleteCourse(index, Course.course_id)"
-                    style="display: flex; justify-content: space-between; align-items: center;" title="Delete Course"
-                    size="sm"
-                    color="danger">
-                    <!-- <img :src="deleteIcon" alt="Delete" style="width: 20px; height: 20px;" /> -->
-                    Delete Course
-                  </CButton>
-                  
-                  <CButton size="sm" color="warning"
-                  @click.stop="openUpdateCourseModal(Course.course_id, Course.course_title, Course.course_description)">
-                  
-                  Update
-                </CButton>
-                
-              </div>
-
+                      <CButton 
+                        size="sm" 
+                        class="btn-warning-custom"
+                        @click.stop="openUpdateCourseModal(Course.course_id, Course.course_title, Course.course_description)"
+                      >
+                        Update
+                      </CButton>
+                    </div>
                 </div>
-              </CAccordionHeader>
-              <CAccordionBody>
-                <strong>Description:</strong> {{ Course.course_description }}
-                <div v-if="Course.lectures && Course.lectures.length" style="margin-top: 1rem;">
-                  <strong>Lectures:</strong>
-                  <div class="lecture-list">
-                    <div v-for="(lecture, i) in Course.lectures" :key="lecture.lecture_id || i" class="lecture-card">
-                      <div class="lecture-header">
-                        <span class="lecture-title">{{ lecture.lecture_title }}</span>
-                        <!-- <a :href="lecture.lecture_link" target="_blank">
-                          <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
-                        </a> -->
-
-                        <!-- Inside your lecture-card -->
-                        <!-- <button
-                          style="background: none; border: none; padding: 0; cursor: pointer;">
-                          <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
-                        </button> -->
-                        
-                        
-                        <div style="display: flex; gap: 10px;">
-                        
-                          <button @click="deleteLecture(index, i, lecture.lecture_id)" class="action-btn delete-btn"
-                          title="Delete Lecture">
-                          <img :src="deleteIcon" alt="Delete" style="width: 32px; height: 32px;" />
+                </CAccordionHeader>
+                <CAccordionBody>
+                    <strong style="color: #000000b5;">Description:</strong> 
+                    <span style="color: #000000b5;">{{ Course.course_description }}</span>
+                    <div v-if="Course.lectures && Course.lectures.length" style="margin-top: 1rem;">
+                    <strong style="color: #000000b5;">Lectures:</strong>
+                    <div class="lecture-list">
+                      <div v-for="(lecture, i) in Course.lectures" :key="lecture.lecture_id || i" class="lecture-card">
+                        <div class="lecture-header">
+                          <span class="lecture-title">{{ lecture.lecture_title }}</span>
+                          <!-- <a :href="lecture.lecture_link" target="_blank">
+                            <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
+                          </a> -->
+                          <!-- Inside your lecture-card -->
+                          <!-- <button
+                            style="background: none; border: none; padding: 0; cursor: pointer;">
+                            <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
+                          </button> -->
+    
+    
+                          <div style="display: flex; gap: 10px;">
+    
+                            <button @click="deleteLecture(index, i, lecture.lecture_id)" class="action-btn delete-btn"
+                            title="Delete Lecture">
+                            <img :src="deleteIcon" alt="Delete" style="width: 32px; height: 32px;" />
+                          </button>
+    
+                          <!-- Add update button to lecture header -->
+                          <button
+                          @click="openUpdateLectureModal(lecture.lecture_id, lecture.lecture_title, lecture.lecture_description, lecture.lecture_link, Course.course_id, index, i)"
+                          class="action-btn update-btn" title="Update Lecture">
+                          <img :src="pen" alt="Update" style="width: 32px; height: 32px;" />
                         </button>
-                        
-                        <!-- Add update button to lecture header -->
-                        <button
-                        @click="openUpdateLectureModal(lecture.lecture_id, lecture.lecture_title, lecture.lecture_description, lecture.lecture_link, Course.course_id, index, i)"
-                        class="action-btn update-btn" title="Update Lecture">
-                        <img :src="pen" alt="Update" style="width: 32px; height: 32px;" />
+    
+    
+                        <!-- Replace your current play button with this -->
+                        <button @click="playLecture(lecture.lecture_link)"
+                        style="background: none; border: none; padding: 0; cursor: pointer;">
+                        <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
                       </button>
-                      
-                      
-                      <!-- Replace your current play button with this -->
-                      <button @click="playLecture(lecture.lecture_link)"
-                      style="background: none; border: none; padding: 0; cursor: pointer;">
-                      <img :src="playButton" alt="Play" style="width: 32px; height: 32px;" />
-                    </button>
-                    
-                    
-                  </div>
-
-
+    
+    
+                    </div>
+                        </div>
+                        <div class="lecture-description">{{ lecture.lecture_description }}</div>
                       </div>
-                      <div class="lecture-description">{{ lecture.lecture_description }}</div>
                     </div>
                   </div>
+                </CAccordionBody>
+              </CAccordionItem>
+            </CAccordion>
+            <!-- Course Modal -->
+            <CModal :visible="visible" @close="visible = false" alignment="center" size="lg">
+              <CModalHeader>
+                <CModalTitle>Add New Course</CModalTitle>
+              </CModalHeader>
+              <CModalBody>
+                <CForm>
+                  <CFormInput v-model="newTitle" label="Course Title" placeholder="Enter course title" class="mb-3" />
+                  <CFormTextarea v-model="newDescription" label="Course Description" rows="4"
+                    placeholder="Enter course description" />
+                </CForm>
+              </CModalBody>
+              <CModalFooter>
+                <CButton color="secondary" @click="visible = false">Cancel</CButton>
+                <CButton color="success" @click="addCourse">Add</CButton>
+              </CModalFooter>
+            </CModal>
+            <!-- Lecture Modal -->
+            <CModal :visible="lectureModalVisible" @close="lectureModalVisible = false" alignment="center" size="lg">
+              <CModalHeader>
+                <CModalTitle>Add Lecture</CModalTitle>
+              </CModalHeader>
+              <CModalBody>
+                <CForm>
+                  <CFormInput v-model="newLectureTitle" label="Lecture Title" placeholder="Enter lecture title"
+                    class="mb-3" />
+                  <CFormInput v-model="newLectureDescription" label="Lecture Description"
+                    placeholder="Enter lecture description" class="mb-3" />
+                  <CFormInput v-model="newLectureVideoUrl" label="Lecture Link" placeholder="Enter video link" />
+                </CForm>
+              </CModalBody>
+              <CModalFooter>
+                <CButton color="secondary" @click="lectureModalVisible = false">Cancel</CButton>
+                <CButton color="success" @click.stop="addLectureToCourse">Add Lecture</CButton>
+              </CModalFooter>
+            </CModal>
+            <!-- Video Modal -->
+            <!-- YouTube Video Modal -->
+            <CModal :visible="showVideoModal" @close="closeVideoModal" alignment="center" size="xl">
+              <CModalHeader>
+                <CModalTitle>Video Player</CModalTitle>
+              </CModalHeader>
+              <CModalBody>
+                <div style="text-align: center;">
+                  <iframe v-if="currentVideoUrl" :src="currentVideoUrl" width="100%" height="450" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen style="border-radius: 8px;">
+                  </iframe>
                 </div>
-              </CAccordionBody>
-            </CAccordionItem>
-          </CAccordion>
-          <!-- Course Modal -->
-          <CModal :visible="visible" @close="visible = false" alignment="center" size="lg">
-            <CModalHeader>
-              <CModalTitle>Add New Course</CModalTitle>
-            </CModalHeader>
-            <CModalBody>
-              <CForm>
-                <CFormInput v-model="newTitle" label="Course Title" placeholder="Enter course title" class="mb-3" />
-                <CFormTextarea v-model="newDescription" label="Course Description" rows="4"
-                  placeholder="Enter course description" />
-              </CForm>
-            </CModalBody>
-            <CModalFooter>
-              <CButton color="secondary" @click="visible = false">Cancel</CButton>
-              <CButton color="success" @click="addCourse">Add</CButton>
-            </CModalFooter>
-          </CModal>
-          <!-- Lecture Modal -->
-          <CModal :visible="lectureModalVisible" @close="lectureModalVisible = false" alignment="center" size="lg">
-            <CModalHeader>
-              <CModalTitle>Add Lecture</CModalTitle>
-            </CModalHeader>
-            <CModalBody>
-              <CForm>
-                <CFormInput v-model="newLectureTitle" label="Lecture Title" placeholder="Enter lecture title"
-                  class="mb-3" />
-                <CFormInput v-model="newLectureDescription" label="Lecture Description"
-                  placeholder="Enter lecture description" class="mb-3" />
-                <CFormInput v-model="newLectureVideoUrl" label="Lecture Link" placeholder="Enter video link" />
-              </CForm>
-            </CModalBody>
-            <CModalFooter>
-              <CButton color="secondary" @click="lectureModalVisible = false">Cancel</CButton>
-              <CButton color="success" @click.stop="addLectureToCourse">Add Lecture</CButton>
-            </CModalFooter>
-          </CModal>
-
-          <!-- Video Modal -->
-          <!-- YouTube Video Modal -->
-          <CModal :visible="showVideoModal" @close="closeVideoModal" alignment="center" size="xl">
-            <CModalHeader>
-              <CModalTitle>Video Player</CModalTitle>
-            </CModalHeader>
-            <CModalBody>
-              <div style="text-align: center;">
-                <iframe v-if="currentVideoUrl" :src="currentVideoUrl" width="100%" height="450" frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen style="border-radius: 8px;">
-                </iframe>
-              </div>
-            </CModalBody>
-            <CModalFooter>
-              <CButton color="secondary" @click="closeVideoModal">Close</CButton>
-            </CModalFooter>
-          </CModal>
-
-          <!-- Update Course Modal -->
-          <CModal :visible="updateCourseModalVisible" @close="updateCourseModalVisible = false" alignment="center"
-            size="lg">
-            <CModalHeader>
-              <CModalTitle>Update Course</CModalTitle>
-            </CModalHeader>
-            <CModalBody>
-              <CForm>
-                <CFormInput v-model="updateTitle" label="Course Title" placeholder="Enter course title" class="mb-3" />
-                <CFormTextarea v-model="updateDescription" label="Course Description" rows="4"
-                  placeholder="Enter course description" />
-              </CForm>
-            </CModalBody>
-            <CModalFooter>
-              <CButton color="secondary" @click="updateCourseModalVisible = false">Cancel</CButton>
-              <CButton color="warning" @click="updateCourse">Update</CButton>
-            </CModalFooter>
-          </CModal>
-
-          <!-- Update Lecture Modal -->
-          <CModal :visible="updateLectureModalVisible" @close="updateLectureModalVisible = false" alignment="center"
-            size="lg">
-            <CModalHeader>
-              <CModalTitle>Update Lecture</CModalTitle>
-            </CModalHeader>
-            <CModalBody>
-              <CForm>
-                <CFormInput v-model="updateLectureTitle" label="Lecture Title" placeholder="Enter lecture title"
-                  class="mb-3" />
-                <CFormInput v-model="updateLectureDescription" label="Lecture Description"
-                  placeholder="Enter lecture description" class="mb-3" />
-                <CFormInput v-model="updateLectureVideoUrl" label="Lecture Link" placeholder="Enter video link" />
-              </CForm>
-            </CModalBody>
-            <CModalFooter>
-              <CButton color="secondary" @click="updateLectureModalVisible = false">Cancel</CButton>
-              <CButton color="warning" @click="updateLecture">Update</CButton>
-            </CModalFooter>
-          </CModal>
-
-
-
-
+              </CModalBody>
+              <CModalFooter>
+                <CButton color="danger" variant="outline" @click="closeVideoModal">Close</CButton>
+              </CModalFooter>
+            </CModal>
+            <!-- Update Course Modal -->
+            <CModal :visible="updateCourseModalVisible" @close="updateCourseModalVisible = false" alignment="center"
+              size="lg">
+              <CModalHeader>
+                <CModalTitle>Update Course</CModalTitle>
+              </CModalHeader>
+              <CModalBody>
+                <CForm>
+                  <CFormInput v-model="updateTitle" label="Course Title" placeholder="Enter course title" class="mb-3" />
+                  <CFormTextarea v-model="updateDescription" label="Course Description" rows="4"
+                    placeholder="Enter course description" />
+                </CForm>
+              </CModalBody>
+              <CModalFooter>
+                <CButton color="secondary" @click="updateCourseModalVisible = false">Cancel</CButton>
+                <CButton color="warning" @click="updateCourse">Update</CButton>
+              </CModalFooter>
+            </CModal>
+            <!-- Update Lecture Modal -->
+            <CModal :visible="updateLectureModalVisible" @close="updateLectureModalVisible = false" alignment="center"
+              size="lg">
+              <CModalHeader>
+                <CModalTitle>Update Lecture</CModalTitle>
+              </CModalHeader>
+              <CModalBody>
+                <CForm>
+                  <CFormInput v-model="updateLectureTitle" label="Lecture Title" placeholder="Enter lecture title"
+                    class="mb-3" />
+                  <CFormInput v-model="updateLectureDescription" label="Lecture Description"
+                    placeholder="Enter lecture description" class="mb-3" />
+                  <CFormInput v-model="updateLectureVideoUrl" label="Lecture Link" placeholder="Enter video link" />
+                </CForm>
+              </CModalBody>
+              <CModalFooter>
+                <CButton color="secondary" @click="updateLectureModalVisible = false">Cancel</CButton>
+                <CButton color="warning" @click="updateLecture">Update</CButton>
+              </CModalFooter>
+            </CModal>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </InteractiveLayout>
 </template>
 
 <style scoped>
 .accordion-container {
-  margin-top: 4%;
-  margin-left: 20%;
-  margin-right: 10%;
-  padding: 50px;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  border-radius: 10px;
+  background: #ffffff3d;
+  /* backdrop-filter: blur(10px); */
+  /* border: 1px solid rgba(255, 255, 255, 0.2); */
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  width: 97%;
+  height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
-.heading {
+:deep(.accordion) {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff3d;
+  color: #000000b5;
+}
+
+:deep(.accordion-item) {
+  background: transparent;
+  border: none;
+  margin-bottom: 0.1rem; 
+  overflow: hidden; 
+}
+
+:deep(.accordion-button),
+:deep(.accordion-button:not(.collapsed)) {
+  background: rgba(255, 255, 255, 0.3); 
+  font-weight: 550;
+  color: #000000b5;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+}
+
+:deep(.accordion-button) {
+  border: none;
+}
+
+/* .heading {
   text-align: center;
   color: rgb(155, 50, 103);
   font-size: 2.5rem;
   margin-bottom: 20px;
-}
+} */
 
 .lecture-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 5px;
   margin-top: 10px;
+  color: #000000a5;
 }
 
 .lecture-card {
-  background: #fff;
-  border-radius: 8px;
+  background: #ffffff3d;
+  /* border-radius: 8px; */
   box-shadow: 0 2px 8px rgba(79, 140, 255, 0.07);
-  padding: 18px 22px;
+  padding: 15px 30px 10px 15px;
   transition: box-shadow 0.2s;
-  border-left: 5px solid #81AB40;
+  border-left: 5px solid #ffffff66;
 }
 
 .lecture-card:hover {
   box-shadow: 0 4px 16px rgba(79, 140, 255, 0.15);
-  border-left: 5px solid #e54c91;
+  border-left: 5px solid #e54c91aa;
+  background: #ffffff66;
+  /* border: #ffffff3d solid 1px; */
 }
 
 .lecture-header {
@@ -664,8 +695,9 @@ onMounted(fetchCourses)
 
 .lecture-title {
   font-weight: 600;
-  font-size: 1.1rem;
-  color: #4f8cff;
+  font-size: 1rem;
+  color: #0464ffcc;
+  text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
 }
@@ -692,9 +724,9 @@ onMounted(fetchCourses)
 }
 
 .lecture-description {
-  margin-top: 8px;
-  color: #333;
-  font-size: 0.98rem;
+  margin-top: 0px;
+  color: #000000b5;
+  font-size: 0.8rem;
 }
 .action-btn {
   background: none;
@@ -705,7 +737,64 @@ onMounted(fetchCourses)
   transition: background-color 0.2s;
 }
 
-/*.action-btn:hover {
+:deep(.btn-outline-white) {
+  background-color: rgb(32, 182, 34, 0.85);
+  color: white;                /* Text color */
+  /* border: 2px solid white;     White border */
+}
+
+:deep(.btn-outline-white:hover) {
+  background-color: rgb(32, 182, 34);     /* White background on hover */
+  color: white;                /* Switch text to black for contrast */
+  border: 1px solid yellowgreen;
+}
+
+.course-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* White outline button for Add Lecture */
+.btn-outline-light {
+  background-color: #0492ffcc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.btn-outline-light:hover {
+  background-color: white;
+  color: #ff4f9b; /* matches your gradient pink */
+}
+
+/* Custom danger button */
+.btn-danger-custom {
+  background-color: #ff4f5e;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-danger-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 79, 94, 0.4);
+}
+
+/* Custom warning button */
+.btn-warning-custom {
+  background-color: #ff9100cf;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-warning-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(252, 211, 77, 0.4);
+}
+
+/* .action-btn:hover {
   background-color: #f0f0f0;
 } 
 
@@ -715,6 +804,8 @@ onMounted(fetchCourses)
 
 .delete-btn:hover {
   background-color: #f8d7da;
-}*/
+} */
+
+
 
 </style>

@@ -1,111 +1,105 @@
 <template>
-
-    <div class="admin-page">
-      <Navbar/>
-      <Sidebar/>
-
-      <div class="admin-content">
-        <div class="main-container">
-
-          <h2 class="section-title">INSIGHTS</h2>
-          <div class="insights-container">
-            <div class="insights-grid">
-              <div class="stat-card institutes-card">
-                <div class="stat-icon">🏫</div>
-                <div class="stat-content">
-                  <h3>Total Institutes</h3>
-                  <p class="stat-number">{{ totalInstitutes }}</p>
+    <InteractiveLayout>
+      <div class="admin-page">
+          <div class="main-container">
+            <!-- <h2 class="section-title">INSIGHTS</h2> -->
+            <div class="insights-container">
+              <div class="insights-grid">
+                <div class="stat-card institutes-card">
+                  <div class="stat-icon">🏫</div>
+                  <div class="stat-content">
+                    <h3>Total Institutes</h3>
+                    <p class="stat-number">{{ totalInstitutes }}</p>
+                  </div>
                 </div>
-              </div>
-              
-              <div class="chart-wrapper">
-                <h3 class="chart-title">Class Distribution</h3>
-                <div class="chart-container">
-                  <Pie :data="chartData" :options="chartOptions" />
+      
+                <div class="chart-wrapper">
+                  <div class="chart-container">
+                    <h3 class="chart-title">Class Distribution</h3>
+                    <div style="width:180px; height:180px; margin:10px auto;">
+                      <Pie :data="chartData" :options="chartOptions" />
+                    </div>
+                    <div class="chart-legend">
+                    <div class="legend-item" v-for="(label, index) in chartData.labels" :key="label">
+                      <span class="legend-color" :style="{ backgroundColor: chartData.datasets[0].backgroundColor[index] }"></span>
+                      <span class="legend-text">{{ label }}</span>
+                    </div>
+                  </div>
+                  </div>
                 </div>
-                <div class="chart-legend">
-                  <div class="legend-item" v-for="(label, index) in chartData.labels" :key="label">
-                    <span class="legend-color" :style="{ backgroundColor: chartData.datasets[0].backgroundColor[index] }"></span>
-                    <span class="legend-text">{{ label }}</span>
+      
+                <div class="stat-card students-card">
+                  <div class="stat-icon">👥</div>
+                  <div class="stat-content">
+                    <h3>Total Students</h3>
+                    <p class="stat-number">{{ totalStudents }}</p>
                   </div>
                 </div>
               </div>
-              
-              <div class="stat-card students-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-content">
-                  <h3>Total Students</h3>
-                  <p class="stat-number">{{ totalStudents }}</p>
+            </div>
+            <!-- <h2 class="section-title">Top Performing Schools</h2> -->
+            <!-- <div class="table-section">
+              <div class="podium-container">
+                <div class="podium-item second-place">
+                  <div class="medal-wrapper">
+                    <div class="medal silver">🥈</div>
+                    <div class="school-info">
+                      <h4>{{ allInstitutes[0].institute_name }}</h4>
+                      <p class="score">{{ allInstitutes[1].average_score }}%</p>
+                    </div>
+                  </div>
+                </div>
+      
+                <div class="podium-item first-place">
+                  <div class="medal-wrapper">
+                    <div class="medal gold">🥇</div>
+                    <div class="school-info">
+                      <h4>{{ allInstitutes[0].institute_name }}</h4>
+                      <p class="score">{{ allInstitutes[0].average_score }}%</p>
+                    </div>
+                  </div>
+                </div>
+      
+                <div class="podium-item third-place">
+                  <div class="medal-wrapper">
+                    <div class="medal bronze">🥉</div>
+                    <div class="school-info">
+                      <h4>{{ allInstitutes[2].institute_name }}</h4>
+                      <p class="score">{{ allInstitutes[2].average_score }}%</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+              </div> -->
+              <div class="table-container">
+                <table class="institute-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 15%">Rank</th>
+                      <th style="width: 30%">Institute Name</th>
+                      <th style="width: 20%">Average Score</th>
+                      <th style="width: 35%">Performance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(inst, rank) in allInstitutes" :key="inst.institute_id" class="table-row">
+                      <td class="rank-cell">
+                        <span class="rank-badge">{{ rank + 1}}</span>
+                      </td>
+                      <td class="institute-cell">{{ inst.institute_name }}</td>
+                      <td class="score-cell">{{ inst.average_score }}%</td>
+                      <td class="performance-cell">
+                        <div class="progress-bar">
+                          <div class="progress-fill" :style="{ width: inst.average_score + '%' }"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
           </div>
-
-          <h2 class="section-title">Top Performing Schools</h2>
-          <!-- <div class="table-section">
-            <div class="podium-container">
-              <div class="podium-item second-place">
-                <div class="medal-wrapper">
-                  <div class="medal silver">🥈</div>
-                  <div class="school-info">
-                    <h4>{{ allInstitutes[0].institute_name }}</h4>
-                    <p class="score">{{ allInstitutes[1].average_score }}%</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="podium-item first-place">
-                <div class="medal-wrapper">
-                  <div class="medal gold">🥇</div>
-                  <div class="school-info">
-                    <h4>{{ allInstitutes[0].institute_name }}</h4>
-                    <p class="score">{{ allInstitutes[0].average_score }}%</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="podium-item third-place">
-                <div class="medal-wrapper">
-                  <div class="medal bronze">🥉</div>
-                  <div class="school-info">
-                    <h4>{{ allInstitutes[2].institute_name }}</h4>
-                    <p class="score">{{ allInstitutes[2].average_score }}%</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            </div> -->
-
-            <div class="table-container">
-              <table class="performance-table">
-                <thead>
-                  <tr>
-                    <th>Rank</th>
-                    <th>Institute Name</th>
-                    <th>Average Score</th>
-                    <th>Performance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(inst, rank) in allInstitutes" :key="inst.institute_id" class="table-row">
-                    <td class="rank-cell">
-                      <span class="rank-badge">{{ rank + 1}}</span>
-                    </td>
-                    <td class="institute-cell">{{ inst.institute_name }}</td>
-                    <td class="score-cell">{{ inst.average_score }}%</td>
-                    <td class="performance-cell">
-                      <div class="progress-bar">
-                        <div class="progress-fill" :style="{ width: inst.average_score + '%' }"></div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
           </div>
-        </div>
-    </div>
-
+    </InteractiveLayout>
 </template>
 
 <script setup>
@@ -118,10 +112,7 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-
-import Sidebar from './Sidebar.vue';
-import Navbar from '../Student/Navbar.vue';
-
+import InteractiveLayout from './AdminLayout.vue';
 
 let totalInstitutes = ref();
 let totalTeachers = ref();
@@ -213,41 +204,22 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-.interactive-background {
-  width: 100%;
-  min-height: 100vh;
-  position: relative;
-  overflow: hidden;
-  transition: background 0.3s ease;
-  font-family: 'Poppins', sans-serif;
-}
-
 
 .admin-page {
   display: flex;
 }
 
-.admin-content {
-  flex-grow: 1;
-  padding: 20px;
-  margin-left: 250px;
-  overflow-y: auto;
-  margin-top: 60px;
-}
-
 .main-container {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  background: #ffffff3d;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 40px;
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  margin: 20px auto;
-  width: 80%;
-  font-family: 'poppins', sans-serif;
-  max-width: 1400px;
+  margin: 20px;
+  width: 100%;
+  height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 .section-title {
@@ -261,17 +233,19 @@ onMounted(() => {
 }
 
 .insights-container {
-  margin-bottom: 50px;
+  margin: 0 40px 30px 40px;
 }
 
 .insights-grid {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
-  gap: 30px;
+  gap: 10px;
   align-items: center;
 }
 
 .stat-card {
+  width: 250px;
+  height: 250px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -282,26 +256,21 @@ onMounted(() => {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-}
-
 .stat-icon {
   font-size: 3em;
   margin-bottom: 15px;
 }
 
 .stat-content h3 {
-  color: rgb(0, 0, 0);
-  font-size: 1.2em;
+  color: #000000aa;
+  font-size: 1em;
   font-weight: 600;
   margin-bottom: 10px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .stat-number {
-  color: #000000;
+  color: #000000aa;
   font-size: 3em;
   font-weight: 700;
   margin: 0;
@@ -313,20 +282,20 @@ onMounted(() => {
 }
 
 .chart-title {
-  color: rgb(0, 0, 0);
-  font-size: 1.5em;
+  color: #000000aa;
+  font-size: 1em;
   font-weight: 600;
   margin-bottom: 20px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .chart-container {
-  width: 300px;
-  height: 300px;
-  margin: 0 auto 20px;
+  width: 280px;
+  height: 280px;
+  margin: 0 auto;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  padding: 20px;
+  padding: 15px 30px;
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -422,63 +391,60 @@ onMounted(() => {
 }
 
 .table-container {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  max-height: 330px;
+  width: 100%;
+  overflow-y: auto;
+  border-radius: 15px;
+  background: #ffffff3d;
+  margin: 20px 0 0 0;
 }
 
-.performance-table {
+table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  color: rgb(0, 0, 0);
+  text-align: center;
+  font-size: 20px;
+  color: #000000a5;
 }
 
-.performance-table th {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
-  padding: 20px;
-  text-align: left;
+thead {
+  position: sticky;
+  top: 0;
+  background: #ffddc8;
+}
+
+th {
+  padding: 10px;
   font-weight: 600;
-  font-size: 1.1em;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  font-size: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
   border-bottom: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-.performance-table th:first-child {
-  border-radius: 15px 0 0 0;
+td {
+  padding: 10px;
 }
 
-.performance-table th:last-child {
-  border-radius: 0 15px 0 0;
-}
-
-.table-row {
+tr {
+  font-size: 0.8rem;
   transition: all 0.3s ease;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.table-row:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(1.02);
-}
-
-.performance-table td {
-  padding: 20px;
-  font-size: 1em;
+tr:hover {
+  background: #ffffff4d;
+  transform: scale(1.01);
 }
 
 .rank-badge {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #333;
-  padding: 8px 15px;
-  border-radius: 20px;
+  /* background: #ffffffd; */
+  color: #000000aa;
+  /* padding: 8px 15px; */
+  /* border-radius: 15px; */
   font-weight: 700;
   font-size: 1.1em;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
 }
 
 .institute-cell {
@@ -489,7 +455,7 @@ onMounted(() => {
 .score-cell {
   font-weight: 700;
   font-size: 1.2em;
-  color: #000000;
+  color: #000000aa;
 }
 
 .progress-bar {

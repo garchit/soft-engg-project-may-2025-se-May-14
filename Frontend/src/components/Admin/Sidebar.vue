@@ -7,7 +7,7 @@
               to="/admin-home" 
               class="nav-link" 
               :class="{ active: activeLink === 'DASHBOARD' }"
-              @click="setActiveLink('home')"
+              @click="setActiveLink('DASHBOARD')"
             >
               DASHBOARD
             </router-link>
@@ -17,9 +17,9 @@
               to="/videos-upload" 
               class="nav-link" 
               :class="{ active: activeLink === 'LECTURES' }"
-              @click="setActiveLink('lectures')"
+              @click="setActiveLink('LECTURES')"
             >
-              LECTURES & Courses
+              COURSE 
             </router-link>
           </li>
           <li class="nav-item">
@@ -27,9 +27,9 @@
               to="/admin-institute" 
               class="nav-link" 
               :class="{ active: activeLink === 'INSTITUTE' }"
-              @click="setActiveLink('institute')"
+              @click="setActiveLink('INSTITUTE')"
             >
-              INSTITUTE
+              INSTITUTE 
             </router-link>
           </li>
 
@@ -37,10 +37,10 @@
             <router-link 
               to="/quiz-manage" 
               class="nav-link" 
-              :class="{ active: activeLink === 'INSTITUTE' }"
-              @click="setActiveLink('institute')"
+              :class="{ active: activeLink === 'QUIZ' }"
+              @click="setActiveLink('QUIZ')"
             >
-              Quiz Management
+              QUIZ 
             </router-link>
           </li>
         </ul>
@@ -48,32 +48,37 @@
     </div>
   </template>
   
-  <script setup>
-  import { ref } from 'vue';
+<script setup>
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const activeLink = ref(route.name); // or route.path
+
+const setActiveLink = (linkName) => {
+  activeLink.value = linkName;
+};
+</script>
+
   
-  const activeLink = ref('home');
+<style scoped>
   
-  const setActiveLink = (linkName) => {
-    activeLink.value = linkName;
-  };
-  </script>
-  
-  <style scoped>
-  .sidebar {
-    width: 250px;
-    height: 100vh;
-    background-color: rgba(226, 210, 210, 0.423);
-    position: fixed;
-    left: 0;
-    top: 0;
-    padding: 0; 
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center; 
-  }
+.sidebar {
+  width: 250px;
+  height: 100vh; /* Full height */
+  background-color: #ffffff4b;
+  position: fixed;
+  left: 0;
+  top: 0; /* Start from the top */
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 900; /* Lower than Navbar */
+}
   
   .sidebar-nav {
     display: flex;
@@ -100,28 +105,23 @@
     width: 100%;
     padding: 15px 20px;
     text-decoration: none;
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: 700; /* Ensure bold text */
-    font-family: 'Poppins', sans-serif; /* Use Poppins font */
-    text-align: center;
+    color: #ffffff !important;
+    font-size: 17px;
     transition: all 0.3s ease;
     position: relative;
   }
   
   .nav-link:hover {
-    background-color: #e54c9196; 
-    text-decoration: none;
+    background-color: #e54c9164 !important;
+    color: #fff
   }
   
   .nav-link.active {
-    background-color: #81AB40;
-    color: #e54c917b;
+    background-color: #ffffff73 !important;
+    font-weight: 600;
+    color: #e54c91 !important;
   }
-  
-  .nav-link.active:hover {
-    color: #E54C91;
-  }
+
   
   /* Responsive design */
   @media (max-width: 768px) {
