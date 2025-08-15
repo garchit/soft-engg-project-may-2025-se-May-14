@@ -40,8 +40,8 @@
 
         <h2 class="section-header">Recommended For You</h2>
         <div class="cards-container">
-            <CCard v-for="course in recommendedCourses" :key="course.id" class="info-card hover-card">
-              <CCardImage orientation="center" :src="course.image_url" class="card-img" />
+            <CCard v-for="course in recommendedCourses" :key="course.id" class="info-card hover-card" >
+              <CCardImage orientation="center" :src="`/src/assets/unit${course.id}.png`" class="card-img"  @error="onImageError"/>
               <CCardBody class="card-body">
                 <CCardText>{{ course.title }}</CCardText>
               </CCardBody>
@@ -98,6 +98,10 @@ const fetchCourseProgress = async () => {
     }
   } catch (error) { console.error("Error fetching course progress:", error.response?.data); }
 };
+
+const onImageError = (event) => {
+    event.target.src = '/src/assets/default.png';
+}
 
 const fetchRecommendations = async () => {
     if (!user.value.id) return;

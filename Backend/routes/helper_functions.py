@@ -119,3 +119,5 @@ def average_institute_score(institute_id):
                return {"error": "Database error occurred", "details": str(e)}, 500        
         #        return 0
 
+def get_unit_name(unit_id):
+       return db.session.query(Course).filter(Course.id == unit_id).first().title

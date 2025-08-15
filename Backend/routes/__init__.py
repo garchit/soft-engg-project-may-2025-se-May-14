@@ -15,7 +15,7 @@ from .videosummary import VideoSummaryResource
 from .admin_resources import Homepage
 from .user_leaderboard import LeaderboardApi,UserRankApi
 from .user_course import UserCoursesApi, UserCoursesByUserApi
-
+from .questions_resource import AllQuestionResources
 
 def init_routes(app):
     api = Api(app, prefix='/Finance_Tutor')
@@ -53,4 +53,5 @@ def init_routes(app):
     api.add_resource(InstituteInfo, '/institute_info/<int:institute_id>')
     api.add_resource(UserBadgesApi, '/user_badges/<int:user_id>')
     api.add_resource(RandomQuestionsResource, '/random_questions')
+    api.add_resource(AllQuestionResources, '/questionsall')
 

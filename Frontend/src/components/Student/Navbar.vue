@@ -13,9 +13,25 @@
   
   <script setup>
   import { ref } from 'vue';
-  const logout = () => {
-    alert('Logging out...');
-    window.location.href = '/'; 
+  import { useToast } from 'vue-toast-notification';
+
+  const toast = useToast();
+
+  const logout = async() => {
+    try{
+      const response = await fetch("Finance_Tutor/logout",{
+        method: "POST"
+      })
+
+      if(response.ok){
+        window.location.href = '/'; }
+        toast.success("Logout successful");
+        return;
+      }
+
+    catch(e){
+      toast.error("Error", {e});
+    }
   };
   </script>
   

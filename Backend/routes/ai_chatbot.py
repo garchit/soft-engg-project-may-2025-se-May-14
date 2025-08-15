@@ -24,7 +24,7 @@ else:
     # Correctly locate the documents folder relative to this file
     base_dir = os.path.dirname(os.path.abspath(__file__)) # Gets the 'routes' directory
     project_root = os.path.dirname(base_dir) # Goes up to the 'Backend' directory
-    file_path = os.path.join(project_root, 'documents', 'examples.txt')
+    file_path = os.path.join(project_root, 'routes', 'documents', 'examples.txt')
     
     loader = TextLoader(file_path, encoding="utf-8")
     documents = loader.load()

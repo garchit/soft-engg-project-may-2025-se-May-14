@@ -5,6 +5,7 @@ from flask import request
 from models.unit import Unit
 from sqlalchemy.exc import SQLAlchemyError
 import random
+from .helper_functions import get_unit_name
 
 class QuestionResource(Resource):
     def get(self,id):
@@ -28,7 +29,7 @@ class QuestionResource(Resource):
         
     def post(self):
         data=request.get_json(force=True)
-        unit_id=data.get("unit_id")
+        unit_name=data.get("unit_name")
         description=data.get("description")
         marks=data.get("marks")
         option_a=data.get("option_a")
@@ -36,10 +37,10 @@ class QuestionResource(Resource):
         option_c=data.get("option_c")
         option_d=data.get("option_d")
         correct_option=data.get("correct_option")
-        required_fields=[unit_id,description,option_a,option_b,option_c,option_d,correct_option]
+        required_fields=[unit_name,description,option_a,option_b,option_c,option_d,correct_option]
         list_correct_option=["a","b","c","d"]
 
-        check_unit=db.session.query(Unit).filter(Unit.id==unit_id).first()
+        check_unit=db.session.query(Unit).filter(Unit.title==unit_name).first()
         if not check_unit:
             return {"error":"No such Unit"},404
         
@@ -54,7 +55,7 @@ class QuestionResource(Resource):
 
             if marks is None:
                 marks=1
-            question=Question(unit_id=unit_id,description=description,marks=marks,option_a=option_a,
+            question=Question(unit_id=check_unit.id,description=description,marks=marks,option_a=option_a,
                                 option_b=option_b,option_c=option_c,
                                 option_d=option_d,correct_option=correct_option)
             db.session.add(question)
@@ -66,7 +67,7 @@ class QuestionResource(Resource):
 
     def put(self,id):
         data=request.get_json(force=True)
-        unit_id=data.get("unit_id")
+        unit_name=data.get("unit_name")
         description=data.get("description")
         marks=data.get("marks")
         option_a=data.get("option_a")
@@ -74,10 +75,10 @@ class QuestionResource(Resource):
         option_c=data.get("option_c")
         option_d=data.get("option_d")
         correct_option=data.get("correct_option")
-        required_fields=[unit_id,description,option_a,option_b,option_c,option_d,correct_option]
+        required_fields=[unit_name,description,option_a,option_b,option_c,option_d,correct_option]
         list_correct_option=["a","b","c","d"]
 
-        check_unit=db.session.query(Unit).filter(Unit.id==unit_id).first()
+        check_unit=db.session.query(Unit).filter(Unit.title==unit_name).first()
         if not check_unit:
             return {"error":"No such Unit"},404
         
@@ -96,7 +97,8 @@ class QuestionResource(Resource):
             if not question:
                 return {"error":"question not found"},404
             question.description=description
-            question.unit_id=unit_id
+            # question.unit_name=unit_name
+            question.unit_id = check_unit.id      # fixed line
             question.correct_option=correct_option
             question.option_a=option_a
             question.option_b=option_b
@@ -153,7 +155,43 @@ class AllQuestionResource(Resource):
             db.session.rollback()
             return {"error": "Internal Server Error", "details": str(e)}, 500
         
+class AllQuestionResources(Resource):
+    # ...existing code...
 
+    def get(self):
+        try:
+            questions = db.session.query(Question).all()
+            print("questions", questions)
+            # question=db.session.query(Question).filter(Question.id==id).first()
+            if not questions:
+                return {"message": "No questions found in the database"}, 404
+
+            question_list = []
+            for q in questions:
+                question_list.append({
+                    # create_json(q)
+                    "id": q.id,
+                    "unit_id": q.unit_id,
+                    "unit_name": get_unit_name(q.unit_id),
+                    "description": q.description,
+                    "marks": q.marks,
+                    "option_a": q.option_a,
+                    "option_b": q.option_b,
+                    "option_c": q.option_c,
+                    "option_d": q.option_d,
+                    "correct_option": q.correct_option
+                })
+
+            return {
+                "message": "All questions fetched successfully",
+                "total_questions": len(question_list),
+                "questions": question_list
+            }, 200
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"error": "Internal Server Error", "details": str(e)}, 500
+        
 class RandomQuestionsResource(Resource):
     def get(self):
         try:

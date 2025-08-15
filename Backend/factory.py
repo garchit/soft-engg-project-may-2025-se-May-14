@@ -38,7 +38,7 @@ def create_app():
     CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
 
     login_manager.init_app(app)
-    login_manager.login_view = 'loginresource'
+    login_manager.login_view = 'login'
 
     init_routes(app)
     return app
