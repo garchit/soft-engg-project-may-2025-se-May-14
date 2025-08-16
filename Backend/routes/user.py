@@ -32,10 +32,13 @@ class UserApi(Resource):
 
     def post(self):
         data = request.get_json(force=True)
-
+        print(data['full_name'], data['username'], data['email'], data['password'], data['dob'], data['institute_id'], data.get('parents_email'), data.get('user_class'),data.get('role'))
         try:
+            print("before dob object creation")
             dob_obj = datetime.strptime(data['dob'], "%Y-%m-%d").date()
+            print("DOB object created:", dob_obj,type(dob_obj))
         except ValueError:
+            # print("DOB parsing failed")
             return {"error": "DOB must be in YYYY-MM-DD format"}, 400
 
         role = data.get("user_type")

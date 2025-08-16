@@ -9,7 +9,7 @@
           <div class="form-row" style="justify-content: center; align-items: center;">
           <div class="form-group" style="width: 50%; max-width: 300px;">
             <label class="form-label" style="text-align: center;">Student Email</label>
-            <input v-model="studentEmail" type="email" class="form-input" placeholder="Enter Student Email" required>
+            <input v-model="email" type="email" class="form-input" placeholder="Enter Student Email" required>
           </div>
           </div>
           
@@ -22,7 +22,7 @@
 
           <div class="form-group" style="width: 50%; max-width: 300px;">
             <label class="form-label" style="text-align: center;">Fullname</label>
-            <input v-model="fullname" type="text" class="form-input" placeholder="Enter Fullname" required>
+            <input v-model="full_name" type="text" class="form-input" placeholder="Enter Fullname" required>
           </div>
 
         </div>
@@ -31,11 +31,11 @@
             <div class="form-row" style="align-items: center; justify-content: center;">
             <div class="form-group" style="flex: 1; text-align: center;">
               <label class="form-label" style="display: flex; justify-content: center; align-items: center; height: 100%;">Parent's Email</label>
-              <input v-model="parentEmail" type="email" class="form-input" placeholder="Enter Parent's Email" required>
+              <input v-model="parents_email" type="email" class="form-input" placeholder="Enter Parent's Email" required>
             </div>
             <div class="form-group" style="flex: 1; text-align: center;">
               <label class="form-label" style="display: flex; justify-content: center; align-items: center; height: 100%;">Date of Birth</label>
-              <input v-model="dateOfBirth" type="date" class="form-input" required>
+              <input v-model="dob" type="date" class="form-input" required>
             </div>
             </div>
 
@@ -43,14 +43,14 @@
             <div class="form-row" style="justify-content: center; align-items: center;">
             <div class="form-group" style="text-align: center;">
               <label class="form-label form-label-thick" style="text-align: center;">Institute Name</label>
-              <select v-model="institute" class="form-input" required>
+              <select v-model="institute_id" class="form-input" required>
               <option value="">Select Institute</option>
               <option v-for="inst in instituteList" :key="inst.id" :value="inst.id">{{ inst.name }}</option>
               </select>
             </div>
             <div class="form-group" style="text-align: center;">
               <label class="form-label form-label-thick" style="text-align: center;">Class</label>
-              <select v-model="className" class="form-input" required>
+              <select v-model="user_class" class="form-input" required>
               <option value="">Select Class</option>
               <option v-for="cls in classes" :key="cls" :value="cls">{{ cls }}</option>
               </select>
@@ -98,19 +98,20 @@ import { useToast } from 'vue-toast-notification';
 const router = useRouter();
 const toast = useToast();
 
-let fullname = ref('');
-let studentEmail = ref('');
+let full_name = ref('');
+let email = ref('');
 let username = ref('');
-let parentEmail = ref('');
-let dateOfBirth = ref('');
-let className = ref('');
+let parents_email = ref('');
+let dob = ref('');
+let user_class = ref('');
 let password = ref('');
 let confirmPassword = ref('');
-let institute = ref('');
+let institute_id = ref('');
+let user_type="student"
 
 
-let classes = ref(['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5',
-  'Class 6', 'Class 7', 'Class 8']);
+let classes = ref([1, 2,  3,  4, 5,
+   6,  7,  8]);
 
 let instituteList = ref();
 
@@ -121,8 +122,10 @@ async function allInstitutes(){
     if (!response.ok) throw new Error("Server Error");
     
     const data = await response.json();
+    console.log("Before setting instituteList");
     console.log(data)
-    instituteList.value = data.json_list;
+    instituteList.value = data;
+    console.log("After setting instituteList",instituteList.value);
   } catch (e) {
     toast.error("Error fetching Insitute Names");
     console.error(e);
@@ -134,24 +137,62 @@ onMounted(() => {
 })
 
 // Handle form submission
-const handleSubmit = () => {
+const handleSubmit = async() => {
   if (password.value !== confirmPassword.value) {
     toast.error('Passwords do not match!');
     return;
   }
 
   console.log({
+    full_name: full_name.value,
+    email: email.value,
     username: username.value,
-    parentEmail: parentEmail.value,
-    dateOfBirth: dateOfBirth.value,
-    className: className.value,
+    parents_email: parents_email.value,
+    dob: dob.value,
+    user_class: user_class.value,
     password: password.value,
-    institute: institute.value,
+    institute_id: institute_id.value,
+    user_type: user_type
   });
-
-  toast.success('Form submitted successfully!');
-};
-
+try{
+  const response= await fetch('http://127.0.0.1:5000/Finance_Tutor/User/signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      full_name: full_name.value,
+      email: email.value,
+      username: username.value,
+      parents_email: parents_email.value,
+      dob: dob.value,
+      user_class: user_class.value,
+      password: password.value,
+      institute_id: institute_id.value,
+      user_type: user_type
+    })
+  })
+  if (!response.ok) {
+    toast.error('Sign Up Failed: ' + response.statusText);
+    return;
+  }
+    toast.success('Sign Up Successful!');
+    goToLogin();
+    // Clear the form fields after successful submission
+    full_name.value = '';
+    email.value = '';
+    username.value = '';
+    parents_email.value = '';
+    dob.value = '';
+    user_class.value = '';
+    password.value = '';
+    confirmPassword.value = '';
+    institute_id.value = '';
+  }
+  catch (error) {
+    toast.error('Sign Up Failed: ' + error.message);
+  }
+}
 
 const goToLogin = () => {
   router.push('/'); 

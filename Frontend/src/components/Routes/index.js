@@ -1,7 +1,7 @@
 import { createRouter , createWebHistory } from "vue-router";
 import LandingPage from "../LandingPage.vue";
 import Login from "../Login.vue";
-import SignUpArchit from "../Institute/SignUp-Archit.vue";
+import SignUpArchit from "../Institute/SignUp.vue";
 import SignUp from "../Student/SignUp-Tanuja.vue";
 import AdminHome from "../Admin/AdminDashboard.vue";
 import VideosUploadPage from "../Admin/VideosUploadPage.vue";
@@ -21,6 +21,8 @@ import Learn from "../Student/Learn.vue";
 import LearnVideos from "../Student/LearnVideos.vue";
 import StudentPractice from "../Student/StudentPractice.vue";
 
+import StudentPractice2 from "../Student/StudentPractice2.vue";
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -38,6 +40,8 @@ const router = createRouter({
     {path: "/student-learn/:unitId", component: LearnVideos},
     {path: '/student-unit-practice/:unitId', component: StudentPractice},
     {path : "/videos-upload" , component : VideosUploadPage},
+    {path: "/revisit-courses", component: StudentPractice2},
+
 
     // Institute routes
     {

@@ -121,3 +121,14 @@ def average_institute_score(institute_id):
 
 def get_unit_name(unit_id):
        return db.session.query(Course).filter(Course.id == unit_id).first().title
+
+def get_dict_students_per_class(students_per_class):
+        result = {}
+        for classes,frequency in students_per_class:
+                if classes not in result:
+                        result[classes] = frequency
+                else:
+                        result[classes] += frequency
+
+               
+        return result

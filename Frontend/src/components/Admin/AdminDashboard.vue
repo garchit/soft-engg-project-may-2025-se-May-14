@@ -20,10 +20,10 @@
                       <Pie :data="chartData" :options="chartOptions" />
                     </div>
                     <div class="chart-legend">
-                    <div class="legend-item" v-for="(label, index) in chartData.labels" :key="label">
-                      <span class="legend-color" :style="{ backgroundColor: chartData.datasets[0].backgroundColor[index] }"></span>
-                      <span class="legend-text">{{ label }}</span>
-                    </div>
+                    <!-- <div class="legend-item" v-for="(label, index) in chartData.labels" :key="label">
+                       <span class="legend-color" :style="{ backgroundColor: chartData.datasets[0].backgroundColor[index] }"></span> -->
+                      <!-- <span class="legend-text">{{ label }}</span>
+                    </div> -->
                   </div>
                   </div>
                 </div>
@@ -37,40 +37,6 @@
                 </div>
               </div>
             </div>
-            <!-- <h2 class="section-title">Top Performing Schools</h2> -->
-            <!-- <div class="table-section">
-              <div class="podium-container">
-                <div class="podium-item second-place">
-                  <div class="medal-wrapper">
-                    <div class="medal silver">🥈</div>
-                    <div class="school-info">
-                      <h4>{{ allInstitutes[0].institute_name }}</h4>
-                      <p class="score">{{ allInstitutes[1].average_score }}%</p>
-                    </div>
-                  </div>
-                </div>
-      
-                <div class="podium-item first-place">
-                  <div class="medal-wrapper">
-                    <div class="medal gold">🥇</div>
-                    <div class="school-info">
-                      <h4>{{ allInstitutes[0].institute_name }}</h4>
-                      <p class="score">{{ allInstitutes[0].average_score }}%</p>
-                    </div>
-                  </div>
-                </div>
-      
-                <div class="podium-item third-place">
-                  <div class="medal-wrapper">
-                    <div class="medal bronze">🥉</div>
-                    <div class="school-info">
-                      <h4>{{ allInstitutes[2].institute_name }}</h4>
-                      <p class="score">{{ allInstitutes[2].average_score }}%</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              </div> -->
               <div class="table-container">
                 <table class="institute-table">
                   <thead>
@@ -130,8 +96,13 @@ const chartData = ref({
       '#FF6B6B',
       '#4ECDC4',
       '#45B7D1',
-      '#96CEB4',
-      '#FFEAA7'
+      '#FFD93D',
+      '#FF8C94',
+      '#A8E6CF',
+      '#DCE775',
+      '#B39DDB',
+      '#F48FB1',
+      '#81D4FA'
     ],
     borderWidth: 0,
     hoverOffset: 8,
@@ -184,12 +155,17 @@ async function adminDashboardData() {
       label: 'Students',
       data: Object.values(newVal),
       backgroundColor: [
-        '#FF6B6B',
-        '#4ECDC4',
-        '#45B7D1',
-        '#96CEB4',
-        '#FFEAA7'
-      ],
+      '#FF6B6B',
+      '#4ECDC4',
+      '#45B7D1',
+      '#FFD93D',
+      '#FF8C94',
+      '#A8E6CF',
+      '#DCE775',
+      '#B39DDB',
+      '#F48FB1',
+      '#81D4FA'
+    ],
       borderWidth: 0,
       hoverOffset: 8,
     }],

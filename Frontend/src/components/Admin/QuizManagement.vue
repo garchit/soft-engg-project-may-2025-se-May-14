@@ -15,7 +15,7 @@ import {
 import InteractiveLayout from './AdminLayout.vue'
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:5000/Finance_Tutor' // Update with your API URL
+const API_BASE_URL = '/Finance_Tutor' // Update with your API URL
 
 // Store
 const quiz = reactive({
@@ -431,19 +431,20 @@ const correctOptions = [
         <div>
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-              <h2 class="page-title">
+              <!-- <h2 class="page-title">
                 <i class="fas fa-question-circle me-2"></i>
                 Quiz Management
               </h2>
-              <p class="text-muted">Manage your quiz questions and track performance</p>
+              <p class="text-muted">Manage your quiz questions and track performance</p> -->
             </div>
             <button 
-            class="btn btn-primary btn-lg add-btn"
+            class="btn-outline-white"
+            variant="outline"
             @click="modals.add = true"
             :disabled="ui.loading"
             >
-            <i class="fas fa-plus me-2"></i>
-            Add Question
+            <!-- <i class="fas fa-plus me-2"></i> -->
+            + Add Question
             </button>
           </div>
           
@@ -499,7 +500,7 @@ const correctOptions = [
         <!-- Filters Section -->
         <div class="filters-section mb-4">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-9">
               <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
                 <input
@@ -507,17 +508,17 @@ const correctOptions = [
                 type="text"
                 class="form-control search-input"
                 placeholder="Search questions..."
+                style="padding: 6px 15px; background: #ffffffdd;"
                 />
               </div>
             </div>
             <div class="col-md-3">
-              <select v-model="quiz.filters.unit" class="form-select">
-                <option value="all">All Units</option>
+              <select v-model="quiz.filters.unit" class="form-select" style="padding: 5px;">
+                <option value="all">&nbsp;&nbsp;All Units</option>
                 <option v-for="unit in quiz.units" :key="unit.id" :value="unit.name">
                   {{ unit.name }}
                 </option>
               </select>
-              
             </div>
             <!-- <div class="col-md-3">
               <div class="d-flex gap-2">
@@ -975,15 +976,17 @@ const correctOptions = [
 /* Main Layout */
 .main-content {
   margin: 20px;
-  border-radius: 5px;
-  background-color: #ffffff3d;  
+  border-radius: 15px;
+  background: #ffffff4d;  
   padding: 0;
-  height: calc(100vh - 250px);
+  height: calc(100vh - 100px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
 }
 
 .container-fluid {
-  padding: 2rem;
-  overflow-y: auto;
+  padding: 20px;
+  /* overflow-y: auto; */
 }
 
 /* Header Section */
@@ -993,26 +996,27 @@ const correctOptions = [
   margin: 0;
 }
 
-.add-btn {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+.btn-outline-white {
+  background: rgb(32, 182, 34, 0.85);
   border: none;
-  border-radius: 50px;
-  padding: 12px 30px;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+  color: white;
+  border-radius:8px;
+  padding: 8px 12px;
+  /* font-weight: 400;  */
   transition: all 0.3s ease;
 }
 
-.add-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
+.btn-outline-white:hover {
+  background-color: rgb(32, 182, 34);     /* White background on hover */
+  color: white;                /* Switch text to black for contrast */
+  border: 1px solid yellowgreen;
 }
 
 /* Stats Cards */
 .stats-card {
-  background: white;
+  background: #ffffffaa;
   border-radius: 15px;
-  padding: 1.5rem;
+  padding: 10px;
   display: flex;
   align-items: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -1024,8 +1028,8 @@ const correctOptions = [
 }
 
 .stats-icon {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -1037,23 +1041,23 @@ const correctOptions = [
 
 .stats-content h3 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #2d3748;
+  color: #000000cc;
 }
 
 .stats-content p {
   margin: 0;
   color: #718096;
-  font-size: 0.9rem;
+  font-size: 0.6rem;
 }
 
 /* Filters Section */
 .filters-section {
-  background: rgba(255, 255, 255, 0.95);
+  background: #ffffffaa;
   backdrop-filter: blur(10px);
   border-radius: 15px;
-  padding: 1.5rem;
+  padding: 15px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -1084,7 +1088,7 @@ const correctOptions = [
 
 /* Table Section */
 .table-section {
-  background: rgba(255, 255, 255, 0.95);
+  background: #ffffffaa;
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 1.5rem;

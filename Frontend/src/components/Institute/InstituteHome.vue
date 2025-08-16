@@ -1,72 +1,66 @@
 <template>
-    <div class="learn-container">
-      <div class="main-content">
-        <header class="profile-header">
-          <div class="page-heading-box">
-            <div class="page-heading">{{ instituteName }}</div>
-            <div class="page-caption">
-              Overview of the institute's performance and top teachers.
-            </div>
+  <div class="learn-container">
+    <div class="main-content">
+      <header class="profile-header">
+        <div class="page-heading-box">
+          <div class="page-heading">{{ instituteName }}</div>
+          <div class="page-caption">
+            Overview of the institute's performance and top teachers.
           </div>
-        </header>
+        </div>
+      </header>
+    </div>
+    <div class="course-content">
+      <div class="top-teachers-podium">
+        <div class="top-card">
+          <div class="medal-icon bronze">🥉</div>
+          <div class="info">
+            <div class="name">{{ sortedTeachers[2]?.teacher_name }}</div>
+          </div>
+        </div>
+        <div class="top-card">
+          <div class="medal-icon gold">🥇</div>
+          <div class="info">
+            <div class="name">{{ sortedTeachers[0]?.teacher_name }}</div>
+          </div>
+        </div>
+        <div class="top-card">
+          <div class="medal-icon silver">🥈</div>
+          <div class="info">
+            <div class="name">{{ sortedTeachers[1]?.teacher_name }}</div>
+          </div>
+        </div>
+        <div class="unit-divider"></div>
       </div>
-      <div class="course-content">
-        <div class="top-teachers-podium">
-          <div class="top-card " >
-            <!-- v-if="topTeachers[2]"> -->
-            <div class="medal-icon bronze">🥉</div>
-            <div class="info">
-              <!-- <div class="name">{{ topTeachers[2].name }}</div>-->
-              <div class="name">Teacher03</div>
-            </div>
-          </div>
-          <div class="top-card " >
-          <!-- v-if="topTeachers[0]"> -->
-            <div class="medal-icon gold">🥇</div>
-            <div class="info">
-              <!-- <div class="name">{{ topTeachers[0].name }}</div>-->
-              <div class="name">Teacher01</div>
-            </div>
-          </div>
-          <div class="top-card ">
-           <!-- v-if="topTeachers[1]"> -->
-            <div class="medal-icon silver">🥈</div>
-            <div class="info">
-              <!-- <div class="name">{{ topTeachers[1].name }}</div> -->
-              <div class="name">Teacher02</div>
-            </div>
-          </div>
+
+      <div class="charts-container">
+        <div class="chart-card">
+          <Bar :data="topTeachersData" :options="horizontalBarOptions" :width="0" :height="10" />
+        </div>
+        <div class="chart-card">
+          <Pie :data="scoreDistributionData" :options="scoreDistributionOptions" />
+        </div>
+        <div class="chart-card">
+          <Bar :data="topicFrequencyData" :width="0" :height="10" />
+        </div>
+      </div>
+
+      <div class="unit-cards">
+        <div class="unit-card" v-for="data in cardsData" :key="data.title">
           <div class="unit-divider"></div>
-        </div>
-
-        <div class="charts-container">
-          <div class="chart-card">
-            <Bar :data="topTeachersData" :options="horizontalBarOptions" :width="0" :height="10" />
-          </div>
-          <div class="chart-card">
-            <Bar :data="scoreDistributionData" :width="0" :height="10" />
-          </div>
-          <div class="chart-card">
-            <Bar :data="topicFrequencyData" :width="0" :height="10" />
-          </div>
-        </div>
-
-        <div class="unit-cards">
-          <div class="unit-card" v-for="data in cardsData" :key="data.title">
-            <div class="unit-divider"></div>
-            <div class="unit-header">
-              <p>{{ data.title }}</p> <p class="unit-description">{{ data.value }}</p>
-            </div>
+          <div class="unit-header">
+            <p>{{ data.title }}</p>
+            <p class="unit-description">{{ data.value }}</p>
           </div>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
-
 <script setup>
-import { onMounted, ref } from 'vue';
-import { Bar } from 'vue-chartjs';
+import { onMounted, ref, computed } from 'vue';
+import { Bar, Pie } from 'vue-chartjs';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
 import {
@@ -77,8 +71,10 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
+  ArcElement,
 } from 'chart.js';
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement);
 
 const toast = useToast();
 const route = useRoute();
@@ -90,11 +86,12 @@ const totalTeachers = ref(null);
 const averageInstituteScore = ref(null);
 const totalStudents = ref(null);
 let teacherProgressData = ref([]);
+let totalStudentsPerClass = ref({});
+const sortedTeachers = ref([]);
 
 async function instituteDashboard() {
   try {
-    const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/institute_info/${instituteId}`);
-    
+    const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/institute_home/${instituteId}`);
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || "Error fetching institute dashboard data");
 
@@ -102,22 +99,23 @@ async function instituteDashboard() {
     totalTeachers.value = data.total_teachers;
     averageInstituteScore.value = data.average_institute_score;
     totalStudents.value = data.total_students;
+    totalStudentsPerClass.value = data.total_students_per_class;
+    console.log(totalStudentsPerClass.value, "Total Students Per Class Data");
 
   } catch (e) {
     toast.error(e.message || e.toString());
   }
 }
 
-async function instituteTeacherData(){
-  try{
+async function instituteTeacherData() {
+  try {
     const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/teacher_wise_progress/${instituteId}`);
-  
     const data = await response.json();
-    teacherProgressData = data.teacher_progress;
-    if(!response.ok) throw new Error(data.error || "Error fetching Teacher Data");
-
-    console.log(teacherProgressData);
-  } catch(e){
+    teacherProgressData.value = data.teacher_progress; // Use .value to assign
+    if (!response.ok) throw new Error(data.error || "Error fetching Teacher Data");
+    sortedTeachers.value = teacherProgressData.value.sort((a, b) => b.teacher_progress - a.teacher_progress);
+    console.log(sortedTeachers.value, "Sorted Teachers Data");
+  } catch (e) {
     toast.error(e.message || e.toString());
   }
 }
@@ -125,7 +123,7 @@ async function instituteTeacherData(){
 onMounted(() => {
   instituteDashboard();
   instituteTeacherData();
-})
+});
 
 const cardsData = ref([
   { title: 'Total Teachers', value: totalTeachers },
@@ -134,8 +132,10 @@ const cardsData = ref([
 ]);
 
 // Chart Data
-const topTeachersData = {
-  labels: teacherProgressData.value.map(teacher => teacher.name),
+const topTeachersData = computed(() => ({
+  labels: teacherProgressData.value.map(
+    teacher => teacher.teacher_name.split(" ")[0] // first part before space
+  ),
   datasets: [
     {
       label: 'Performance',
@@ -143,7 +143,7 @@ const topTeachersData = {
       backgroundColor: '#007bff',
     },
   ],
-};
+}));
 
 const horizontalBarOptions = {
   indexAxis: 'y',
@@ -154,27 +154,37 @@ const horizontalBarOptions = {
   },
 };
 
-const scoreDistributionData = {
-  labels: ['Class 6', 'Class 7', 'Class 8', 'Class 9'],
+const scoreDistributionData = computed(() => ({
+  labels: Object.keys(totalStudentsPerClass.value),
   datasets: [
     {
-      label: 'Average Score',
-      data: [72, 78, 74, 80],
-      backgroundColor: '#4bc0c0',
+      data: Object.values(totalStudentsPerClass.value),
+      backgroundColor: Object.keys(totalStudentsPerClass.value).map((_, i) => {
+        const colors = ["#4bc0c0", "#ff6384", "#ffcd56", "#36a2eb"]
+        return colors[i % colors.length]
+      }),
     },
   ],
-};
+}))
 
-const topicFrequencyData = {
+const scoreDistributionOptions = {
+  responsive: true,
+  plugins: {
+    legend: { position: "bottom" },
+    title: { display: true, text: "Students Per Class" },
+  },
+}
+
+const topicFrequencyData = computed(() => ({
   labels: ['Stocks', 'Bonds', 'Mutual Funds', 'Crypto'],
   datasets: [
     {
       label: 'Topic Frequency',
-      data: [40, 25, 20, 10],
+      data: [40, 25, 20, 10], // replace with API later if needed
       backgroundColor: '#36a2eb',
     },
   ],
-};
+}));
 </script>
 
 <style scoped>

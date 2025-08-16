@@ -73,60 +73,7 @@
 import { ref, computed } from 'vue'
 import InteractiveLayout from './AdminLayout.vue'
 
-let institutes = ref([
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-    { name: 'Institute C', students: 200 },
-    { name: 'Institute A', students: 120 },
-    { name: 'Institute B', students: 85 },
-])
+let institutes = ref([])
 
 // Toggle states
 const showNameSearch = ref(false)
@@ -153,7 +100,6 @@ const filteredInstitutes = computed(() => {
     return matchesName && matchesStudents
   })
 })
-
 </script>
 
 <style scoped>
