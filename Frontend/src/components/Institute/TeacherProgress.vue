@@ -7,12 +7,17 @@
             Check your teacher's progress here and send them AI generated report.
           </div>
         </div>
+        <div>
           <button class="generate-report-btn" @click="alert('Feature will be available soon')">
             Generate Report
             <span class="sparkle sparkle1"></span>
             <span class="sparkle sparkle2"></span>
             <span class="sparkle sparkle3"></span>
           </button>
+          <button class="edit-teacher" @click="showEditTeacher = true">
+            EditTeacher
+          </button>
+          </div>
       </header>
       <main class="main-container">
         <!-- Charts Section -->
@@ -63,6 +68,18 @@
         </div>
       </main>
     </div>
+    <div v-if="showEditTeacher" class="overlay">
+          <div class="form-box">
+            <h3 class="form-title">Edit Teacher</h3>
+            <input v-model="teacherName" placeholder="Teacher Name" class="form-input" />
+            <input v-model="teacherEmail" placeholder="Teacher Email" class="form-input" type="email"/>
+            <input v-model="teacherClass" type="number" min="1" max="8" placeholder="Teacher Class" class="form-input" />
+            <div class="form-actions">
+              <button @click="editTeacher" class="btn btn-save">Save</button>
+              <button @click="showEditTeacher = false" class="btn btn-cancel">Cancel</button>
+            </div>
+          </div>
+        </div>
 </template>
 
 <script setup>
@@ -83,6 +100,9 @@ const instituteId = ref(router.params.institute_id);
 
 let doughnutChartInstance = null
 let barChartInstance = null
+const showEditTeacher = ref(false);
+const teacherEmail = ref('');
+const teacherClass = ref('');
 
 const renderCharts = () => {
   // Destroy old instances if they exist
@@ -158,6 +178,7 @@ const renderCharts = () => {
 }
 
 const fetchTeacherProgress = async () => {
+  // Fetch teacher data to get name and email 
   try {
     const res = await fetch(
       `http://127.0.0.1:5000/Finance_Tutor/teacher_wise_progress/${instituteId.value}`,
@@ -243,7 +264,7 @@ watch(
 .generate-report-btn {
   position: relative;
   padding: 1.2rem 0.9rem;
-  width: 150px;
+  width: 250px;
   border-radius: 15px;
   background: #ffffff2d;
   border: none;
@@ -260,6 +281,25 @@ watch(
 .generate-report-btn:hover {
   background: #20b45766;
   transform: scale(1.05);
+}
+.edit-teacher:hover {
+  background: #20b45766;
+  transform: scale(1.05);
+}
+.edit-teacher {
+  position: relative;
+  padding: 1.2rem 0.9rem;
+  width: 250px;
+  border-radius: 15px;
+  background: #ffffff2d;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 /* Sparkle base style */
@@ -473,5 +513,74 @@ tr:hover {
   color: #444;
   font-weight: 600;
 }
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
 
+.form-box {
+  background: #ffddc8dd;
+  backdrop-filter: blur(4px);
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 500px;
+}
+
+.form-title {
+  margin-bottom: 25px;
+  font-size: 18px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-save {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #43a047;
+}
+
+.btn-cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #d32f2f;
+}
 </style>

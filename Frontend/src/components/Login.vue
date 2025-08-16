@@ -72,6 +72,8 @@ const handleSubmit = async () => {
       // CRITICAL: Save the username to localStorage so other pages can use it
       if (user && user.username) {
           localStorage.setItem('username', user.username);
+          localStorage.setItem('user_id', user.id);
+
       } else {
           console.log("Logged in user did not have a username (e.g., an Institute).");
       }
