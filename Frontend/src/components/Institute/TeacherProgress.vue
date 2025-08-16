@@ -8,15 +8,15 @@
           </div>
         </div>
         <div>
-          <button class="generate-report-btn" @click="alert('Feature will be available soon')">
+          <!-- <button class="generate-report-btn" @click="alert('Feature will be available soon')">
             Generate Report
             <span class="sparkle sparkle1"></span>
             <span class="sparkle sparkle2"></span>
             <span class="sparkle sparkle3"></span>
-          </button>
-          <button class="edit-teacher" @click="showEditTeacher = true">
+          </button> -->
+          <!-- <button class="edit-teacher" @click="showEditTeacher = true">
             EditTeacher
-          </button>
+          </button> -->
           </div>
       </header>
       <main class="main-container">

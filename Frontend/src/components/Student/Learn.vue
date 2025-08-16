@@ -46,7 +46,7 @@ import axios from 'axios';
 import InteractiveLayout from '../InteractiveLayout.vue';
 
 const API_BASE = "/Finance_Tutor";
-const currentUserId = localStorage.getItem('id') || "1"; // fallback user ID
+const currentUserId = localStorage.getItem('user_id') || "1"; // fallback user ID
 const currentUsername = localStorage.getItem('username') || "Hitesh123"; // fallback username
 
 const units = ref([]);

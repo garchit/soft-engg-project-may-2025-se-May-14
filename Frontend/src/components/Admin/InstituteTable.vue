@@ -47,19 +47,44 @@
                   </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="inst in filteredInstitutes">
-                        <td>{{ inst.name}}</td>
-                        <td style="text-align: center;">{{ inst.students }}</td>
+                    <!-- Loading state -->
+                    <tr v-if="loading">
+                      <td colspan="3" style="text-align: center; padding: 20px;">
+                        Loading institutes...
+                      </td>
+                    </tr>
+                    
+                    <!-- Error state -->
+                    <tr v-else-if="error">
+                      <td colspan="3" style="text-align: center; padding: 20px; color: red;">
+                        {{ error }}
+                      </td>
+                    </tr>
+                    
+                    <!-- Data rows -->
+                    <tr v-else v-for="inst in filteredInstitutes" :key="inst.id">
+                        <td>{{ inst.name }}</td>
+                        <td style="text-align: center;">{{ inst.total_students }}</td>
                         <td>
-                          <a href="#" class="text-primary me-2" title="Edit" style="color: black;">
+                          <!-- <a href="#" class="text-primary me-2" title="Edit" style="color: black;" @click.prevent="editInstitute(inst)">
                             <i class="bi bi-pencil-square"></i>
                           </a>
-                          <a href="#" class="text-danger me-2" title="Delete" style="color: red;">
+                          <a href="#" class="text-danger me-2" title="Delete" style="color: red;" @click.prevent="deleteInstitute(inst)">
                             <i class="bi bi-trash"></i>
-                          </a>
-                          <a href="#" class="text-warning" title="Block" style="color: black !important; ">
+                          </a> -->
+                          <!-- <a href="#" class="text-warning" title="Block" style="color: black !important;" @click.prevent="blockInstitute(inst)">
                             <i class="bi bi-slash-circle"></i>
-                          </a>
+                          </a> -->
+                          <a 
+  href="#" 
+  class="text-warning" 
+  :title="inst.blocked ? 'Unblock' : 'Block'" 
+  style="color: black !important;" 
+  @click.prevent="blockInstitute(inst)"
+>
+  <i :class="inst.blocked ? 'bi bi-check-circle' : 'bi bi-slash-circle'"></i>
+</a>
+
                         </td>
                     </tr>
                 </tbody>
@@ -70,10 +95,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import InteractiveLayout from './AdminLayout.vue'
 
+// Reactive data
 let institutes = ref([])
+const loading = ref(false)
+const error = ref('')
 
 // Toggle states
 const showNameSearch = ref(false)
@@ -84,6 +112,89 @@ const searchName = ref('')
 const studentFilterType = ref('')
 const studentFilterValue = ref(null)
 
+// API function to fetch institutes
+const fetchInstitutes = async () => {
+  loading.value = true
+  error.value = ''
+  
+  try {
+    const response = await fetch('http://127.0.0.1:5000/Finance_Tutor/all_institute')
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    institutes.value = data
+  } catch (err) {
+    error.value = `Failed to fetch institutes: ${err.message}`
+    console.error('Error fetching institutes:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Action handlers
+const editInstitute = (institute) => {
+  console.log('Edit institute:', institute)
+  // Implement edit functionality
+}
+
+const deleteInstitute = (institute) => {
+  if (institute.id === -1) {
+    alert("You cannot delete Independent Students!")
+    return
+  }
+  
+  if (confirm(`Are you sure you want to delete ${institute.name}?`)) {
+    console.log('Delete institute:', institute)
+    // Implement delete functionality
+  }
+}
+
+const blockInstitute = async (institute) => {
+  console.log("ccc",institute);
+  if (institute.id === -1) {
+    alert("You cannot block me!!")
+    return
+  }
+  
+  const action = institute.blocked ? 'unblock' : 'block'
+  
+  if (confirm(`Are you sure you want to ${action} ${institute.name}?`)) {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/toggle_block_institute/${institute.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      console.log("Response:", response);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      
+      if (data.message) {
+        // Success - refresh the institutes list to get updated data
+        await fetchInstitutes()
+        alert(`Institute ${action}ed successfully!`)
+      } else if (data.error) {
+        alert(`Error: ${data.error}`)
+      }
+      
+    } catch (error) {
+      console.error('Error toggling block status:', error)
+      alert(`Failed to ${action} institute: ${error.message}`)
+    }
+  }
+}
+
+
+// Computed property for filtered institutes
 const filteredInstitutes = computed(() => {
   return institutes.value.filter(inst => {
     const matchesName = inst.name.toLowerCase().includes(searchName.value.toLowerCase())
@@ -91,14 +202,19 @@ const filteredInstitutes = computed(() => {
 
     if (studentFilterType.value && studentFilterValue.value !== null) {
       if (studentFilterType.value === 'less') {
-        matchesStudents = inst.students < studentFilterValue.value
+        matchesStudents = inst.total_students < studentFilterValue.value
       } else if (studentFilterType.value === 'more') {
-        matchesStudents = inst.students > studentFilterValue.value
+        matchesStudents = inst.total_students > studentFilterValue.value
       }
     }
 
     return matchesName && matchesStudents
   })
+})
+
+// Fetch data on component mount
+onMounted(() => {
+  fetchInstitutes()
 })
 </script>
 

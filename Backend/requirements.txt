@@ -14,5 +14,7 @@ requests
 sentence_transformers
 torch
 urllib3
-youtube-transcript-api
+youtube-transcript-api==1.1.1
 google-generativeai
+langchain-community
+chromadb
