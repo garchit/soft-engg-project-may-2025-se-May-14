@@ -1,6 +1,5 @@
 <template>
   <div class="learn-container">
-    <!-- Profile Header -->
     <header class="profile-header">
       <div class="page-heading-box">
         <div class="page-heading">Profile</div>
@@ -8,10 +7,8 @@
       </div>
     </header>
 
-    <!-- Profile Card -->
     <div v-if="!isLoading" class="profile-card">
       <div class="profile-container-horizontal">
-        <!-- Left Side: Profile Picture -->
         <div class="profile-left">
           <div class="profile-picture-container">
             <img
@@ -34,7 +31,6 @@
           </div>
         </div>
 
-        <!-- Right Side: Form Details -->
         <div class="profile-right">
           <div v-for="field in fields" :key="field.key" class="form-group">
             <label :for="field.key">{{ field.label }}</label>
@@ -50,7 +46,6 @@
             <span v-if="errors[field.key]" class="error-message">{{ errors[field.key] }}</span>
           </div>
 
-          <!-- Edit / Save Button -->
           <div class="btn-group">
             <button @click="toggleEdit" class="edit-btn">
               {{ isEditing ? 'SAVE PROFILE' : 'EDIT PROFILE' }}
@@ -60,18 +55,15 @@
       </div>
     </div>
 
-    <!-- Loading -->
     <div v-if="isLoading" class="loading-container">
       <div class="spinner"></div>
       <p>Loading profile...</p>
     </div>
 
-    <!-- Success -->
     <div v-if="showSuccessMessage" class="success-message">
       Profile updated successfully!
     </div>
 
-    <!-- Error Message -->
     <div v-if="apiError" class="error-message-popup">
       {{ apiError }}
     </div>
@@ -79,19 +71,20 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted, computed, nextTick } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, reactive, onMounted, computed, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios'; // <-- 1. IMPORT AXIOS
 
 export default {
   name: 'InstituteProfile',
   setup() {
     const defaultProfileSvg = `https://randomuser.me/api/portraits/lego/2.jpg`;
     const router = useRouter();
-    const route = useRoute();
+    
+    const instituteId = ref(localStorage.getItem('institute_id'));
 
-    const instituteId = computed(() => route.params.institute_id);
 
-    const API_BASE_URL = 'http://localhost:5000/Finance_Tutor'; // Update if needed
+    const API_BASE_URL = '/Finance_Tutor'; 
 
     const isEditing = ref(false);
     const isLoading = ref(false);
@@ -123,15 +116,74 @@ export default {
       { key: 'password', label: 'PASSWORD', type: 'password' }
     ];
 
-    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const FILE_SIZE_LIMIT = 5 * 1024 * 1024;
-
     const profileImageUrl = computed(() => profileData.picture || defaultProfileSvg);
 
     const onImageError = () => {
       profileData.picture = defaultProfileSvg;
     };
+    
+    const fetchInstituteProfile = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/institute/${instituteId.value}`, {
+          withCredentials: true // This sends session cookies
+        });
+        
+        if (response.data.error) {
+          throw new Error(response.data.error);
+        }
+        return response.data;
+      } catch (error) {
+        apiError.value = error.response ? error.response.data.error : error.message;
+        throw error;
+      }
+    };
 
+    const updateInstituteProfile = async (profileUpdateData) => {
+      try {
+        const payload = {
+            name: profileUpdateData.username,
+            address: profileUpdateData.address,
+            email: profileUpdateData.email,
+            password: profileUpdateData.password
+        };
+        const response = await axios.put(`${API_BASE_URL}/institute/${instituteId.value}`, payload, {
+            withCredentials: true // This sends session cookies
+        });
+        
+        if (response.data.error) {
+          throw new Error(response.data.error);
+        }
+        return response.data;
+      } catch (error) {
+        apiError.value = error.response ? error.response.data.error : error.message;
+        throw error;
+      }
+    };
+
+
+    const loadProfile = async () => {
+      isLoading.value = true;
+      apiError.value = null;
+      try {
+        const data = await fetchInstituteProfile();
+        Object.assign(profileData, {
+          username: data.Name || '',
+          password: 'password',
+          email: data.email || '',
+          address: data.Address || '',
+          picture: '/default-profile.png'
+        });
+        Object.assign(originalData, {...profileData});
+      } catch (error) {
+  
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
+
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const FILE_SIZE_LIMIT = 5 * 1024 * 1024;
     const validators = {
       username: val => !val.trim() ? 'Institute name is required'
         : val.length < 3 ? 'Institute name must be at least 3 characters' : '',
@@ -141,83 +193,16 @@ export default {
         : !EMAIL_REGEX.test(val) ? 'Please enter a valid email address' : '',
       address: val => !val.trim() ? 'Address is required' : ''
     };
-
     const validateField = key => {
       errors[key] = validators[key](profileData[key]);
     };
-
     const validateForm = () => {
       Object.keys(validators).forEach(validateField);
       return Object.values(errors).every(e => !e) &&
              Object.values(profileData).every(v => v);
     };
-
-    const fetchInstituteProfile = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/institute/${instituteId.value}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        return data;
-      } catch (error) {
-        apiError.value = error.message;
-        throw error;
-      }
-    };
-
-    const updateInstituteProfile = async (profileUpdateData) => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/institute/${instituteId.value}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: profileUpdateData.username,
-            address: profileUpdateData.address,
-            email: profileUpdateData.email,
-            password: profileUpdateData.password
-          })
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        return data;
-      } catch (error) {
-        apiError.value = error.message;
-        throw error;
-      }
-    };
-
-    const loadProfile = async () => {
-      isLoading.value = true;
-      apiError.value = null;
-      try {
-        const data = await fetchInstituteProfile();
-        Object.assign(profileData, {
-          username: data.Name || '',
-          password: 'password', // never show password
-          email: data.email || '',
-          address: data.Address || '',
-          picture: '/default-profile.png'
-        });
-        Object.assign(originalData, {...profileData});
-      } catch (error) {
-        // error already handled
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
     const saveProfile = async () => {
       if (!validateForm()) return false;
-
       isLoading.value = true;
       apiError.value = null;
       try {
@@ -232,7 +217,6 @@ export default {
         isLoading.value = false;
       }
     };
-
     const toggleEdit = async () => {
       if (isEditing.value) {
         const success = await saveProfile();
@@ -243,14 +227,12 @@ export default {
         document.getElementById('username')?.focus();
       }
     };
-
     const cancelEdit = () => {
       Object.assign(profileData, originalData);
       Object.keys(errors).forEach(k => errors[k] = '');
       isEditing.value = false;
       apiError.value = null;
     };
-
     const uploadProfilePicture = e => {
       const file = e.target.files[0];
       if (!file) return;
@@ -259,44 +241,28 @@ export default {
       reader.onload = ev => { profileData.picture = ev.target.result };
       reader.readAsDataURL(file);
     };
-
     const triggerFileUpload = () => fileInput.value?.click();
-
     const handleLogout = () => router.push('/login');
-
     onMounted(() => {
       if (instituteId.value) {
         loadProfile();
       } else {
-        apiError.value = 'Invalid institute ID';
+        apiError.value = 'Invalid institute ID. Please log in again.';
       }
     });
 
     return {
-      isEditing,
-      isLoading,
-      showSuccessMessage,
-      profileData,
-      errors,
-      fileInput,
-      fields,
-      toggleEdit,
-      cancelEdit,
-      uploadProfilePicture,
-      triggerFileUpload,
-      handleLogout,
-      validateField,
-      defaultProfileSvg,
-      instituteId,
-      profileImageUrl,
-      onImageError,
-      apiError
+      isEditing, isLoading, showSuccessMessage, profileData, errors,
+      fileInput, fields, toggleEdit, cancelEdit, uploadProfilePicture,
+      triggerFileUpload, handleLogout, validateField, defaultProfileSvg,
+      instituteId, profileImageUrl, onImageError, apiError
     };
   }
 }
 </script>
 
 <style scoped>
+
 .learn-container {
   display: flex;
   flex-direction: column;
