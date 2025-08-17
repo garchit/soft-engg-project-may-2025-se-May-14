@@ -35,7 +35,6 @@
 </template>
 
 <script setup>
-// THIS IS THE FINAL, CORRECTED SCRIPT. IT USES THE PROXY AND SAVES THE USERNAME.
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
@@ -58,7 +57,6 @@ const goToLandingPage = () => {
 
 const handleSubmit = async () => {
   try {
-    // Use axios with the proxied URL for consistent, reliable requests
     const response = await axios.post('/Finance_Tutor/login', {
       email: email.value,
       password: password.value
@@ -69,26 +67,28 @@ const handleSubmit = async () => {
       
       const user = response.data.user;
       
-      // CRITICAL: Save the username to localStorage so other pages can use it
+      // Save common user data if it exists
       if (user && user.username) {
           localStorage.setItem('username', user.username);
           localStorage.setItem('user_id', user.id);
-
-      } else {
-          console.log("Logged in user did not have a username (e.g., an Institute).");
       }
       
-      // Use the role from the API response to redirect
-      if (user.role === "admin") {
-          router.push('/admin-home');
-      } else if (user.role === "institute") {
+      // Check for the institute role specifically
+      if (user.role === "institute") {
+          // --- THIS IS THE FIX ---
+          // Save the institute_id to localStorage
+          localStorage.setItem('institute_id', user.id);
+          // Navigate to the correct home page, using the id
           router.push(`/${user.id}/institute-home`);
-      } else {
+      } 
+      else if (user.role === "admin") {
+          router.push('/admin-home');
+      } else { // This handles the student role
           router.push(`/student-home`);
       }
     }
   } catch (error) {
-    const errorMessage = error.response ? error.response.error : error.message;
+    const errorMessage = error.response ? error.response.data.error : error.message;
     toast.error(errorMessage || 'Login failed. Please check your credentials.');
   }
 };
