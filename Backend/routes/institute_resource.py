@@ -282,7 +282,7 @@ class InstituteResource(Resource):
 
               return {"message": "User created successfully"   }, 201
       
-       @login_required
+       #@login_required
        def delete(self,id):
               try:
                      institute=db.session.query(Institute).filter(Institute.id==id).first()
