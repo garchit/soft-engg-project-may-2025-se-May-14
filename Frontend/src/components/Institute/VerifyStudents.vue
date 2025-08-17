@@ -13,7 +13,6 @@
       <div class="course-content">
         <input type="text" v-model="searchQuery" class="search-bar" placeholder="Search by name..." />
         <div class="table-container">
-            <!-- Table -->
             <table>
               <thead>
                 <tr>
@@ -77,7 +76,6 @@ async function fetchStudents(){
 
 onMounted(fetchStudents);
 
-// Filtered List
 const filteredStudents = computed(() => {
   return students.value
     .filter(student =>
@@ -86,31 +84,37 @@ const filteredStudents = computed(() => {
     .sort((a, b) => Number(a.class) - Number(b.class))
 })
 
+// --- THIS IS THE CORRECTED FUNCTION ---
 async function approveOrReject(studentId, action) {
   try {
-    const confirmAction = confirm("Are you sure you want to verify the student?");
-    
-    if (confirmAction) {
-      const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/verify_student/${studentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ "verified": action })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error verifying student');
-      }
-
-      const data = await response.json();
-      toast.success(data.message);
-
-      await fetchStudents();
+    const confirmMessage = action === 1 
+      ? "Are you sure you want to approve this student?" 
+      : "Are you sure you want to reject this student?";
+      
+    if (!confirm(confirmMessage)) {
+      return; // User cancelled the action
     }
+
+    const response = await fetch(`http://127.0.0.1:5000/Finance_Tutor/verify_student/${studentId}`, {
+      method: "PUT",
+      credentials: 'include',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ verified: action })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'An error occurred.');
+    }
+
+    toast.success(data.message);
+    await fetchStudents(); // Refresh the list of students
+
   } catch (e) {
-    toast.error("Failed to verify/unverify: " + e.error);
+    toast.error(`Failed to process action: ${e.message}`);
   }
 }
 </script>
@@ -218,7 +222,6 @@ tr:hover {
 .student-table thead{
   position: sticky;
   top: 0;
-  /* background: linear-gradient(135deg, #4FC3F7 0%, #1976D2 100%); */
   background-color: rgba(255, 255, 255, 0.6);
   color: #334155;
   z-index: 1;
