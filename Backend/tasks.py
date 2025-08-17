@@ -271,10 +271,10 @@ def schedule_all_parent_reports():
 celery.conf.beat_schedule = {
     'send-monthly-teacher-reports': {
         'task': 'tasks.send_monthly_class_reports_to_teachers',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='*/2'),
     },
     'schedule-weekly-parent-reports': {
         'task': 'tasks.schedule_all_parent_reports',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='*/2'),
     }
 }
