@@ -172,13 +172,12 @@ const isGameOver = ref(false);
 const isProcessing = ref(false);
 const breakSoundRef = ref(null);
 const unitName = ref(null);
-const userId = ref(localStorage.getItem('user_id') || ''); // Fetch from local storage // NOTE: Replace with the actual user ID from your auth system.
+const userId = ref(localStorage.getItem('user_id') || ''); 
 
 const totalTime = 60; 
 let timerInterval = null;
 
 const API_BASE = '/Finance_Tutor'; 
-const API_URL = `${API_BASE}/user_courses`;
 
 const currentQuestion = computed(() => questions.value[currentQuestionIndex.value]);
 const isLastQuestion = computed(() => currentQuestionIndex.value === questions.value.length - 1);
@@ -286,7 +285,6 @@ const toggleSpeech = () => {
     return;
   }
 
-  // Load voices
   const voices = window.speechSynthesis.getVoices();
   const preferredVoice =
     voices.find(v => v.name.includes("Google UK English Female")) ||
@@ -294,7 +292,6 @@ const toggleSpeech = () => {
     voices.find(v => /female/i.test(v.name)) ||
     voices[0];
 
-  // Build text
   const questionText = currentQuestion.value.text;
   const optionsText = currentQuestion.value.options
     .map((opt, idx) => `Option ${String.fromCharCode(65 + idx)}: ${opt}`)
@@ -302,7 +299,6 @@ const toggleSpeech = () => {
 
   const fullText = `${questionText}. ${optionsText}`;
 
-  // Create utterance
   utterance = new SpeechSynthesisUtterance(fullText);
   utterance.lang = "en-US";
   utterance.rate = 0.95;
@@ -357,7 +353,6 @@ const handleGameOver = () => {
   isGameOver.value = true;
   if (timerInterval) clearInterval(timerInterval);
   
-  // Calculate score for game over state
   const percentage = Math.round((score.value / (currentQuestionIndex.value + 1)) * 100);
   submitScore(percentage);
 };
@@ -414,17 +409,17 @@ const handleContinue = async () => {
   }, 2000);
 };
 
-// New function to submit the score to the API
+// --- THIS IS THE CORRECTED FUNCTION ---
 const submitScore = async (percentage) => {
   try {
     const unitId = route.params.unitId;
+    const url = `${API_BASE}/user_course_completed/${userId.value}`;
     const payload = {
-      user_id: userId.value,
       course_id: unitId,
       marks_scored: percentage
     };
     
-    const response = await axios.post(API_URL, payload);
+    const response = await axios.post(url, payload);
     console.log('Score submitted successfully:', response.data);
   } catch (err) {
     console.error('Error submitting quiz results:', err);
@@ -435,7 +430,6 @@ const finishQuiz = () => {
   if (timerInterval) clearInterval(timerInterval);
   isCompleted.value = true;
 
-  // Calculate the final percentage and submit to the API
   const percentage = Math.round((score.value / questions.value.length) * 100);
   submitScore(percentage);
 };
@@ -514,7 +508,6 @@ onUnmounted(() => {
 }
 
 .practice-content {
-  /* margin-top: 80px; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -635,8 +628,8 @@ onUnmounted(() => {
 }
 
 .completion-card:hover {
-  transform: scale(1.05); /* Slightly enlarge the element */
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); /* Add a more prominent shadow */
+  transform: scale(1.05);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
 }
 
 .completion-title {
@@ -778,26 +771,11 @@ onUnmounted(() => {
 }
 
 @keyframes heartBreak {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  25% {
-    transform: scale(1.3) rotate(-10deg);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(0.8) rotate(10deg);
-    opacity: 0.6;
-  }
-  75% {
-    transform: scale(1.1) rotate(-5deg);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
+  0% { transform: scale(1); opacity: 1; }
+  25% { transform: scale(1.3) rotate(-10deg); opacity: 0.8; }
+  50% { transform: scale(0.8) rotate(10deg); opacity: 0.6; }
+  75% { transform: scale(1.1) rotate(-5deg); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 0.4; }
 }
 
 .question-content {
@@ -904,7 +882,7 @@ onUnmounted(() => {
 }
 
 .speaker-btn {
-  background-color: #f5f5f5; /* Light neutral */
+  background-color: #f5f5f5;
   border: none;
   border-radius: 50%;
   width: 30px;
@@ -929,7 +907,7 @@ onUnmounted(() => {
 .icon {
   width: 20px;
   height: 20px;
-  color: #444; /* Neutral dark */
+  color: #444;
 }
 
 @media (max-width: 768px) {

@@ -16,11 +16,20 @@
           <div class="donut-chart-container">
             <DonutChart :progress="overallProgress" />
           </div>
-          <div class="stats-group">
-              <div class="rank">
-                <h2 style="color: white; text-align: center;">Rank: {{ user.rank || 'N/A' }}</h2>
-              </div>
+
+          <div class="rank-card">
+            <div class="rank-title">
+              <span class="rank-icon">👑</span> Your Rank
+            </div>
+            <div class="rank-number">#{{ user.rank || 'N/A' }}</div>
+            <div class="sparkle-container">
+              <div class="sparkle"></div>
+              <div class="sparkle"></div>
+              <div class="sparkle"></div>
+              <div class="sparkle"></div>
+            </div>
           </div>
+
           <StreakCalendar ref="calendarComponent" />
         </div>
 
@@ -31,7 +40,7 @@
               <CCardBody class="card-body">
                 <CCardText>
                   {{ course.title }}<br>
-                  <strong>Grade: {{ course.grade }}</strong>
+                  <strong>Grade: {{ course.marks_scored }}%</strong>
                 </CCardText>
               </CCardBody>
             </CCard>
@@ -56,7 +65,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import StreakCalendar from './Calendar.vue'; 
+import StreakCalendar from './Calendar.vue';
 import { CCard, CCardImage, CCardBody, CCardText } from '@coreui/vue';
 import DonutChart from '../donutChart.vue';
 import InteractiveLayout from '../InteractiveLayout.vue';
@@ -78,7 +87,7 @@ const fetchUserData = async () => {
   try {
     const response = await axios.get(`${API_BASE}/user_rank/${currentUsername}`);
     user.value = response.data;
-  } catch (error) { console.error("Error fetching user data:", error); } 
+  } catch (error) { console.error("Error fetching user data:", error); }
   finally { loading.value = false; }
 };
 
@@ -119,11 +128,9 @@ const fetchCompletedCourses = async () => {
     } catch (error) { console.error("Error fetching completed courses:", error.response?.data); }
 };
 
-// --- Lifecycle Hook ---
 onMounted(async () => {
-  await fetchUserData(); // First, get user data (including the ID)
-  
-  // Now that we have the user ID, we can call all other functions
+  await fetchUserData(); 
+
   if (user.value.id) {
     fetchCourseProgress();
     performAutomaticCheckIn();
@@ -134,7 +141,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* ALL YOUR ORIGINAL CSS IS PRESERVED HERE */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 .student-dashboard-page { padding: 20px; width: 100%; font-family: 'Poppins', sans-serif; max-height: 100vh; overflow-y: auto; }
 .profile-header { width: 100%; display: flex; justify-content: center; align-items: center; margin-bottom: 25px; }
@@ -145,13 +152,87 @@ onMounted(async () => {
 .top-stats-section { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 40px; }
 .donut-chart-container { width: 250px; height: 250px; transition: transform 0.3s ease; }
 .donut-chart-container:hover { transform: scale(1.05); }
-.rank { background-color: #E54C91; padding: 15px 25px; border-radius: 15px; text-align: center; box-shadow: 0 6px 12px rgba(229, 76, 145, 0.4); font-family: 'Poppins', sans-serif; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.rank:hover { transform: scale(1.1); box-shadow: 0 10px 20px rgba(229, 76, 145, 0.5); }
+
+
 .section-header { text-align: center; font-family: 'Poppins', sans-serif; color: #333; font-weight: 600; font-size: 1.8em; margin-top: 40px; margin-bottom: 20px; text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1); }
 .cards-container { display: flex; justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap; background-color: rgba(255, 255, 255, 0.5); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); border-radius: 15px; padding: 25px; margin-bottom: 20px; }
 .info-card { width: 160px; height: 180px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; transition: transform 0.3s ease, box-shadow 0.3s ease; border: none; }
 .info-card.hover-card:hover { transform: translateY(-8px); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15); }
 .card-img { width: 100%; height: 100px; object-fit: cover; }
 .card-body { text-align: center; padding: 10px; font-size: 0.9rem; font-weight: 500; color: #555; width: 100%; }
-.stats-group { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+
+@keyframes sparkle {
+  0% { transform: scale(0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.rank-card {
+  background: linear-gradient(135deg, #91b5e5, #38a9e7);
+  padding: 20px 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.rank-card:hover {
+  transform: scale(1.05);
+}
+
+.rank-title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.rank-icon {
+  font-size: 1.5rem;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.rank-number {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+.sparkle-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  animation: sparkle 1.5s infinite;
+}
+
+.sparkle:nth-child(1) { top: 15%; left: 20%; animation-delay: 0.2s; }
+.sparkle:nth-child(2) { top: 30%; left: 80%; animation-delay: 0.5s; }
+.sparkle:nth-child(3) { top: 75%; left: 10%; animation-delay: 0.8s; }
+.sparkle:nth-child(4) { top: 85%; left: 90%; animation-delay: 1.2s; }
+
 </style>

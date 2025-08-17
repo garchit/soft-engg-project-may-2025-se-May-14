@@ -1,7 +1,7 @@
 <template>
   <InteractiveLayout>
     <div class="unit-lectures">
-      <!-- Main Header with Unit Title & Description -->
+
       <div class="main-content">
         <header class="profile-header">
           <div class="page-heading-box">
