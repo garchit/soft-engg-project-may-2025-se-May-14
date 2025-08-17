@@ -89,9 +89,29 @@ class CourseResource(Resource):
             return {"error":"Internal Server Error","details":str(e)},500  
         
 class CompletedCourse(Resource):
-    def get(self,user_id):
-        pass
-    def post(self,user_id):
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+        
+        completed_courses = db.session.query(UserCourse).filter_by(user_id=user_id).all()
+        courses_data = []
+        for user_course in completed_courses:
+            course = db.session.query(Course).filter_by(id=user_course.course_id).first()
+            if course:
+                courses_data.append({
+                'id': course.id,
+                'user_id': user_course.user_id,
+                'course_id': user_course.course_id,
+                'marks_scored': user_course.marks_scored,
+                'title': course.title,
+                })
+        return {
+            "message": "Completed courses fetched successfully",
+            "completed_courses": courses_data
+        }, 200
+
+    def post(self, user_id):
         data=request.get_json(force=True)
         course_id=data.get("course_id")
         marks_scored=data.get("marks_scored")
@@ -101,14 +121,21 @@ class CompletedCourse(Resource):
         course=db.session.query(Course).filter(Course.id==course_id).first()
         if not course:
             return {"error":"No such course exist"},404
+        user_course_entry = UserCourse.query.filter_by(user_id=user_id, course_id=course_id).first()
+
         try:
-            user_course_completed=UserCourse(user_id=user_id,course_id=course_id,marks_scored=marks_scored)
-            db.session.add(user_course_completed)
+            if user_course_entry:
+                user_course_entry.marks_scored = marks_scored
+                user_course_entry.completion_date = db.func.now()
+            else:
+                user_course_entry = UserCourse(user_id=user_id, course_id=course_id, marks_scored=marks_scored)
+                db.session.add(user_course_entry)
+
             db.session.commit()
-            return {"message":"Successfully Added"},201
+            return {"message": "Course progress saved successfully"}, 201
         except SQLAlchemyError as e:
             db.session.rollback()
-            return {"error":"Internal Server Error","details":str(e)},500
+            return {"error": "Internal Server Error", "details": str(e)}, 500
 
 class CourseProgress(Resource):
     def get(self,user_id):
