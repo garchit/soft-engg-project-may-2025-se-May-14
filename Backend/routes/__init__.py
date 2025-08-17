@@ -20,7 +20,6 @@ from .questions_resource import AllQuestionResources
 def init_routes(app):
     api = Api(app, prefix='/Finance_Tutor')
 
-    # USer Route
     api.add_resource(UserApi,"/User/signup","/User/<int:id>")
     api.add_resource(LoginResource,"/login")
     api.add_resource(LogoutResource,"/logout")
@@ -55,4 +54,4 @@ def init_routes(app):
     api.add_resource(RandomQuestionsResource, '/random_questions')
     api.add_resource(AllQuestionResources, '/questionsall')
     api.add_resource(InstituteHome,"/institute_home/<int:institute_id>")
-
+    
