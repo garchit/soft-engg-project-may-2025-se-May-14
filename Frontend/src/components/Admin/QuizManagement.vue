@@ -587,13 +587,13 @@ const correctOptions = [
               size="sm" 
               @click="openEditModal(question)"
               :disabled="ui.loading">
-              <i class="fas fa-edit"></i>
+              <i class="bi bi-pencil-fill"></i>
             </CButton>
               <CButton color="danger" 
                       size="sm" 
                       @click="deleteQuestion(question.id)"
                       :disabled="ui.loading">
-                      <i class="fas fa-trash"></i>
+                      <i class="bi bi-archive-fill"></i>
                     </CButton>
                   </div>
           </CTableDataCell>

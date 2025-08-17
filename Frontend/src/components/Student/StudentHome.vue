@@ -36,7 +36,7 @@
         <h2 class="section-header">Units Completed</h2>
         <div class="cards-container">
             <CCard v-for="course in completedCourses" :key="course.id" class="info-card">
-              <CCardImage orientation="center" :src="course.image_url" class="card-img" />
+              <CCardImage orientation="center" :src="`/src/assets/unit${course.id}.png`" class="card-img" @error="onImageError"/>
               <CCardBody class="card-body">
                 <CCardText>
                   {{ course.title }}<br>
